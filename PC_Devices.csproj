@@ -1,0 +1,476 @@
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{449F2C28-2A86-4C99-A36A-F888B679DB49}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PC_Devices</RootNamespace>
+    <AssemblyName>PC_Devices</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>\\172.16.253.4\itdata2%24\IT16. Pu\WebSite\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Unc</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>true</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <InstallUrl>\\172.16.253.4\itdata2%24\IT16. Pu\WebSite\</InstallUrl>
+    <UpdateUrl>\\172.16.253.4\itdata2%24\IT16. Pu\WebSite\</UpdateUrl>
+    <MinimumRequiredVersion>1.0.0.0</MinimumRequiredVersion>
+    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>stack_multi.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>189896A26EABF79D7F8FB77D25AFFB03B9557531</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>PC_Devices_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Accessibility" />
+    <Reference Include="AForge, Version=2.2.5.0, Culture=neutral, PublicKeyToken=c1db6ff4eaa06aeb, processorArchitecture=MSIL">
+      <HintPath>..\packages\AForge.2.2.5\lib\AForge.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Video, Version=2.2.5.0, Culture=neutral, PublicKeyToken=cbfb6e07d173c401, processorArchitecture=MSIL">
+      <HintPath>..\packages\AForge.Video.2.2.5\lib\AForge.Video.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Video.DirectShow, Version=2.2.5.0, Culture=neutral, PublicKeyToken=61ea4348d43881b7, processorArchitecture=MSIL">
+      <HintPath>..\packages\AForge.Video.DirectShow.2.2.5\lib\AForge.Video.DirectShow.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.BonusSkins.v25.1" />
+    <Reference Include="DevExpress.Data.Desktop.v25.1" />
+    <Reference Include="DevExpress.Data.v25.1" />
+    <Reference Include="DevExpress.Docs.Pdf.v25.1, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Images.v25.1, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Mvvm.v25.1, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Pdf.v25.1.Core, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Pdf.v25.1.Drawing, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Pdf.v25.1.SkiaRenderer, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Printing.v25.1.Core" />
+    <Reference Include="DevExpress.Utils.v25.1" />
+    <Reference Include="DevExpress.Xpf.PdfViewer.v25.1, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraBars.v25.1" />
+    <Reference Include="DevExpress.Sparkline.v25.1.Core" />
+    <Reference Include="DevExpress.XtraEditors.v25.1" />
+    <Reference Include="DevExpress.Drawing.v25.1" />
+    <Reference Include="DevExpress.XtraGrid.v25.1, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraLayout.v25.1, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraPdfViewer.v25.1, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\DevExpress 25.1\Components\Bin\Framework\DevExpress.XtraPdfViewer.v25.1.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.XtraPrinting.v25.1, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraReports.v25.1, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraScheduler.v25.1, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraScheduler.v25.1.Core, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraScheduler.v25.1.Core.Desktop, Version=25.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="zxing, Version=0.16.11.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZXing.Net.0.16.11\lib\net48\zxing.dll</HintPath>
+    </Reference>
+    <Reference Include="zxing.presentation, Version=0.16.11.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZXing.Net.0.16.11\lib\net48\zxing.presentation.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DB\Constaint.cs" />
+    <Compile Include="DB\DBUtils.cs" />
+    <Compile Include="DTO\UserDTO.cs" />
+    <Compile Include="FRM\BarcodeReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FRM\BarcodeReport.Designer.cs">
+      <DependentUpon>BarcodeReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_ADD_DEVICE.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_ADD_DEVICE.Designer.cs">
+      <DependentUpon>FRM_ADD_DEVICE.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_ADD_DEVICE_CANCEL_REGISTER.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_ADD_DEVICE_CANCEL_REGISTER.Designer.cs">
+      <DependentUpon>FRM_ADD_DEVICE_CANCEL_REGISTER.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_ADD_DEVICE_REGISTER.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_ADD_DEVICE_REGISTER.Designer.cs">
+      <DependentUpon>FRM_ADD_DEVICE_REGISTER.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_ADD_USER_SKILL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_ADD_USER_SKILL.Designer.cs">
+      <DependentUpon>FRM_ADD_USER_SKILL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_CANCEL_HISTORY.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_CANCEL_HISTORY.Designer.cs">
+      <DependentUpon>FRM_DEVICE_CANCEL_HISTORY.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_CANCEL_REGISTER_LIST.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_CANCEL_REGISTER_LIST.Designer.cs">
+      <DependentUpon>FRM_DEVICE_CANCEL_REGISTER_LIST.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_LIST.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_LIST.Designer.cs">
+      <DependentUpon>FRM_DEVICE_LIST.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_MAINT_HISTORY_LIST.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_MAINT_HISTORY_LIST.Designer.cs">
+      <DependentUpon>FRM_DEVICE_MAINT_HISTORY_LIST.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_MAINT_LIST.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_MAINT_LIST.Designer.cs">
+      <DependentUpon>FRM_DEVICE_MAINT_LIST.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_NEW_WAITING_APPROVE_LIST.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_NEW_WAITING_APPROVE_LIST.Designer.cs">
+      <DependentUpon>FRM_DEVICE_NEW_WAITING_APPROVE_LIST.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_REGISTER_HISTORY_LIST.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_REGISTER_HISTORY_LIST.Designer.cs">
+      <DependentUpon>FRM_DEVICE_REGISTER_HISTORY_LIST.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_REGISTER_LIST.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_REGISTER_LIST.Designer.cs">
+      <DependentUpon>FRM_DEVICE_REGISTER_LIST.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_TYPE_MST.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_TYPE_MST.Designer.cs">
+      <DependentUpon>FRM_DEVICE_TYPE_MST.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_EDIT_DEVICE.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_EDIT_DEVICE.Designer.cs">
+      <DependentUpon>FRM_EDIT_DEVICE.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_EDIT_DEVICE_REGISTER.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_EDIT_DEVICE_REGISTER.Designer.cs">
+      <DependentUpon>FRM_EDIT_DEVICE_REGISTER.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_EDIT_MAINT.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_EDIT_MAINT.Designer.cs">
+      <DependentUpon>FRM_EDIT_MAINT.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_IMAGE_VIEWER_ADV.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_IMAGE_VIEWER_ADV.Designer.cs">
+      <DependentUpon>FRM_IMAGE_VIEWER_ADV.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_PDF_VIEWER_ADV.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_PDF_VIEWER_ADV.Designer.cs">
+      <DependentUpon>FRM_PDF_VIEWER_ADV.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_SCAN_QR.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_SCAN_QR.Designer.cs">
+      <DependentUpon>FRM_SCAN_QR.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_USER_SKILL_LIST.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_USER_SKILL_LIST.Designer.cs">
+      <DependentUpon>FRM_USER_SKILL_LIST.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\FRM_ACCOUNT_SKILL_MGMT.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\FRM_ACCOUNT_SKILL_MGMT.Designer.cs">
+      <DependentUpon>FRM_ACCOUNT_SKILL_MGMT.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\FRM_LOGIN.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\FRM_LOGIN.Designer.cs">
+      <DependentUpon>FRM_LOGIN.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_MAIL_CONFIG.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_MAIL_CONFIG.Designer.cs">
+      <DependentUpon>FRM_MAIL_CONFIG.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\FRM_MAIN.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\FRM_MAIN.Designer.cs">
+      <DependentUpon>FRM_MAIN.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_SEND_EMAIL_MAINT.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\DEVICE_MANAGEMENT\FRM_SEND_EMAIL_MAINT.Designer.cs">
+      <DependentUpon>FRM_SEND_EMAIL_MAINT.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\FRM_USER_CHANGE_PASSWORD.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\FRM_USER_CHANGE_PASSWORD.Designer.cs">
+      <DependentUpon>FRM_USER_CHANGE_PASSWORD.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FRM\BarcodeReport.resx">
+      <DependentUpon>BarcodeReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_ADD_DEVICE.resx">
+      <DependentUpon>FRM_ADD_DEVICE.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_ADD_DEVICE_CANCEL_REGISTER.resx">
+      <DependentUpon>FRM_ADD_DEVICE_CANCEL_REGISTER.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_ADD_DEVICE_REGISTER.resx">
+      <DependentUpon>FRM_ADD_DEVICE_REGISTER.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_ADD_USER_SKILL.resx">
+      <DependentUpon>FRM_ADD_USER_SKILL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_CANCEL_HISTORY.resx">
+      <DependentUpon>FRM_DEVICE_CANCEL_HISTORY.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_CANCEL_REGISTER_LIST.resx">
+      <DependentUpon>FRM_DEVICE_CANCEL_REGISTER_LIST.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_LIST.resx">
+      <DependentUpon>FRM_DEVICE_LIST.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_MAINT_HISTORY_LIST.resx">
+      <DependentUpon>FRM_DEVICE_MAINT_HISTORY_LIST.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_MAINT_LIST.resx">
+      <DependentUpon>FRM_DEVICE_MAINT_LIST.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_NEW_WAITING_APPROVE_LIST.resx">
+      <DependentUpon>FRM_DEVICE_NEW_WAITING_APPROVE_LIST.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_REGISTER_HISTORY_LIST.resx">
+      <DependentUpon>FRM_DEVICE_REGISTER_HISTORY_LIST.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_REGISTER_LIST.resx">
+      <DependentUpon>FRM_DEVICE_REGISTER_LIST.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_DEVICE_TYPE_MST.resx">
+      <DependentUpon>FRM_DEVICE_TYPE_MST.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_EDIT_DEVICE.resx">
+      <DependentUpon>FRM_EDIT_DEVICE.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_EDIT_DEVICE_REGISTER.resx">
+      <DependentUpon>FRM_EDIT_DEVICE_REGISTER.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_EDIT_MAINT.resx">
+      <DependentUpon>FRM_EDIT_MAINT.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_IMAGE_VIEWER_ADV.resx">
+      <DependentUpon>FRM_IMAGE_VIEWER_ADV.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_PDF_VIEWER_ADV.resx">
+      <DependentUpon>FRM_PDF_VIEWER_ADV.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_SCAN_QR.resx">
+      <DependentUpon>FRM_SCAN_QR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\DEVICE_MANAGEMENT\FRM_USER_SKILL_LIST.resx">
+      <DependentUpon>FRM_USER_SKILL_LIST.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\FRM_ACCOUNT_SKILL_MGMT.resx">
+      <DependentUpon>FRM_ACCOUNT_SKILL_MGMT.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\FRM_LOGIN.resx">
+      <DependentUpon>FRM_LOGIN.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\FRM_MAIN.resx">
+      <DependentUpon>FRM_MAIN.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\FRM_USER_CHANGE_PASSWORD.resx">
+      <DependentUpon>FRM_USER_CHANGE_PASSWORD.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+    <None Include="PC_Devices_TemporaryKey.pfx" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.8 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Action_ResetPassword_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AssignTo_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BO_Role_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BO_User_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UserGroup_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Action_Close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Action_Close_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Outlook">
+      <Guid>{00062FFF-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>9</VersionMajor>
+      <VersionMinor>6</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="stdole">
+      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\stack.ico" />
+    <Content Include="Resources\stack.png" />
+    <Content Include="Resources\stack_multi.ico" />
+    <Content Include="stack_multi.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

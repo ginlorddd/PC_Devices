@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PublishUrlHistory>\\172.16.253.4\itdata2%24\IT16. Pu\WebSite\|W:\IT15. Publish Software\04. Pu\PC_Devices\|publish\</PublishUrlHistory>
+    <InstallUrlHistory>\\172.16.253.4\itdata2%24\IT16. Pu\WebSite\</InstallUrlHistory>
+    <SupportUrlHistory />
+    <UpdateUrlHistory>\\172.16.253.4\itdata2%24\IT16. Pu\WebSite\</UpdateUrlHistory>
+    <BootstrapperUrlHistory />
+    <ErrorReportUrlHistory />
+    <FallbackCulture>en-US</FallbackCulture>
+    <VerifyUploadedFiles>false</VerifyUploadedFiles>
+  </PropertyGroup>
+  <PropertyGroup>
+    <EnableSecurityDebugging>false</EnableSecurityDebugging>
+  </PropertyGroup>
+</Project>
