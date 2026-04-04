@@ -4,17 +4,21 @@ using DM_OHD.DB;
 using DM_OHD.DTO;
 using System;
 using System.Data;
-using System.Windows.Forms;
 using DevExpress.XtraGrid.Columns;
 using DevExpress.Utils;
-using DevExpress.Data;
 using System.Globalization;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace DM_OHD.FRM
 {
     public partial class FRM_PRODUCTION_PLAN : XtraForm
     {
         private readonly ProductionPlanDTO _dto = new ProductionPlanDTO();
+        private readonly PanelControl _filterPanel = new PanelControl();
+        private readonly DateEdit _deFrom = new DateEdit();
+        private readonly DateEdit _deTo = new DateEdit();
+        private readonly SimpleButton _btnApplyFilter = new SimpleButton();
 
         public FRM_PRODUCTION_PLAN()
         {
@@ -27,6 +31,7 @@ namespace DM_OHD.FRM
             RegisterNumberFormat(viewRatio);
             RegisterNumberFormat(viewOutput);
             RegisterNumberFormat(viewMaster);
+            BuildMonthFilterBar();
 
             btnSaveFY.Click += (s, e) => { _dto.SavePlanFY(gridFY.DataSource as DataTable); LoadData(); };
             btnSaveRatio.Click += (s, e) => { _dto.SaveMachineRatio(gridRatio.DataSource as DataTable); LoadData(); };
@@ -35,6 +40,53 @@ namespace DM_OHD.FRM
 
             ApplyPermissions();
             Load += (s, e) => LoadData();
+        }
+
+        private void BuildMonthFilterBar()
+        {
+            _filterPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            _filterPanel.Height = 42;
+            _filterPanel.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+
+            var lblFrom = new LabelControl { Text = "From:", Left = 10, Top = 13 };
+            _deFrom.Left = 50;
+            _deFrom.Top = 9;
+            _deFrom.Width = 100;
+
+            var lblTo = new LabelControl { Text = "To:", Left = 168, Top = 13 };
+            _deTo.Left = 190;
+            _deTo.Top = 9;
+            _deTo.Width = 100;
+
+            ConfigureMonthEditor(_deFrom);
+            ConfigureMonthEditor(_deTo);
+            _deFrom.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            _deTo.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+
+            _btnApplyFilter.Text = "🔍";
+            _btnApplyFilter.Left = 300;
+            _btnApplyFilter.Top = 8;
+            _btnApplyFilter.Width = 52;
+            _btnApplyFilter.Click += (s, e) => ApplyMonthFilterToAllViews();
+
+            _filterPanel.Controls.Add(lblFrom);
+            _filterPanel.Controls.Add(_deFrom);
+            _filterPanel.Controls.Add(lblTo);
+            _filterPanel.Controls.Add(_deTo);
+            _filterPanel.Controls.Add(_btnApplyFilter);
+
+            Controls.Add(_filterPanel);
+            _filterPanel.BringToFront();
+        }
+
+        private void ConfigureMonthEditor(DateEdit editor)
+        {
+            editor.Properties.Mask.EditMask = "MM/yyyy";
+            editor.Properties.Mask.UseMaskAsDisplayFormat = true;
+            editor.Properties.CalendarView = DevExpress.XtraEditors.Repository.CalendarView.Vista;
+            editor.Properties.VistaCalendarInitialViewStyle = DevExpress.XtraEditors.VistaCalendarInitialViewStyle.YearView;
+            editor.Properties.VistaCalendarViewStyle = DevExpress.XtraEditors.VistaCalendarViewStyle.YearView;
+            editor.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
         }
 
         private void ApplyPermissions()
@@ -57,6 +109,26 @@ namespace DM_OHD.FRM
             view.Appearance.HeaderPanel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             view.Appearance.HeaderPanel.Options.UseFont = true;
             view.OptionsView.ColumnAutoWidth = false;
+            view.OptionsView.AllowCellMerge = true;
+            view.CellMerge -= View_CellMerge;
+            view.CellMerge += View_CellMerge;
+        }
+
+        private void View_CellMerge(object sender, CellMergeEventArgs e)
+        {
+            var view = sender as GridView;
+            string field = e.Column.FieldName;
+            if (field != "PRODUCT_NO" && field != "DIE_NO" && field != "DIE_NAME")
+            {
+                e.Merge = false;
+                e.Handled = true;
+                return;
+            }
+
+            string v1 = Convert.ToString(view.GetRowCellValue(e.RowHandle1, e.Column));
+            string v2 = Convert.ToString(view.GetRowCellValue(e.RowHandle2, e.Column));
+            e.Merge = string.Equals(v1, v2, StringComparison.OrdinalIgnoreCase);
+            e.Handled = true;
         }
 
         private void LoadData()
@@ -66,39 +138,41 @@ namespace DM_OHD.FRM
             gridOutput.DataSource = _dto.GetDieOutput();
             gridMaster.DataSource = _dto.GetMaster();
             SetCaptions();
+            ApplyMonthFilterToAllViews();
         }
 
         private void SetCaptions()
         {
-            SetGridCaption(viewFY, "PRODUCT_NO", "Mã sản phẩm");
-            SetGridCaption(viewFY, "DIE_NO", "Số khuôn");
-            SetGridCaption(viewFY, "DIE_NAME", "Tên khuôn");
-            SetGridCaption(viewFY, "CAVITY", "Cavity");
+            SetGridCaption(viewFY, "PRODUCT_NO", "ITEM_CODE");
+            SetGridCaption(viewFY, "DIE_NAME", "ITEM_DESC");
+            SetGridCaption(viewFY, "DIE_NO", "MOLD_NO");
+            SetGridCaption(viewFY, "CAVITY", "MACHINE_NO");
             ConfigureMonthColumns(viewFY, "Kế hoạch FY");
 
-            SetGridCaption(viewRatio, "DIE_NO", "Số khuôn");
-            SetGridCaption(viewRatio, "DIE_NAME", "Tên khuôn");
-            SetGridCaption(viewRatio, "CAVITY", "Cavity");
+            SetGridCaption(viewRatio, "DIE_NAME", "ITEM_DESC");
+            SetGridCaption(viewRatio, "DIE_NO", "MOLD_NO");
+            SetGridCaption(viewRatio, "CAVITY", "MACHINE_NO");
             ConfigureMonthColumns(viewRatio, "Tỉ lệ chạy máy (%)");
 
-            SetGridCaption(viewOutput, "DIE_NO", "Số khuôn");
-            SetGridCaption(viewOutput, "DIE_NAME", "Tên khuôn");
-            SetGridCaption(viewOutput, "CAVITY", "Cavity");
+            SetGridCaption(viewOutput, "DIE_NAME", "ITEM_DESC");
+            SetGridCaption(viewOutput, "DIE_NO", "MOLD_NO");
+            SetGridCaption(viewOutput, "CAVITY", "MACHINE_NO");
             ConfigureMonthColumns(viewOutput, "Sản lượng khuôn");
 
-            SetGridCaption(viewMaster, "FY_SHOTS", "Kế hoạch FY");
-            SetGridCaption(viewMaster, "RUN_RATIO", "Tỉ lệ máy (%)");
-            SetGridCaption(viewMaster, "REQUIRED_QTY", "Sản lượng cần SX");
-            SetGridCaption(viewMaster, "OHD_MOC", "Mốc OHD");
+            SetGridCaption(viewMaster, "DIE_NAME", "ITEM_DESC");
+            SetGridCaption(viewMaster, "DIE_NO", "MOLD_NO");
+            SetGridCaption(viewMaster, "CAVITY", "MACHINE_NO");
+            SetGridCaption(viewMaster, "QTY_TYPE", "QTY_TYPE");
+            ConfigureMonthColumns(viewMaster, "Bảng 1 - Kế hoạch OHD");
 
-            ApplyFixedColumns(viewFY, true);
-            ApplyFixedColumns(viewRatio, false);
-            ApplyFixedColumns(viewOutput, false);
-            ApplyMasterColumns();
-
-            ConfigureGrouping(viewFY);
-            ConfigureGrouping(viewRatio);
-            ConfigureGrouping(viewOutput);
+            ApplyFixedColumns(viewFY, true, false);
+            ApplyFixedColumns(viewRatio, false, false);
+            ApplyFixedColumns(viewOutput, false, false);
+            ApplyFixedColumns(viewMaster, false, true);
+            ApplySort(viewFY, true, false);
+            ApplySort(viewRatio, false, false);
+            ApplySort(viewOutput, false, false);
+            ApplySort(viewMaster, false, true);
         }
 
         private void ConfigureMonthColumns(GridView view, string valueCaption)
@@ -117,58 +191,77 @@ namespace DM_OHD.FRM
             }
 
             if (view.Columns["PRODUCT_NO"] != null) view.Columns["PRODUCT_NO"].Width = 110;
-            if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].Width = 110;
             if (view.Columns["DIE_NAME"] != null) view.Columns["DIE_NAME"].Width = 180;
-            if (view.Columns["CAVITY"] != null) view.Columns["CAVITY"].Width = 120;
+            if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].Width = 110;
+            if (view.Columns["CAVITY"] != null) view.Columns["CAVITY"].Width = 100;
+            if (view.Columns["QTY_TYPE"] != null) view.Columns["QTY_TYPE"].Width = 110;
         }
 
-        private void ApplyFixedColumns(GridView view, bool includeProductNo)
-        {
-            if (includeProductNo && view.Columns["PRODUCT_NO"] != null)
-                view.Columns["PRODUCT_NO"].Fixed = FixedStyle.Left;
-
-            if (view.Columns["DIE_NO"] != null)
-                view.Columns["DIE_NO"].Fixed = FixedStyle.Left;
-            if (view.Columns["DIE_NAME"] != null)
-                view.Columns["DIE_NAME"].Fixed = FixedStyle.Left;
-            if (view.Columns["CAVITY"] != null)
-                view.Columns["CAVITY"].Fixed = FixedStyle.Left;
-        }
-
-        private void ApplyMasterColumns()
-        {
-            SetGridCaption(viewMaster, "DIE_NO", "Số khuôn");
-            SetGridCaption(viewMaster, "DIE_NAME", "Tên khuôn");
-            SetGridCaption(viewMaster, "CAVITY", "Cavity");
-            SetGridCaption(viewMaster, "PLAN_YEAR", "Năm");
-            SetGridCaption(viewMaster, "PLAN_MONTH", "Tháng");
-            ApplyFixedColumns(viewMaster, false);
-        }
-
-        private void ConfigureGrouping(GridView view)
+        private void ApplySort(GridView view, bool includeProductNo, bool includeQtyType)
         {
             view.BeginSort();
             try
             {
-                view.ClearGrouping();
-                if (view.Columns["DIE_NO"] != null)
-                {
-                    view.Columns["DIE_NO"].GroupIndex = 0;
-                }
+                view.ClearSorting();
+                int i = 0;
+                if (includeProductNo && view.Columns["PRODUCT_NO"] != null)
+                    view.Columns["PRODUCT_NO"].SortIndex = i++;
                 if (view.Columns["DIE_NAME"] != null)
-                {
-                    view.Columns["DIE_NAME"].GroupIndex = 1;
-                }
+                    view.Columns["DIE_NAME"].SortIndex = i++;
+                if (view.Columns["DIE_NO"] != null)
+                    view.Columns["DIE_NO"].SortIndex = i++;
                 if (view.Columns["CAVITY"] != null)
-                {
-                    view.Columns["CAVITY"].SortOrder = ColumnSortOrder.Ascending;
-                }
-
-                view.OptionsBehavior.AutoExpandAllGroups = true;
+                    view.Columns["CAVITY"].SortIndex = i++;
+                if (includeQtyType && view.Columns["QTY_TYPE"] != null)
+                    view.Columns["QTY_TYPE"].SortIndex = i;
             }
             finally
             {
                 view.EndSort();
+            }
+        }
+
+        private void ApplyFixedColumns(GridView view, bool includeProductNo, bool includeQtyType)
+        {
+            if (includeProductNo && view.Columns["PRODUCT_NO"] != null)
+                view.Columns["PRODUCT_NO"].Fixed = FixedStyle.Left;
+            if (view.Columns["DIE_NAME"] != null)
+                view.Columns["DIE_NAME"].Fixed = FixedStyle.Left;
+            if (view.Columns["DIE_NO"] != null)
+                view.Columns["DIE_NO"].Fixed = FixedStyle.Left;
+            if (view.Columns["CAVITY"] != null)
+                view.Columns["CAVITY"].Fixed = FixedStyle.Left;
+            if (includeQtyType && view.Columns["QTY_TYPE"] != null)
+                view.Columns["QTY_TYPE"].Fixed = FixedStyle.Left;
+        }
+
+        private void ApplyMonthFilterToAllViews()
+        {
+            DateTime from = _deFrom.DateTime == DateTime.MinValue ? new DateTime(2025, 1, 1) : new DateTime(_deFrom.DateTime.Year, _deFrom.DateTime.Month, 1);
+            DateTime to = _deTo.DateTime == DateTime.MinValue ? new DateTime(2030, 12, 1) : new DateTime(_deTo.DateTime.Year, _deTo.DateTime.Month, 1);
+            if (from > to)
+            {
+                var temp = from;
+                from = to;
+                to = temp;
+            }
+
+            ApplyMonthVisibility(viewFY, from, to);
+            ApplyMonthVisibility(viewRatio, from, to);
+            ApplyMonthVisibility(viewOutput, from, to);
+            ApplyMonthVisibility(viewMaster, from, to);
+        }
+
+        private void ApplyMonthVisibility(GridView view, DateTime from, DateTime to)
+        {
+            foreach (GridColumn col in view.Columns)
+            {
+                if (!col.FieldName.StartsWith("M") || col.FieldName.Length != 7) continue;
+                if (!int.TryParse(col.FieldName.Substring(1, 4), out int year)) continue;
+                if (!int.TryParse(col.FieldName.Substring(5, 2), out int month)) continue;
+
+                DateTime current = new DateTime(year, month, 1);
+                col.Visible = current >= from && current <= to;
             }
         }
 
@@ -183,8 +276,7 @@ namespace DM_OHD.FRM
             if (e.Value == null || e.Value == DBNull.Value) return;
             string field = e.Column?.FieldName ?? string.Empty;
             bool isMonthValue = field.StartsWith("M") && field.Length == 7;
-            bool isMasterNumeric = field == "FY_SHOTS" || field == "RUN_RATIO" || field == "REQUIRED_QTY" || field == "OHD_MOC";
-            if (!isMonthValue && !isMasterNumeric) return;
+            if (!isMonthValue) return;
 
             if (!decimal.TryParse(Convert.ToString(e.Value), out decimal number)) return;
             e.DisplayText = number.ToString("N0", CultureInfo.InvariantCulture).Replace(",", ".");

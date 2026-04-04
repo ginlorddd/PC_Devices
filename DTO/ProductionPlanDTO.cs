@@ -30,7 +30,11 @@ namespace DM_OHD.DTO
             return BuildWideTable(raw, "OUTPUT_QTY");
         }
 
-        public DataTable GetMaster() => DBUtils.GetData("SELECT DIE_NO, DIE_NAME, CAVITY, PLAN_YEAR, PLAN_MONTH, FY_SHOTS, RUN_RATIO, REQUIRED_QTY, OHD_MOC FROM OHD_PLAN_MASTER ORDER BY PLAN_YEAR, PLAN_MONTH, DIE_NO");
+        public DataTable GetMaster()
+        {
+            DataTable raw = DBUtils.GetData("SELECT DIE_NO, DIE_NAME, CAVITY, PLAN_YEAR, PLAN_MONTH, FY_SHOTS, RUN_RATIO, REQUIRED_QTY, OHD_MOC FROM OHD_PLAN_MASTER ORDER BY DIE_NO, CAVITY, PLAN_YEAR, PLAN_MONTH");
+            return BuildWideMasterTable(raw);
+        }
 
         public void SavePlanFY(DataTable wideTable)
         {
@@ -113,6 +117,55 @@ namespace DM_OHD.DTO
             }
 
             return wide;
+        }
+
+
+        private DataTable BuildWideMasterTable(DataTable raw)
+        {
+            DataTable wide = new DataTable();
+            wide.Columns.Add("DIE_NO", typeof(string));
+            wide.Columns.Add("DIE_NAME", typeof(string));
+            wide.Columns.Add("CAVITY", typeof(string));
+            wide.Columns.Add("QTY_TYPE", typeof(string));
+
+            foreach (var ym in YearMonths())
+            {
+                wide.Columns.Add(BuildMonthColumnName(ym.year, ym.month), typeof(decimal));
+            }
+
+            var grouped = raw.AsEnumerable().GroupBy(r => (
+                DieNo: Convert.ToString(r["DIE_NO"]),
+                DieName: Convert.ToString(r["DIE_NAME"]),
+                Cavity: Convert.ToString(r["CAVITY"]) ));
+
+            foreach (var g in grouped)
+            {
+                AddMasterTypeRow(wide, g, "FY_SHOTS", "Plan FY");
+                AddMasterTypeRow(wide, g, "RUN_RATIO", "Run Ratio");
+                AddMasterTypeRow(wide, g, "REQUIRED_QTY", "Required Qty");
+                AddMasterTypeRow(wide, g, "OHD_MOC", "OHD MOC");
+            }
+
+            return wide;
+        }
+
+        private void AddMasterTypeRow(DataTable target, IGrouping<(string DieNo, string DieName, string Cavity), DataRow> group, string valueField, string qtyType)
+        {
+            DataRow row = target.NewRow();
+            row["DIE_NO"] = group.Key.DieNo;
+            row["DIE_NAME"] = group.Key.DieName;
+            row["CAVITY"] = group.Key.Cavity;
+            row["QTY_TYPE"] = qtyType;
+
+            foreach (DataRow src in group)
+            {
+                int y = ToInt(src["PLAN_YEAR"]);
+                int m = ToInt(src["PLAN_MONTH"]);
+                string col = BuildMonthColumnName(y, m);
+                if (target.Columns.Contains(col)) row[col] = ToDecimal(src[valueField]);
+            }
+
+            target.Rows.Add(row);
         }
 
         private void SaveWideTable(DataTable wideTable, string tableName, string valueColumn, bool includeProductNo = false)
