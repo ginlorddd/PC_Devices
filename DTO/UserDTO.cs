@@ -2,86 +2,107 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace PC_Devices.DTO
 {
     public class UserDTO
     {
-        public bool _loginUser(string userID, string pass)
+        public bool Login(string userId, string password)
         {
-            try
-            {
-                bool check = false;
-                //Constaint._DocumentType = DocumentType;
+            DataTable dt = DBUtils.GetData(
+                "SELECT USER_ID, FULL_NAME FROM APP_USER WHERE USER_ID=@USER_ID AND PASSWORD_MD5=@PWD AND IS_ACTIVE=1",
+                new SqlParameter("@USER_ID", userId),
+                new SqlParameter("@PWD", Constaint.ToMd5(password)));
 
-                string _query = "SELECT a.USER_ID, a.FULLNAME ,a.ID_ACCESS, a.EMAIL FROM TBL_ACCOUNT a WHERE a.USER_ID = '" + userID + "' AND a.PASSWORD='" + Constaint._md5(pass) + "'";
-                //string _query = "SELECT a.USER_ID, a.SECTION_ID, a.FULLNAME ,a.ID_ACCESS, s.SECTION_SHORT_NAME FROM TBL_ACCOUNT a left join TBL_SECTION_MST s on a.SECTION_ID = s.SECTION_ID WHERE a.USER_ID = '" + userID + "' AND a.PASSWORD='" + Constaint._md5(pass) + "'";
-                DataTable _data = DBUtils._getData(_query);
-                if (_data.Rows.Count > 0 && _data != null)
-                {
-                    Constaint._userID = Convert.ToString(_data.Rows[0]["USER_ID"]);
-                    Constaint._nameUser = Convert.ToString(_data.Rows[0]["FULLNAME"]);
-                    Constaint._access = Convert.ToString(_data.Rows[0]["ID_ACCESS"]);
-                    Constaint._email = Convert.ToString(_data.Rows[0]["EMAIL"]);
-                    //Constaint._sectionShort = Convert.ToString(_data.Rows[0]["SECTION_SHORT_NAME"]);
-                    //Constaint._sectionID = Convert.ToString(_data.Rows[0]["SECTION_ID"]);
-                    Constaint._password = Constaint._md5(pass);
-                    //Constaint._sectionName = Convert.ToString(_data.Rows[0]["SECTION_NAME"]);
-                    //Constaint._postisionID = Convert.ToString(_data.Rows[0]["POSTISION_ID"]);
-                    //Constaint._postisionName = Convert.ToString(_data.Rows[0]["POSTISION_NAME"]);
-                    //Constaint._factoryName = Convert.ToString(_data.Rows[0]["FACTORY_NAME"]);
-                    //Constaint._sectionID = Convert.ToString(_data.Rows[0]["SECTION_ID"]);
-                    //Constaint._sectionShort = Convert.ToString(_data.Rows[0]["SECTION_SHORT_NAME"]);
-                    MessageBox.Show("Login successfull !" + "\n" + "Welcome " + Constaint._nameUser + "!");
-                    check = true;
-                }
-                //string queryServerFile = "SELECT * FROM TBL_SERVER_FOLDER_FILE ORDER BY ID ASC";
-                //DataTable _dataServerFile = DBUtils._getData(queryServerFile);
-                //if (_dataServerFile.Rows.Count > 0 && _dataServerFile != null)
-                //{
-                    //string ipAdressSqlServer = "172.17.140.55";
-                    //using (Ping pinger = new Ping())
-                    //{
-                    //    PingReply reply = pinger.Send(ipAdressSqlServer);
-                    //    if (reply.Status == IPStatus.Success) // Dải 1 => OK
-                    //    {
-                    //        Constaint._folderFormUpload = Convert.ToString(_dataServerFile.Rows[0]["PATH_SAVE_FORM"]);
-                    //        Constaint._folderResultFileUpload = Convert.ToString(_dataServerFile.Rows[0]["PATH_SAVE_RESULT_FILE"]);
-                    //        Constaint._folderFormUpload_ADM = Convert.ToString(_dataServerFile.Rows[0]["PATH_SAVE_FORM_ADM"]);
-                    //        Constaint._folderFormUpload_Section = Convert.ToString(_dataServerFile.Rows[0]["PATH_SAVE_FORM_SECTION"]);
-                    //        Constaint._folderResultFileUpload_Section = Convert.ToString(_dataServerFile.Rows[0]["PATH_SAVE_RESULT_FILE_SECTION"]);
-                    //        Constaint._folderImageOpenOperation = Convert.ToString(_dataServerFile.Rows[0]["PATH_SAVE_FILE_OPEN_OPERATION"]);
-                    //    }
-                    //    else
-                    //    {
-                    //        Constaint._folderFormUpload = Convert.ToString(_dataServerFile.Rows[1]["PATH_SAVE_FORM"]);
-                    //        Constaint._folderResultFileUpload = Convert.ToString(_dataServerFile.Rows[1]["PATH_SAVE_RESULT_FILE"]);
-                    //        Constaint._folderFormUpload_ADM = Convert.ToString(_dataServerFile.Rows[1]["PATH_SAVE_FORM_ADM"]);
-                    //        Constaint._folderFormUpload_Section = Convert.ToString(_dataServerFile.Rows[1]["PATH_SAVE_FORM_SECTION"]);
-                    //        Constaint._folderResultFileUpload_Section = Convert.ToString(_dataServerFile.Rows[1]["PATH_SAVE_RESULT_FILE_SECTION"]);
-                    //        Constaint._folderImageOpenOperation = Convert.ToString(_dataServerFile.Rows[1]["PATH_SAVE_FILE_OPEN_OPERATION"]);
-                    //    }
-                    //}
-                    ////////test--------------------
-                    //Constaint._folderFileUpload = @"D:\Devices";
-                    //Constaint._folderResultFileUpload = @"D:\06. Software\Document control\Code\file\KQ\";
-                    //Constaint._folderFormUpload_ADM = @"D:\06. Software\Document control\Code\file\ADM\";
-                    //Constaint._folderFormUpload_Section = @"D:\06. Software\Document control\Code\file\SECTION\FILE_FORM\";
-                    //Constaint._folderResultFileUpload_Section = @"D:\06. Software\Document control\Code\file\SECTION\RESULTS\";
-                    //Constaint._folderImageOpenOperation = @"D:\06. Software\Document control\Code\file\OPEN\";
-                //}
-                return check;
-            }
-            catch (Exception ex)
+            if (dt.Rows.Count == 0)
             {
-                MessageBox.Show(ex.ToString());
                 return false;
             }
+
+            Constaint.CurrentUserId = Convert.ToString(dt.Rows[0]["USER_ID"]);
+            Constaint.CurrentUserName = Convert.ToString(dt.Rows[0]["FULL_NAME"]);
+
+            DataTable roleTable = DBUtils.GetData(
+                "SELECT ROLE_CODE FROM APP_USER_ROLE WHERE USER_ID=@USER_ID",
+                new SqlParameter("@USER_ID", userId));
+
+            Constaint.CurrentRoles = new HashSet<string>(
+                roleTable.AsEnumerable().Select(r => Convert.ToString(r["ROLE_CODE"])),
+                StringComparer.OrdinalIgnoreCase);
+
+            return true;
+        }
+
+        public DataTable GetUsers()
+        {
+            return DBUtils.GetData(@"SELECT u.USER_ID, u.FULL_NAME, u.IS_ACTIVE,
+                                    STUFF((SELECT ',' + ur.ROLE_CODE FROM APP_USER_ROLE ur WHERE ur.USER_ID=u.USER_ID FOR XML PATH('')),1,1,'') AS ROLES
+                                    FROM APP_USER u ORDER BY u.USER_ID");
+        }
+
+        public DataTable GetRoles()
+        {
+            return DBUtils.GetData("SELECT ROLE_CODE, ROLE_NAME FROM APP_ROLE ORDER BY ROLE_CODE");
+        }
+
+        public void SaveUser(string userId, string fullName, string password, bool isActive, List<string> roles)
+        {
+            object exists = DBUtils.ExecScalar("SELECT COUNT(1) FROM APP_USER WHERE USER_ID=@USER_ID", new SqlParameter("@USER_ID", userId));
+            if (Convert.ToInt32(exists) == 0)
+            {
+                DBUtils.Exec("INSERT INTO APP_USER(USER_ID,FULL_NAME,PASSWORD_MD5,IS_ACTIVE) VALUES(@USER_ID,@FULL_NAME,@PWD,@ACTIVE)",
+                    new SqlParameter("@USER_ID", userId),
+                    new SqlParameter("@FULL_NAME", fullName),
+                    new SqlParameter("@PWD", Constaint.ToMd5(password)),
+                    new SqlParameter("@ACTIVE", isActive));
+            }
+            else
+            {
+                string update = string.IsNullOrWhiteSpace(password)
+                    ? "UPDATE APP_USER SET FULL_NAME=@FULL_NAME, IS_ACTIVE=@ACTIVE WHERE USER_ID=@USER_ID"
+                    : "UPDATE APP_USER SET FULL_NAME=@FULL_NAME, PASSWORD_MD5=@PWD, IS_ACTIVE=@ACTIVE WHERE USER_ID=@USER_ID";
+
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    DBUtils.Exec(update,
+                        new SqlParameter("@USER_ID", userId),
+                        new SqlParameter("@FULL_NAME", fullName),
+                        new SqlParameter("@ACTIVE", isActive));
+                }
+                else
+                {
+                    DBUtils.Exec(update,
+                        new SqlParameter("@USER_ID", userId),
+                        new SqlParameter("@FULL_NAME", fullName),
+                        new SqlParameter("@PWD", Constaint.ToMd5(password)),
+                        new SqlParameter("@ACTIVE", isActive));
+                }
+            }
+
+            DBUtils.Exec("DELETE FROM APP_USER_ROLE WHERE USER_ID=@USER_ID", new SqlParameter("@USER_ID", userId));
+            foreach (string role in roles)
+            {
+                DBUtils.Exec("INSERT INTO APP_USER_ROLE(USER_ID,ROLE_CODE) VALUES(@USER_ID,@ROLE)",
+                    new SqlParameter("@USER_ID", userId),
+                    new SqlParameter("@ROLE", role));
+            }
+        }
+
+        public void ChangePassword(string userId, string oldPassword, string newPassword)
+        {
+            object count = DBUtils.ExecScalar("SELECT COUNT(1) FROM APP_USER WHERE USER_ID=@U AND PASSWORD_MD5=@P",
+                new SqlParameter("@U", userId),
+                new SqlParameter("@P", Constaint.ToMd5(oldPassword)));
+            if (Convert.ToInt32(count) == 0)
+            {
+                throw new Exception("Mật khẩu cũ không đúng.");
+            }
+
+            DBUtils.Exec("UPDATE APP_USER SET PASSWORD_MD5=@P WHERE USER_ID=@U",
+                new SqlParameter("@U", userId),
+                new SqlParameter("@P", Constaint.ToMd5(newPassword)));
         }
     }
 }
