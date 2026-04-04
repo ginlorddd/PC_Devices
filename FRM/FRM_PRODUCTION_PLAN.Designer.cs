@@ -20,6 +20,12 @@
         private DevExpress.XtraEditors.SimpleButton btnSaveRatio;
         private DevExpress.XtraEditors.SimpleButton btnSaveOutput;
         private DevExpress.XtraEditors.SimpleButton btnGenerateMaster;
+        private DevExpress.XtraEditors.PanelControl panelFilter;
+        private DevExpress.XtraEditors.LabelControl lblFrom;
+        private DevExpress.XtraEditors.LabelControl lblTo;
+        private DevExpress.XtraEditors.DateEdit deFrom;
+        private DevExpress.XtraEditors.DateEdit deTo;
+        private DevExpress.XtraEditors.SimpleButton btnApplyFilter;
 
         protected override void Dispose(bool disposing)
         {
@@ -46,6 +52,12 @@
             this.btnSaveRatio = new DevExpress.XtraEditors.SimpleButton();
             this.btnSaveOutput = new DevExpress.XtraEditors.SimpleButton();
             this.btnGenerateMaster = new DevExpress.XtraEditors.SimpleButton();
+            this.panelFilter = new DevExpress.XtraEditors.PanelControl();
+            this.lblFrom = new DevExpress.XtraEditors.LabelControl();
+            this.lblTo = new DevExpress.XtraEditors.LabelControl();
+            this.deFrom = new DevExpress.XtraEditors.DateEdit();
+            this.deTo = new DevExpress.XtraEditors.DateEdit();
+            this.btnApplyFilter = new DevExpress.XtraEditors.SimpleButton();
             this.tabControl1.SuspendLayout();
             this.tabFY.SuspendLayout();
             this.tabRatio.SuspendLayout();
@@ -59,6 +71,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.viewOutput)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridMaster)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.viewMaster)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panelFilter)).BeginInit();
+            this.panelFilter.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.deFrom.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.deFrom.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.deTo.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.deTo.Properties)).BeginInit();
             this.SuspendLayout();
             // tabControl
             this.tabControl1.Controls.Add(this.tabFY);
@@ -66,8 +84,8 @@
             this.tabControl1.Controls.Add(this.tabOutput);
             this.tabControl1.Controls.Add(this.tabMaster);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Size = new System.Drawing.Size(1280, 720);
+            this.tabControl1.Location = new System.Drawing.Point(0, 42);
+            this.tabControl1.Size = new System.Drawing.Size(1280, 678);
             // tab FY
             this.tabFY.Controls.Add(this.gridFY);
             this.tabFY.Controls.Add(this.btnSaveFY);
@@ -112,9 +130,55 @@
             this.btnGenerateMaster.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.btnGenerateMaster.Height = 36;
             this.btnGenerateMaster.Text = "Tạo bảng kế hoạch OHD (master)";
+            // panelFilter
+            this.panelFilter.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.panelFilter.Controls.Add(this.btnApplyFilter);
+            this.panelFilter.Controls.Add(this.deTo);
+            this.panelFilter.Controls.Add(this.deFrom);
+            this.panelFilter.Controls.Add(this.lblTo);
+            this.panelFilter.Controls.Add(this.lblFrom);
+            this.panelFilter.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelFilter.Location = new System.Drawing.Point(0, 0);
+            this.panelFilter.Name = "panelFilter";
+            this.panelFilter.Size = new System.Drawing.Size(1280, 42);
+
+            this.lblFrom.Location = new System.Drawing.Point(10, 13);
+            this.lblFrom.Name = "lblFrom";
+            this.lblFrom.Size = new System.Drawing.Size(29, 13);
+            this.lblFrom.Text = "From:";
+
+            this.deFrom.EditValue = null;
+            this.deFrom.Location = new System.Drawing.Point(50, 10);
+            this.deFrom.Name = "deFrom";
+            this.deFrom.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.deFrom.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.deFrom.Size = new System.Drawing.Size(100, 20);
+
+            this.lblTo.Location = new System.Drawing.Point(168, 13);
+            this.lblTo.Name = "lblTo";
+            this.lblTo.Size = new System.Drawing.Size(16, 13);
+            this.lblTo.Text = "To:";
+
+            this.deTo.EditValue = null;
+            this.deTo.Location = new System.Drawing.Point(190, 10);
+            this.deTo.Name = "deTo";
+            this.deTo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.deTo.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.deTo.Size = new System.Drawing.Size(100, 20);
+
+            this.btnApplyFilter.Location = new System.Drawing.Point(300, 9);
+            this.btnApplyFilter.Name = "btnApplyFilter";
+            this.btnApplyFilter.Size = new System.Drawing.Size(52, 23);
+            this.btnApplyFilter.Text = "🔍";
+
             // form
             this.ClientSize = new System.Drawing.Size(1280, 720);
             this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.panelFilter);
             this.Text = "Kế hoạch sản xuất";
             this.tabControl1.ResumeLayout(false);
             this.tabFY.ResumeLayout(false);
@@ -129,6 +193,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.viewOutput)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridMaster)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.viewMaster)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panelFilter)).EndInit();
+            this.panelFilter.ResumeLayout(false);
+            this.panelFilter.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.deFrom.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.deFrom.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.deTo.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.deTo.Properties)).EndInit();
             this.ResumeLayout(false);
         }
     }
