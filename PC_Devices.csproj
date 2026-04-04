@@ -39,6 +39,7 @@
     <Reference Include="DevExpress.XtraEditors.v25.1" />
     <Reference Include="DevExpress.XtraGrid.v25.1" />
     <Reference Include="DevExpress.XtraLayout.v25.1" />
+    <Reference Include="DevExpress.XtraTabbedMdi.v25.1" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Configuration" />
@@ -57,14 +58,54 @@
     <Compile Include="DB\DBUtils.cs" />
     <Compile Include="DTO\UserDTO.cs" />
     <Compile Include="DTO\DieMasterDTO.cs" />
-    <Compile Include="FRM\FRM_LOGIN.cs" />
-    <Compile Include="FRM\FRM_MAIN.cs" />
-    <Compile Include="FRM\FRM_CHANGE_PASSWORD.cs" />
-    <Compile Include="FRM\FRM_ACCOUNT_MANAGEMENT.cs" />
-    <Compile Include="FRM\FRM_DIE_MASTER.cs" />
+    <Compile Include="FRM\FRM_LOGIN.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\FRM_LOGIN.Designer.cs">
+      <DependentUpon>FRM_LOGIN.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\FRM_MAIN.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\FRM_MAIN.Designer.cs">
+      <DependentUpon>FRM_MAIN.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\FRM_CHANGE_PASSWORD.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\FRM_CHANGE_PASSWORD.Designer.cs">
+      <DependentUpon>FRM_CHANGE_PASSWORD.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\FRM_ACCOUNT_MANAGEMENT.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\FRM_ACCOUNT_MANAGEMENT.Designer.cs">
+      <DependentUpon>FRM_ACCOUNT_MANAGEMENT.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FRM\FRM_DIE_MASTER.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\FRM_DIE_MASTER.Designer.cs">
+      <DependentUpon>FRM_DIE_MASTER.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="FRM\FRM_LOGIN.resx">
+      <DependentUpon>FRM_LOGIN.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\FRM_MAIN.resx">
+      <DependentUpon>FRM_MAIN.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\FRM_CHANGE_PASSWORD.resx">
+      <DependentUpon>FRM_CHANGE_PASSWORD.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\FRM_ACCOUNT_MANAGEMENT.resx">
+      <DependentUpon>FRM_ACCOUNT_MANAGEMENT.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\FRM_DIE_MASTER.resx">
+      <DependentUpon>FRM_DIE_MASTER.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx" />
     <None Include="App.config" />
     <None Include="packages.config" />

@@ -1,5 +1,5 @@
-﻿using DevExpress.XtraEditors;
-using DevExpress.XtraGrid;
+﻿using DevExpress.Utils;
+using DevExpress.XtraEditors;
 using DevExpress.XtraGrid.Views.Grid;
 using PC_Devices.DTO;
 using System;
@@ -10,67 +10,22 @@ using System.Windows.Forms;
 
 namespace PC_Devices.FRM
 {
-    public class FRM_DIE_MASTER : XtraForm
+    public partial class FRM_DIE_MASTER : XtraForm
     {
         private readonly DieMasterDTO _dto = new DieMasterDTO();
-        private readonly GridControl grid = new GridControl();
-        private readonly GridView view = new GridView();
-        private readonly TextEdit txtDieNo = new TextEdit();
-        private readonly TextEdit txtDieName = new TextEdit();
-        private readonly SpinEdit spCavity = new SpinEdit();
 
         public FRM_DIE_MASTER()
         {
-            Text = "Die Master";
-            Width = 1100;
-            Height = 700;
+            InitializeComponent();
+            btnSave.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/actions/add_16x16.png");
+            btnDelete.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/edit/delete_16x16.png");
+            btnExport.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/export/exporttoxlsx_16x16.png");
+            btnImport.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/import/import_16x16.png");
 
-            PanelControl panel = new PanelControl { Dock = DockStyle.Top, Height = 120 };
-            Controls.Add(panel);
-
-            panel.Controls.Add(new LabelControl { Text = "Số khuôn", Left = 15, Top = 20 });
-            panel.Controls.Add(new LabelControl { Text = "Tên khuôn", Left = 15, Top = 55 });
-            panel.Controls.Add(new LabelControl { Text = "Tổng số cavity", Left = 370, Top = 20 });
-
-            txtDieNo.SetBounds(95, 15, 220, 25);
-            txtDieName.SetBounds(95, 50, 250, 25);
-            spCavity.SetBounds(470, 15, 120, 25);
-            spCavity.Properties.IsFloatValue = false;
-            spCavity.Properties.MinValue = 1;
-            spCavity.Properties.MaxValue = 100;
-
-            panel.Controls.Add(txtDieNo);
-            panel.Controls.Add(txtDieName);
-            panel.Controls.Add(spCavity);
-
-            SimpleButton btnSave = new SimpleButton { Text = "Thêm/Sửa", Left = 620, Top = 15, Width = 95 };
-            SimpleButton btnDelete = new SimpleButton { Text = "Xóa", Left = 725, Top = 15, Width = 95 };
-            SimpleButton btnExport = new SimpleButton { Text = "Export", Left = 830, Top = 15, Width = 95 };
-            SimpleButton btnImport = new SimpleButton { Text = "Import Excel", Left = 935, Top = 15, Width = 120 };
-
-            btnSave.Click += (s, e) =>
-            {
-                _dto.Save(txtDieNo.Text.Trim(), txtDieName.Text.Trim(), Convert.ToInt32(spCavity.Value));
-                LoadData();
-            };
-            btnDelete.Click += (s, e) =>
-            {
-                _dto.Delete(txtDieNo.Text.Trim());
-                LoadData();
-            };
+            btnSave.Click += BtnSave_Click;
+            btnDelete.Click += BtnDelete_Click;
             btnExport.Click += BtnExport_Click;
             btnImport.Click += BtnImport_Click;
-
-            panel.Controls.Add(btnSave);
-            panel.Controls.Add(btnDelete);
-            panel.Controls.Add(btnExport);
-            panel.Controls.Add(btnImport);
-
-            grid.Dock = DockStyle.Fill;
-            grid.MainView = view;
-            grid.ViewCollection.Add(view);
-            Controls.Add(grid);
-
             view.RowClick += View_RowClick;
             Load += (s, e) => LoadData();
         }
@@ -79,6 +34,18 @@ namespace PC_Devices.FRM
         {
             grid.DataSource = _dto.GetAll();
             view.BestFitColumns();
+        }
+
+        private void BtnSave_Click(object sender, EventArgs e)
+        {
+            _dto.Save(txtDieNo.Text.Trim(), txtDieName.Text.Trim(), Convert.ToInt32(spCavity.Value));
+            LoadData();
+        }
+
+        private void BtnDelete_Click(object sender, EventArgs e)
+        {
+            _dto.Delete(txtDieNo.Text.Trim());
+            LoadData();
         }
 
         private void View_RowClick(object sender, RowClickEventArgs e)
