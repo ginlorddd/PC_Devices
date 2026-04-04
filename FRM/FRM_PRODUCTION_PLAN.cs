@@ -15,10 +15,7 @@ namespace DM_OHD.FRM
     public partial class FRM_PRODUCTION_PLAN : XtraForm
     {
         private readonly ProductionPlanDTO _dto = new ProductionPlanDTO();
-        private readonly PanelControl _filterPanel = new PanelControl();
-        private readonly DateEdit _deFrom = new DateEdit();
-        private readonly DateEdit _deTo = new DateEdit();
-        private readonly SimpleButton _btnApplyFilter = new SimpleButton();
+        private readonly List<(DateEdit From, DateEdit To)> _tabFilters = new List<(DateEdit From, DateEdit To)>();
 
         public FRM_PRODUCTION_PLAN()
         {
@@ -31,7 +28,7 @@ namespace DM_OHD.FRM
             RegisterNumberFormat(viewRatio);
             RegisterNumberFormat(viewOutput);
             RegisterNumberFormat(viewMaster);
-            BuildMonthFilterBar();
+            BuildMonthFilterBars();
 
             btnSaveFY.Click += (s, e) => { _dto.SavePlanFY(gridFY.DataSource as DataTable); LoadData(); };
             btnSaveRatio.Click += (s, e) => { _dto.SaveMachineRatio(gridRatio.DataSource as DataTable); LoadData(); };
@@ -42,41 +39,52 @@ namespace DM_OHD.FRM
             Load += (s, e) => LoadData();
         }
 
-        private void BuildMonthFilterBar()
+        private void BuildMonthFilterBars()
         {
-            _filterPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            _filterPanel.Height = 42;
-            _filterPanel.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            CreateTabFilter(tabFY);
+            CreateTabFilter(tabRatio);
+            CreateTabFilter(tabOutput);
+            CreateTabFilter(tabMaster);
+        }
+
+        private void CreateTabFilter(System.Windows.Forms.TabPage tab)
+        {
+            var panel = new PanelControl
+            {
+                Dock = System.Windows.Forms.DockStyle.Top,
+                Height = 42,
+                BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder
+            };
 
             var lblFrom = new LabelControl { Text = "From:", Left = 10, Top = 13 };
-            _deFrom.Left = 50;
-            _deFrom.Top = 9;
-            _deFrom.Width = 100;
+            var deFrom = new DateEdit { Left = 50, Top = 9, Width = 100 };
 
             var lblTo = new LabelControl { Text = "To:", Left = 168, Top = 13 };
-            _deTo.Left = 190;
-            _deTo.Top = 9;
-            _deTo.Width = 100;
+            var deTo = new DateEdit { Left = 190, Top = 9, Width = 100 };
 
-            ConfigureMonthEditor(_deFrom);
-            ConfigureMonthEditor(_deTo);
-            _deFrom.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-            _deTo.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            ConfigureMonthEditor(deFrom);
+            ConfigureMonthEditor(deTo);
 
-            _btnApplyFilter.Text = "🔍";
-            _btnApplyFilter.Left = 300;
-            _btnApplyFilter.Top = 8;
-            _btnApplyFilter.Width = 52;
-            _btnApplyFilter.Click += (s, e) => ApplyMonthFilterToAllViews();
+            deFrom.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            deTo.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
 
-            _filterPanel.Controls.Add(lblFrom);
-            _filterPanel.Controls.Add(_deFrom);
-            _filterPanel.Controls.Add(lblTo);
-            _filterPanel.Controls.Add(_deTo);
-            _filterPanel.Controls.Add(_btnApplyFilter);
+            var btnApply = new SimpleButton { Text = "🔍", Left = 300, Top = 8, Width = 52 };
+            btnApply.Click += (s, e) =>
+            {
+                SyncFilterValues(deFrom.DateTime, deTo.DateTime);
+                ApplyMonthFilterToAllViews();
+            };
 
-            Controls.Add(_filterPanel);
-            _filterPanel.BringToFront();
+            panel.Controls.Add(lblFrom);
+            panel.Controls.Add(deFrom);
+            panel.Controls.Add(lblTo);
+            panel.Controls.Add(deTo);
+            panel.Controls.Add(btnApply);
+
+            tab.Controls.Add(panel);
+            panel.BringToFront();
+
+            _tabFilters.Add((deFrom, deTo));
         }
 
         private void ConfigureMonthEditor(DateEdit editor)
@@ -235,10 +243,31 @@ namespace DM_OHD.FRM
                 view.Columns["QTY_TYPE"].Fixed = FixedStyle.Left;
         }
 
+        private void SyncFilterValues(DateTime from, DateTime to)
+        {
+            DateTime fromMonth = new DateTime(from.Year, from.Month, 1);
+            DateTime toMonth = new DateTime(to.Year, to.Month, 1);
+            foreach (var filter in _tabFilters)
+            {
+                filter.From.EditValue = fromMonth;
+                filter.To.EditValue = toMonth;
+            }
+        }
+
+        private (DateEdit From, DateEdit To) GetCurrentFilter()
+        {
+            int idx = tabControl1.SelectedIndex;
+            if (idx >= 0 && idx < _tabFilters.Count) return _tabFilters[idx];
+            return _tabFilters.FirstOrDefault();
+        }
+
         private void ApplyMonthFilterToAllViews()
         {
-            DateTime from = _deFrom.DateTime == DateTime.MinValue ? new DateTime(2025, 1, 1) : new DateTime(_deFrom.DateTime.Year, _deFrom.DateTime.Month, 1);
-            DateTime to = _deTo.DateTime == DateTime.MinValue ? new DateTime(2030, 12, 1) : new DateTime(_deTo.DateTime.Year, _deTo.DateTime.Month, 1);
+            var activeFilter = GetCurrentFilter();
+            DateTime fromDate = activeFilter.From == null ? DateTime.MinValue : activeFilter.From.DateTime;
+            DateTime toDate = activeFilter.To == null ? DateTime.MinValue : activeFilter.To.DateTime;
+            DateTime from = fromDate == DateTime.MinValue ? new DateTime(2025, 1, 1) : new DateTime(fromDate.Year, fromDate.Month, 1);
+            DateTime to = toDate == DateTime.MinValue ? new DateTime(2030, 12, 1) : new DateTime(toDate.Year, toDate.Month, 1);
             if (from > to)
             {
                 var temp = from;
