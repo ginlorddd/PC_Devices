@@ -55,25 +55,49 @@ namespace DM_OHD.DTO
         {
             string sql = @"
                 DELETE FROM OHD_PLAN_MASTER;
+
+                ;WITH src AS (
+                    SELECT o.DIE_NO,
+                           ISNULL(o.DIE_NAME,'') AS DIE_NAME,
+                           ISNULL(o.CAVITY,'') AS CAVITY,
+                           o.PLAN_YEAR,
+                           o.PLAN_MONTH,
+                           ISNULL(o.OUTPUT_QTY,0) AS MONTHLY_SHOTS,
+                           ISNULL(r.RUN_RATIO,0) AS RUN_RATIO,
+                           ISNULL(dm.TOTAL_CAVITY,0) AS TOTAL_CAVITY,
+                           CASE
+                               WHEN ISNULL(dm.TOTAL_CAVITY,0) <= 0 THEN 0
+                               ELSE ISNULL(o.OUTPUT_QTY,0) / NULLIF(CONVERT(decimal(18,4), dm.TOTAL_CAVITY),0)
+                           END AS SHOT_PER_CAVITY
+                    FROM OHD_DIE_OUTPUT o
+                    LEFT JOIN OHD_MACHINE_RATIO r ON o.DIE_NO = r.DIE_NO AND o.CAVITY = r.CAVITY AND o.PLAN_YEAR = r.PLAN_YEAR AND o.PLAN_MONTH = r.PLAN_MONTH
+                    LEFT JOIN DIE_MST dm ON o.DIE_NO = dm.DIE_NO
+                ), agg AS (
+                    SELECT DIE_NO,
+                           DIE_NAME,
+                           CAVITY,
+                           PLAN_YEAR,
+                           PLAN_MONTH,
+                           MONTHLY_SHOTS,
+                           RUN_RATIO,
+                           SUM(SHOT_PER_CAVITY) OVER(PARTITION BY DIE_NO, CAVITY ORDER BY PLAN_YEAR, PLAN_MONTH ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS SHOT_CUMULATIVE
+                    FROM src
+                )
                 INSERT INTO OHD_PLAN_MASTER(DIE_NO,DIE_NAME,CAVITY,PLAN_YEAR,PLAN_MONTH,FY_SHOTS,RUN_RATIO,REQUIRED_QTY,OHD_MOC)
-                SELECT fy.DIE_NO,
-                       ISNULL(fy.DIE_NAME,''),
-                       ISNULL(fy.CAVITY,''),
-                       fy.PLAN_YEAR,
-                       fy.PLAN_MONTH,
-                       ISNULL(fy.FY_SHOTS,0),
-                       ISNULL(r.RUN_RATIO,0),
-                       ROUND(ISNULL(fy.FY_SHOTS,0) * ISNULL(r.RUN_RATIO,0) / 100.0,0) AS REQUIRED_QTY,
+                SELECT DIE_NO,
+                       DIE_NAME,
+                       CAVITY,
+                       PLAN_YEAR,
+                       PLAN_MONTH,
+                       MONTHLY_SHOTS,
+                       RUN_RATIO,
+                       SHOT_CUMULATIVE,
                        CASE
-                           WHEN ISNULL(TRY_CONVERT(decimal(18,4), fy.CAVITY),0) <= 0 THEN 0
-                           ELSE
-                               CASE
-                                   WHEN FLOOR((ISNULL(fy.FY_SHOTS,0) * ISNULL(r.RUN_RATIO,0) / 100.0) / NULLIF(TRY_CONVERT(decimal(18,4), fy.CAVITY),0) / 30.0) * 30 > 240 THEN 240
-                                   ELSE FLOOR((ISNULL(fy.FY_SHOTS,0) * ISNULL(r.RUN_RATIO,0) / 100.0) / NULLIF(TRY_CONVERT(decimal(18,4), fy.CAVITY),0) / 30.0) * 30
-                               END
+                           WHEN SHOT_CUMULATIVE <= 0 THEN 0
+                           WHEN FLOOR(SHOT_CUMULATIVE / 30.0) * 30 > 240 THEN 240
+                           ELSE FLOOR(SHOT_CUMULATIVE / 30.0) * 30
                        END AS OHD_MOC
-                FROM OHD_PLAN_FY fy
-                LEFT JOIN OHD_MACHINE_RATIO r ON fy.DIE_NO = r.DIE_NO AND fy.PLAN_YEAR=r.PLAN_YEAR AND fy.PLAN_MONTH=r.PLAN_MONTH;";
+                FROM agg;";
             DBUtils.Exec(sql);
         }
 
@@ -140,10 +164,9 @@ namespace DM_OHD.DTO
 
             foreach (var g in grouped)
             {
-                AddMasterTypeRow(wide, g, "FY_SHOTS", "Plan FY");
-                AddMasterTypeRow(wide, g, "RUN_RATIO", "Run Ratio");
-                AddMasterTypeRow(wide, g, "REQUIRED_QTY", "Required Qty");
-                AddMasterTypeRow(wide, g, "OHD_MOC", "OHD MOC");
+                AddMasterTypeRow(wide, g, "FY_SHOTS", "Số shot SX theo FY");
+                AddMasterTypeRow(wide, g, "REQUIRED_QTY", "Shot cộng dồn qua tháng");
+                AddMasterTypeRow(wide, g, "OHD_MOC", "Mốc OHD");
             }
 
             return wide;
