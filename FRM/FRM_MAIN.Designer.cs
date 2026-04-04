@@ -1,4 +1,4 @@
-﻿namespace PC_Devices.FRM
+﻿namespace DM_OHD.FRM
 {
     partial class FRM_MAIN
     {

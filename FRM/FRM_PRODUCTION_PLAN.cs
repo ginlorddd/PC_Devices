@@ -1,12 +1,12 @@
 ﻿using DevExpress.XtraEditors;
 using DevExpress.XtraGrid.Views.Grid;
-using PC_Devices.DB;
-using PC_Devices.DTO;
+using DM_OHD.DB;
+using DM_OHD.DTO;
 using System;
 using System.Data;
 using System.Windows.Forms;
 
-namespace PC_Devices.FRM
+namespace DM_OHD.FRM
 {
     public partial class FRM_PRODUCTION_PLAN : XtraForm
     {

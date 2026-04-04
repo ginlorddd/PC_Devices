@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PC_Devices.Properties
+namespace DM_OHD.Properties
 {
 
 

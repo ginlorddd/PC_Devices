@@ -3,7 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Net.NetworkInformation;
 
-namespace PC_Devices.DB
+namespace DM_OHD.DB
 {
     public static class DBUtils
     {

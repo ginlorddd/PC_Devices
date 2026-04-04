@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace PC_Devices.DB
+namespace DM_OHD.DB
 {
     public static class Constaint
     {

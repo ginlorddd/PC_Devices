@@ -5,7 +5,7 @@
     <ProjectGuid>{449F2C28-2A86-4C99-A36A-F888B679DB49}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PC_Devices</RootNamespace>
+    <RootNamespace>DM_OHD</RootNamespace>
     <AssemblyName>DM_OHD</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

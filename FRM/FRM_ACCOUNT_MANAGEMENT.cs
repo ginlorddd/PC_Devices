@@ -1,14 +1,14 @@
 ﻿using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraGrid.Views.Grid;
-using PC_Devices.DTO;
+using DM_OHD.DTO;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace PC_Devices.FRM
+namespace DM_OHD.FRM
 {
     public partial class FRM_ACCOUNT_MANAGEMENT : XtraForm
     {

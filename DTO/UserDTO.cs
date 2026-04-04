@@ -1,11 +1,11 @@
-﻿using PC_Devices.DB;
+﻿using DM_OHD.DB;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 
-namespace PC_Devices.DTO
+namespace DM_OHD.DTO
 {
     public class UserDTO
     {

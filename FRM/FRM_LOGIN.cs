@@ -1,9 +1,9 @@
 ﻿using DevExpress.XtraEditors;
-using PC_Devices.DTO;
+using DM_OHD.DTO;
 using System;
 using System.Windows.Forms;
 
-namespace PC_Devices.FRM
+namespace DM_OHD.FRM
 {
     public partial class FRM_LOGIN : XtraForm
     {

@@ -1,10 +1,10 @@
 ﻿using DevExpress.XtraBars;
-using PC_Devices.DB;
+using DM_OHD.DB;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace PC_Devices.FRM
+namespace DM_OHD.FRM
 {
     public partial class FRM_MAIN : DevExpress.XtraBars.Ribbon.RibbonForm
     {

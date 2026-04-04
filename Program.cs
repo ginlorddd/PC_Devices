@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace PC_Devices
+namespace DM_OHD
 {
     internal static class Program
     {

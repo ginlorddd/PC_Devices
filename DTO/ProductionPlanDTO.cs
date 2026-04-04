@@ -1,9 +1,9 @@
-﻿using PC_Devices.DB;
+﻿using DM_OHD.DB;
 using System;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace PC_Devices.DTO
+namespace DM_OHD.DTO
 {
     public class ProductionPlanDTO
     {
