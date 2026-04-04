@@ -65,6 +65,7 @@
     <Compile Include="DB\DBUtils.cs" />
     <Compile Include="DTO\UserDTO.cs" />
     <Compile Include="DTO\DieMasterDTO.cs" />
+    <Compile Include="DTO\ProductionPlanDTO.cs" />
     <Compile Include="FRM\FRM_LOGIN.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -95,6 +96,12 @@
     <Compile Include="FRM\FRM_DIE_MASTER.Designer.cs">
       <DependentUpon>FRM_DIE_MASTER.cs</DependentUpon>
     </Compile>
+    <Compile Include="FRM\FRM_PRODUCTION_PLAN.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRM\FRM_PRODUCTION_PLAN.Designer.cs">
+      <DependentUpon>FRM_PRODUCTION_PLAN.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -112,6 +119,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FRM\FRM_DIE_MASTER.resx">
       <DependentUpon>FRM_DIE_MASTER.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRM\FRM_PRODUCTION_PLAN.resx">
+      <DependentUpon>FRM_PRODUCTION_PLAN.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx" />
     <None Include="App.config" />

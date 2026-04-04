@@ -15,6 +15,7 @@ namespace PC_Devices.FRM
             InitializeComponent();
             btnAccount.Enabled = Constaint.IsAdmin() || Constaint.HasRole("ACCOUNT_MGMT");
             btnDieMaster.Enabled = Constaint.IsAdmin() || Constaint.HasRole("DIE_MST_MGMT");
+            btnProductionPlan.Enabled = Constaint.IsAdmin() || Constaint.HasRole("PLAN_MGMT");
         }
 
         private void OpenChild<T>() where T : Form, new()
@@ -46,6 +47,11 @@ namespace PC_Devices.FRM
         private void btnChangePassword_ItemClick(object sender, ItemClickEventArgs e)
         {
             OpenChild<FRM_CHANGE_PASSWORD>();
+        }
+
+        private void btnProductionPlan_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            OpenChild<FRM_PRODUCTION_PLAN>();
         }
     }
 }

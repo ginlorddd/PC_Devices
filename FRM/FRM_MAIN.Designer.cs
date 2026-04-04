@@ -7,6 +7,7 @@
         private DevExpress.XtraBars.BarButtonItem btnDieMaster;
         private DevExpress.XtraBars.BarButtonItem btnAccount;
         private DevExpress.XtraBars.BarButtonItem btnChangePassword;
+        private DevExpress.XtraBars.BarButtonItem btnProductionPlan;
         private DevExpress.XtraBars.Ribbon.RibbonPage ribbonPage1;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup1;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup2;
@@ -28,6 +29,7 @@
             this.btnDieMaster = new DevExpress.XtraBars.BarButtonItem();
             this.btnAccount = new DevExpress.XtraBars.BarButtonItem();
             this.btnChangePassword = new DevExpress.XtraBars.BarButtonItem();
+            this.btnProductionPlan = new DevExpress.XtraBars.BarButtonItem();
             this.ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.ribbonPageGroup2 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
@@ -44,9 +46,10 @@
             this.ribbonControl1.SearchEditItem,
             this.btnDieMaster,
             this.btnAccount,
-            this.btnChangePassword});
+            this.btnChangePassword,
+            this.btnProductionPlan});
             this.ribbonControl1.Location = new System.Drawing.Point(0, 0);
-            this.ribbonControl1.MaxItemId = 4;
+            this.ribbonControl1.MaxItemId = 5;
             this.ribbonControl1.Name = "ribbonControl1";
             this.ribbonControl1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.ribbonPage1});
@@ -79,6 +82,16 @@
             this.btnChangePassword.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
             this.btnChangePassword.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnChangePassword_ItemClick);
             // 
+            // 
+            // btnProductionPlan
+            // 
+            this.btnProductionPlan.Caption = "Kế hoạch sản xuất";
+            this.btnProductionPlan.Id = 4;
+            this.btnProductionPlan.ImageOptions.Image = global::PC_Devices.Properties.Resources.BO_Role_32x32;
+            this.btnProductionPlan.Name = "btnProductionPlan";
+            this.btnProductionPlan.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
+            this.btnProductionPlan.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnProductionPlan_ItemClick);
+            // 
             // ribbonPage1
             // 
             this.ribbonPage1.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] {
@@ -90,6 +103,7 @@
             // ribbonPageGroup1
             // 
             this.ribbonPageGroup1.ItemLinks.Add(this.btnDieMaster);
+            this.ribbonPageGroup1.ItemLinks.Add(this.btnProductionPlan);
             this.ribbonPageGroup1.Name = "ribbonPageGroup1";
             this.ribbonPageGroup1.Text = "Master Data";
             // 
