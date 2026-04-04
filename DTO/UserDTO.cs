@@ -28,9 +28,12 @@ namespace PC_Devices.DTO
                 "SELECT ROLE_CODE FROM APP_USER_ROLE WHERE USER_ID=@USER_ID",
                 new SqlParameter("@USER_ID", userId));
 
-            Constaint.CurrentRoles = new HashSet<string>(
-                roleTable.AsEnumerable().Select(r => Convert.ToString(r["ROLE_CODE"])),
-                StringComparer.OrdinalIgnoreCase);
+            HashSet<string> roles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (DataRow row in roleTable.Rows)
+            {
+                roles.Add(Convert.ToString(row["ROLE_CODE"]));
+            }
+            Constaint.CurrentRoles = roles;
 
             return true;
         }

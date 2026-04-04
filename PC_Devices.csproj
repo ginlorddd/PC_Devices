@@ -34,7 +34,11 @@
 
   <ItemGroup>
     <Reference Include="DevExpress.Data.v25.1" />
+    <Reference Include="DevExpress.Data.Desktop.v25.1" />
     <Reference Include="DevExpress.Utils.v25.1" />
+    <Reference Include="DevExpress.Images.v25.1" />
+    <Reference Include="DevExpress.Drawing.v25.1" />
+    <Reference Include="DevExpress.Printing.v25.1.Core" />
     <Reference Include="DevExpress.XtraBars.v25.1" />
     <Reference Include="DevExpress.XtraEditors.v25.1" />
     <Reference Include="DevExpress.XtraGrid.v25.1" />
@@ -44,6 +48,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />

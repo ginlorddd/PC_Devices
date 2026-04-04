@@ -1,5 +1,5 @@
-﻿using DevExpress.Utils;
-using DevExpress.XtraEditors;
+﻿using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraGrid.Views.Grid;
 using PC_Devices.DTO;
 using System;
@@ -17,7 +17,7 @@ namespace PC_Devices.FRM
         public FRM_ACCOUNT_MANAGEMENT()
         {
             InitializeComponent();
-            btnSave.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/save/save_16x16.png");
+            btnSave.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/save/save_16x16.png");
             Load += FRM_ACCOUNT_MANAGEMENT_Load;
             view.RowClick += View_RowClick;
             btnSave.Click += BtnSave_Click;

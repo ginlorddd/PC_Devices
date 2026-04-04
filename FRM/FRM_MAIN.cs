@@ -1,5 +1,4 @@
-﻿using DevExpress.Utils;
-using DevExpress.XtraBars;
+﻿using DevExpress.XtraBars;
 using PC_Devices.DB;
 using System;
 using System.Collections.Generic;
@@ -21,9 +20,9 @@ namespace PC_Devices.FRM
 
         private void AssignIcons()
         {
-            btnDieMaster.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/data/editdatasource_16x16.png");
-            btnAccount.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/business objects/bo_user_16x16.png");
-            btnChangePassword.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/actions/reset_16x16.png");
+            btnDieMaster.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/data/editdatasource_16x16.png");
+            btnAccount.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/business objects/bo_user_16x16.png");
+            btnChangePassword.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/actions/reset_16x16.png");
         }
 
         private void OpenChild<T>() where T : Form, new()

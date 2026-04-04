@@ -1,5 +1,4 @@
-﻿using DevExpress.Utils;
-using DevExpress.XtraEditors;
+﻿using DevExpress.XtraEditors;
 using PC_Devices.DB;
 using PC_Devices.DTO;
 using System;
@@ -13,7 +12,7 @@ namespace PC_Devices.FRM
         public FRM_CHANGE_PASSWORD()
         {
             InitializeComponent();
-            btnSave.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/save/save_16x16.png");
+            btnSave.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/save/save_16x16.png");
             btnSave.Click += BtnSave_Click;
         }
 

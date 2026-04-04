@@ -1,5 +1,4 @@
-﻿using DevExpress.Utils;
-using DevExpress.XtraEditors;
+﻿using DevExpress.XtraEditors;
 using DevExpress.XtraGrid.Views.Grid;
 using PC_Devices.DTO;
 using System;
@@ -17,10 +16,10 @@ namespace PC_Devices.FRM
         public FRM_DIE_MASTER()
         {
             InitializeComponent();
-            btnSave.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/actions/add_16x16.png");
-            btnDelete.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/edit/delete_16x16.png");
-            btnExport.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/export/exporttoxlsx_16x16.png");
-            btnImport.ImageOptions.Image = ImageResourceCache.Default.GetImage("images/import/import_16x16.png");
+            btnSave.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/actions/add_16x16.png");
+            btnDelete.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/edit/delete_16x16.png");
+            btnExport.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/export/exporttoxlsx_16x16.png");
+            btnImport.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/import/import_16x16.png");
 
             btnSave.Click += BtnSave_Click;
             btnDelete.Click += BtnDelete_Click;
