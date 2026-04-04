@@ -5,6 +5,7 @@ using DM_OHD.DTO;
 using System;
 using System.Data;
 using System.Windows.Forms;
+using DevExpress.XtraGrid.Columns;
 
 namespace DM_OHD.FRM
 {
@@ -66,12 +67,17 @@ namespace DM_OHD.FRM
             SetGridCaption(viewFY, "DIE_NO", "Số khuôn");
             SetGridCaption(viewFY, "DIE_NAME", "Tên khuôn");
             SetGridCaption(viewFY, "CAVITY", "Cavity");
-            SetGridCaption(viewFY, "PLAN_YEAR", "Năm");
-            SetGridCaption(viewFY, "PLAN_MONTH", "Tháng");
-            SetGridCaption(viewFY, "FY_SHOTS", "Kế hoạch FY");
+            ConfigureMonthColumns(viewFY, "Kế hoạch FY");
 
-            SetGridCaption(viewRatio, "RUN_RATIO", "Tỉ lệ chạy máy (%)");
-            SetGridCaption(viewOutput, "OUTPUT_QTY", "Sản lượng khuôn");
+            SetGridCaption(viewRatio, "DIE_NO", "Số khuôn");
+            SetGridCaption(viewRatio, "DIE_NAME", "Tên khuôn");
+            SetGridCaption(viewRatio, "CAVITY", "Cavity");
+            ConfigureMonthColumns(viewRatio, "Tỉ lệ chạy máy (%)");
+
+            SetGridCaption(viewOutput, "DIE_NO", "Số khuôn");
+            SetGridCaption(viewOutput, "DIE_NAME", "Tên khuôn");
+            SetGridCaption(viewOutput, "CAVITY", "Cavity");
+            ConfigureMonthColumns(viewOutput, "Sản lượng khuôn");
 
             SetGridCaption(viewMaster, "FY_SHOTS", "Kế hoạch FY");
             SetGridCaption(viewMaster, "RUN_RATIO", "Tỉ lệ máy (%)");
@@ -82,6 +88,29 @@ namespace DM_OHD.FRM
             viewRatio.BestFitColumns();
             viewOutput.BestFitColumns();
             viewMaster.BestFitColumns();
+        }
+
+
+        private void ConfigureMonthColumns(GridView view, string valueCaption)
+        {
+            foreach (GridColumn col in view.Columns)
+            {
+                if (!col.FieldName.StartsWith("M")) continue;
+                if (col.FieldName.Length != 7) continue;
+                if (!int.TryParse(col.FieldName.Substring(1, 4), out int year)) continue;
+                if (!int.TryParse(col.FieldName.Substring(5, 2), out int month)) continue;
+
+                col.Caption = $"{month:00}/{year}";
+                col.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+                col.DisplayFormat.FormatString = "n0";
+                col.Width = 85;
+                col.ToolTip = valueCaption;
+            }
+
+            if (view.Columns["PRODUCT_NO"] != null) view.Columns["PRODUCT_NO"].Width = 110;
+            if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].Width = 110;
+            if (view.Columns["DIE_NAME"] != null) view.Columns["DIE_NAME"].Width = 180;
+            if (view.Columns["CAVITY"] != null) view.Columns["CAVITY"].Width = 120;
         }
 
         private void SetGridCaption(GridView view, string field, string caption)
