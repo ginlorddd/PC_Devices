@@ -12,7 +12,6 @@ namespace PC_Devices.FRM
         public FRM_CHANGE_PASSWORD()
         {
             InitializeComponent();
-            btnSave.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/save/save_16x16.png");
             btnSave.Click += BtnSave_Click;
         }
 

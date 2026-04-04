@@ -17,7 +17,6 @@ namespace PC_Devices.FRM
         public FRM_ACCOUNT_MANAGEMENT()
         {
             InitializeComponent();
-            btnSave.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/save/save_16x16.png");
             Load += FRM_ACCOUNT_MANAGEMENT_Load;
             view.RowClick += View_RowClick;
             btnSave.Click += BtnSave_Click;

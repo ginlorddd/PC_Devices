@@ -50,6 +50,7 @@
             this.txtConfirm.Size = new System.Drawing.Size(220, 22);
             this.btnSave.Location = new System.Drawing.Point(140, 155);
             this.btnSave.Size = new System.Drawing.Size(120, 30);
+            this.btnSave.ImageOptions.Image = global::PC_Devices.Properties.Resources.Action_ResetPassword_32x32;
             this.btnSave.Text = "Lưu";
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

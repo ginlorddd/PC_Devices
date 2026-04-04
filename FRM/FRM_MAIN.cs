@@ -15,19 +15,6 @@ namespace PC_Devices.FRM
             InitializeComponent();
             btnAccount.Enabled = Constaint.IsAdmin() || Constaint.HasRole("ACCOUNT_MGMT");
             btnDieMaster.Enabled = Constaint.IsAdmin() || Constaint.HasRole("DIE_MST_MGMT");
-            AssignIcons();
-        }
-
-        private void AssignIcons()
-        {
-            btnDieMaster.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/data/editdatasource_16x16.png");
-            btnDieMaster.ImageOptions.LargeImage = DevExpress.Images.ImageResourceCache.Default.GetImage("images/data/editdatasource_32x32.png");
-
-            btnAccount.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/business objects/bo_user_16x16.png");
-            btnAccount.ImageOptions.LargeImage = DevExpress.Images.ImageResourceCache.Default.GetImage("images/business objects/bo_user_32x32.png");
-
-            btnChangePassword.ImageOptions.Image = DevExpress.Images.ImageResourceCache.Default.GetImage("images/actions/reset_16x16.png");
-            btnChangePassword.ImageOptions.LargeImage = DevExpress.Images.ImageResourceCache.Default.GetImage("images/actions/reset_32x32.png");
         }
 
         private void OpenChild<T>() where T : Form, new()
