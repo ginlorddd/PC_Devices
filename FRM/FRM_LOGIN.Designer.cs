@@ -1,16 +1,14 @@
-﻿namespace PC_Devices.FRM
+﻿namespace DM_OHD.FRM
 {
     partial class FRM_LOGIN
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
+        private DevExpress.XtraEditors.LabelControl lblUser;
+        private DevExpress.XtraEditors.LabelControl lblPassword;
+        private DevExpress.XtraEditors.TextEdit txtUser;
+        private DevExpress.XtraEditors.TextEdit txtPassword;
+        private DevExpress.XtraEditors.SimpleButton btnLogin;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -20,125 +18,78 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
-            this.btnClose = new System.Windows.Forms.Button();
-            this.btnLogin = new System.Windows.Forms.Button();
-            this.txtPassword = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.txtUser = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.lblUser = new DevExpress.XtraEditors.LabelControl();
+            this.lblPassword = new DevExpress.XtraEditors.LabelControl();
+            this.txtUser = new DevExpress.XtraEditors.TextEdit();
+            this.txtPassword = new DevExpress.XtraEditors.TextEdit();
+            this.btnLogin = new DevExpress.XtraEditors.SimpleButton();
+            ((System.ComponentModel.ISupportInitialize)(this.txtUser.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtPassword.Properties)).BeginInit();
             this.SuspendLayout();
             // 
-            // btnClose
+            // lblUser
             // 
-            this.btnClose.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnClose.Location = new System.Drawing.Point(336, 111);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(84, 23);
-            this.btnClose.TabIndex = 29;
-            this.btnClose.Text = "Thoát";
-            this.btnClose.UseVisualStyleBackColor = true;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            this.lblUser.Location = new System.Drawing.Point(34, 35);
+            this.lblUser.Name = "lblUser";
+            this.lblUser.Size = new System.Drawing.Size(38, 16);
+            this.lblUser.TabIndex = 0;
+            this.lblUser.Text = "User ID";
             // 
-            // btnLogin
+            // lblPassword
             // 
-            this.btnLogin.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnLogin.Location = new System.Drawing.Point(199, 111);
-            this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(84, 23);
-            this.btnLogin.TabIndex = 28;
-            this.btnLogin.Text = "Đăng nhập";
-            this.btnLogin.UseVisualStyleBackColor = true;
-            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
-            // 
-            // txtPassword
-            // 
-            this.txtPassword.Location = new System.Drawing.Point(239, 74);
-            this.txtPassword.Name = "txtPassword";
-            this.txtPassword.PasswordChar = '*';
-            this.txtPassword.Size = new System.Drawing.Size(191, 21);
-            this.txtPassword.TabIndex = 27;
-            this.txtPassword.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPassword_KeyDown);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(168, 77);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(63, 13);
-            this.label2.TabIndex = 23;
-            this.label2.Text = "Mật khẩu:";
+            this.lblPassword.Location = new System.Drawing.Point(34, 75);
+            this.lblPassword.Name = "lblPassword";
+            this.lblPassword.Size = new System.Drawing.Size(56, 16);
+            this.lblPassword.TabIndex = 1;
+            this.lblPassword.Text = "Mật khẩu";
             // 
             // txtUser
             // 
-            this.txtUser.Location = new System.Drawing.Point(239, 41);
+            this.txtUser.Location = new System.Drawing.Point(130, 30);
             this.txtUser.Name = "txtUser";
-            this.txtUser.Size = new System.Drawing.Size(191, 21);
-            this.txtUser.TabIndex = 26;
-            this.txtUser.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtUser_KeyDown);
+            this.txtUser.Size = new System.Drawing.Size(220, 22);
+            this.txtUser.TabIndex = 2;
             // 
-            // label3
+            // txtPassword
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(168, 44);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(65, 13);
-            this.label3.TabIndex = 24;
-            this.label3.Text = "Tài khoản:";
+            this.txtPassword.Location = new System.Drawing.Point(130, 70);
+            this.txtPassword.Name = "txtPassword";
+            this.txtPassword.Properties.PasswordChar = '*';
+            this.txtPassword.Size = new System.Drawing.Size(220, 22);
+            this.txtPassword.TabIndex = 3;
             // 
-            // pictureBox1
+            // btnLogin
             // 
-            this.pictureBox1.Image = global::PC_Devices.Properties.Resources.stack;
-            this.pictureBox1.Location = new System.Drawing.Point(26, 17);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(123, 130);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 31;
-            this.pictureBox1.TabStop = false;
+            this.btnLogin.Location = new System.Drawing.Point(130, 120);
+            this.btnLogin.Name = "btnLogin";
+            this.btnLogin.Size = new System.Drawing.Size(120, 28);
+            this.btnLogin.TabIndex = 4;
+            this.btnLogin.Text = "Đăng nhập";
+            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
             // 
             // FRM_LOGIN
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AcceptButton = this.btnLogin;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(462, 183);
-            this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.btnClose);
+            this.ClientSize = new System.Drawing.Size(402, 187);
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.txtPassword);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.txtUser);
-            this.Controls.Add(this.label3);
-            this.MaximumSize = new System.Drawing.Size(464, 215);
-            this.MinimumSize = new System.Drawing.Size(464, 213);
+            this.Controls.Add(this.lblPassword);
+            this.Controls.Add(this.lblUser);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "FRM_LOGIN";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Đăng nhập";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FRM_LOGIN_FormClosed);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.Text = "Đăng nhập - DM_OHD";
+            ((System.ComponentModel.ISupportInitialize)(this.txtUser.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtPassword.Properties)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
-
-        #endregion
-
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.Button btnClose;
-        private System.Windows.Forms.Button btnLogin;
-        private System.Windows.Forms.TextBox txtPassword;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox txtUser;
-        private System.Windows.Forms.Label label3;
     }
 }
