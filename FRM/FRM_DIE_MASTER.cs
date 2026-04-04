@@ -4,7 +4,9 @@ using PC_Devices.DB;
 using PC_Devices.DTO;
 using System;
 using System.Data;
-using System.Data.OleDb;
+using System.Xml;
+using System.IO.Compression;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -181,23 +183,159 @@ namespace PC_Devices.FRM
 
         private DataTable ReadExcel(string filePath)
         {
-            string ext = Path.GetExtension(filePath).ToLower();
-            string connStr = ext == ".xls"
-                ? $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={filePath};Extended Properties='Excel 8.0;HDR=YES'"
-                : $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};Extended Properties='Excel 12.0 Xml;HDR=YES'";
-
-            using (OleDbConnection conn = new OleDbConnection(connStr))
+            string ext = Path.GetExtension(filePath).ToLowerInvariant();
+            if (ext == ".xlsx")
             {
-                conn.Open();
-                DataTable schema = conn.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
-                string sheetName = schema.Rows[0]["TABLE_NAME"].ToString();
-                using (OleDbDataAdapter ad = new OleDbDataAdapter($"SELECT * FROM [{sheetName}]", conn))
+                return ReadXlsx(filePath);
+            }
+
+            throw new NotSupportedException("Định dạng .xls cần Microsoft Access Database Engine. Vui lòng lưu file thành .xlsx để import.");
+        }
+
+        private DataTable ReadXlsx(string filePath)
+        {
+            DataTable table = new DataTable();
+
+            using (ZipArchive archive = ZipFile.OpenRead(filePath))
+            {
+                List<string> sharedStrings = ReadSharedStrings(archive);
+                string sheetPath = GetFirstSheetPath(archive);
+                ZipArchiveEntry sheetEntry = archive.GetEntry(sheetPath);
+                if (sheetEntry == null)
                 {
-                    DataTable dt = new DataTable();
-                    ad.Fill(dt);
-                    return dt;
+                    throw new Exception("Không tìm thấy sheet trong file excel.");
+                }
+
+                XmlDocument doc = new XmlDocument();
+                using (Stream stream = sheetEntry.Open())
+                {
+                    doc.Load(stream);
+                }
+
+                XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
+                ns.AddNamespace("x", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+                XmlNodeList rows = doc.SelectNodes("//x:sheetData/x:row", ns);
+                if (rows == null || rows.Count == 0)
+                {
+                    return table;
+                }
+
+                bool headerDone = false;
+                foreach (XmlNode row in rows)
+                {
+                    Dictionary<int, string> values = new Dictionary<int, string>();
+                    foreach (XmlNode cell in row.SelectNodes("x:c", ns))
+                    {
+                        string r = cell.Attributes?["r"]?.Value ?? string.Empty;
+                        int colIndex = GetColumnIndex(r);
+                        string val = ReadCellValue(cell, ns, sharedStrings);
+                        values[colIndex] = val;
+                    }
+
+                    if (!headerDone)
+                    {
+                        int maxCol = values.Count == 0 ? 0 : values.Keys.Max();
+                        for (int i = 0; i <= maxCol; i++)
+                        {
+                            string colName = values.ContainsKey(i) ? values[i] : $"Column{i + 1}";
+                            if (string.IsNullOrWhiteSpace(colName)) colName = $"Column{i + 1}";
+                            if (table.Columns.Contains(colName)) colName = colName + "_" + i;
+                            table.Columns.Add(colName);
+                        }
+                        headerDone = true;
+                        continue;
+                    }
+
+                    DataRow dr = table.NewRow();
+                    for (int i = 0; i < table.Columns.Count; i++)
+                    {
+                        dr[i] = values.ContainsKey(i) ? values[i] : string.Empty;
+                    }
+                    table.Rows.Add(dr);
                 }
             }
+
+            return table;
         }
+
+        private List<string> ReadSharedStrings(ZipArchive archive)
+        {
+            List<string> list = new List<string>();
+            ZipArchiveEntry entry = archive.GetEntry("xl/sharedStrings.xml");
+            if (entry == null) return list;
+
+            XmlDocument doc = new XmlDocument();
+            using (Stream stream = entry.Open())
+            {
+                doc.Load(stream);
+            }
+
+            XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
+            ns.AddNamespace("x", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+            XmlNodeList nodes = doc.SelectNodes("//x:sst/x:si", ns);
+            foreach (XmlNode node in nodes)
+            {
+                XmlNode t = node.SelectSingleNode(".//x:t", ns);
+                list.Add(t?.InnerText ?? string.Empty);
+            }
+            return list;
+        }
+
+        private string GetFirstSheetPath(ZipArchive archive)
+        {
+            XmlDocument wbDoc = new XmlDocument();
+            using (Stream s = archive.GetEntry("xl/workbook.xml").Open())
+            {
+                wbDoc.Load(s);
+            }
+            XmlNamespaceManager wbNs = new XmlNamespaceManager(wbDoc.NameTable);
+            wbNs.AddNamespace("x", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+            wbNs.AddNamespace("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
+            XmlNode firstSheet = wbDoc.SelectSingleNode("//x:sheets/x:sheet", wbNs);
+            string rId = firstSheet?.Attributes?["r:id"]?.Value;
+            if (string.IsNullOrWhiteSpace(rId)) return "xl/worksheets/sheet1.xml";
+
+            XmlDocument relDoc = new XmlDocument();
+            using (Stream s = archive.GetEntry("xl/_rels/workbook.xml.rels").Open())
+            {
+                relDoc.Load(s);
+            }
+
+            XmlNamespaceManager relNs = new XmlNamespaceManager(relDoc.NameTable);
+            relNs.AddNamespace("r", "http://schemas.openxmlformats.org/package/2006/relationships");
+            XmlNode relNode = relDoc.SelectSingleNode($"//r:Relationship[@Id='{rId}']", relNs);
+            string target = relNode?.Attributes?["Target"]?.Value ?? "worksheets/sheet1.xml";
+            return "xl/" + target.TrimStart('/');
+        }
+
+        private int GetColumnIndex(string cellRef)
+        {
+            int idx = 0;
+            foreach (char c in cellRef)
+            {
+                if (!char.IsLetter(c)) break;
+                idx = idx * 26 + (char.ToUpperInvariant(c) - 'A' + 1);
+            }
+            return Math.Max(0, idx - 1);
+        }
+
+        private string ReadCellValue(XmlNode cell, XmlNamespaceManager ns, List<string> sharedStrings)
+        {
+            string type = cell.Attributes?["t"]?.Value;
+            XmlNode valueNode = cell.SelectSingleNode("x:v", ns);
+            if (valueNode == null)
+            {
+                XmlNode inlineNode = cell.SelectSingleNode("x:is/x:t", ns);
+                return inlineNode?.InnerText ?? string.Empty;
+            }
+
+            string raw = valueNode.InnerText;
+            if (type == "s" && int.TryParse(raw, out int sstIndex) && sstIndex >= 0 && sstIndex < sharedStrings.Count)
+            {
+                return sharedStrings[sstIndex];
+            }
+            return raw;
+        }
+
     }
 }
