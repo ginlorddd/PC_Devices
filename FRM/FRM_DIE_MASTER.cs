@@ -26,13 +26,32 @@ namespace PC_Devices.FRM
             btnExport.Click += BtnExport_Click;
             btnImport.Click += BtnImport_Click;
             view.RowClick += View_RowClick;
+            ConfigureGridView();
             Load += (s, e) => LoadData();
+        }
+
+
+        private void ConfigureGridView()
+        {
+            view.OptionsView.ShowAutoFilterRow = true;
+            view.OptionsView.ShowGroupPanel = false;
+            view.OptionsView.ColumnAutoWidth = false;
+            view.Appearance.HeaderPanel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            view.Appearance.HeaderPanel.Options.UseFont = true;
+        }
+
+        private void ApplyColumnCaptions()
+        {
+            if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].Caption = "Số khuôn";
+            if (view.Columns["DIE_NAME"] != null) view.Columns["DIE_NAME"].Caption = "Tên khuôn";
+            if (view.Columns["TOTAL_CAVITY"] != null) view.Columns["TOTAL_CAVITY"].Caption = "Tổng số cavity";
+            view.BestFitColumns();
         }
 
         private void LoadData()
         {
             grid.DataSource = _dto.GetAll();
-            view.BestFitColumns();
+            ApplyColumnCaptions();
         }
 
         private void BtnSave_Click(object sender, EventArgs e)

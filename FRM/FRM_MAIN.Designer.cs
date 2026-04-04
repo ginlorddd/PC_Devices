@@ -9,6 +9,7 @@
         private DevExpress.XtraBars.BarButtonItem btnChangePassword;
         private DevExpress.XtraBars.Ribbon.RibbonPage ribbonPage1;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup1;
+        private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup2;
         private DevExpress.XtraTabbedMdi.XtraTabbedMdiManager xtraTabbedMdiManager1;
 
         protected override void Dispose(bool disposing)
@@ -29,6 +30,7 @@
             this.btnChangePassword = new DevExpress.XtraBars.BarButtonItem();
             this.ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
+            this.ribbonPageGroup2 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.xtraTabbedMdiManager1 = new DevExpress.XtraTabbedMdi.XtraTabbedMdiManager(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabbedMdiManager1)).BeginInit();
@@ -55,6 +57,7 @@
             this.btnDieMaster.Caption = "Die Master";
             this.btnDieMaster.Id = 1;
             this.btnDieMaster.Name = "btnDieMaster";
+            this.btnDieMaster.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
             this.btnDieMaster.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnDieMaster_ItemClick);
             // 
             // btnAccount
@@ -62,6 +65,7 @@
             this.btnAccount.Caption = "Quản lý tài khoản";
             this.btnAccount.Id = 2;
             this.btnAccount.Name = "btnAccount";
+            this.btnAccount.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
             this.btnAccount.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnAccount_ItemClick);
             // 
             // btnChangePassword
@@ -69,22 +73,29 @@
             this.btnChangePassword.Caption = "Đổi mật khẩu";
             this.btnChangePassword.Id = 3;
             this.btnChangePassword.Name = "btnChangePassword";
+            this.btnChangePassword.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
             this.btnChangePassword.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnChangePassword_ItemClick);
             // 
             // ribbonPage1
             // 
             this.ribbonPage1.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] {
-            this.ribbonPageGroup1});
+            this.ribbonPageGroup1,
+            this.ribbonPageGroup2});
             this.ribbonPage1.Name = "ribbonPage1";
             this.ribbonPage1.Text = "Hệ thống";
             // 
             // ribbonPageGroup1
             // 
             this.ribbonPageGroup1.ItemLinks.Add(this.btnDieMaster);
-            this.ribbonPageGroup1.ItemLinks.Add(this.btnAccount);
-            this.ribbonPageGroup1.ItemLinks.Add(this.btnChangePassword);
             this.ribbonPageGroup1.Name = "ribbonPageGroup1";
-            this.ribbonPageGroup1.Text = "Chức năng";
+            this.ribbonPageGroup1.Text = "Master Data";
+            // 
+            // ribbonPageGroup2
+            // 
+            this.ribbonPageGroup2.ItemLinks.Add(this.btnAccount);
+            this.ribbonPageGroup2.ItemLinks.Add(this.btnChangePassword);
+            this.ribbonPageGroup2.Name = "ribbonPageGroup2";
+            this.ribbonPageGroup2.Text = "Tài khoản";
             // 
             // xtraTabbedMdiManager1
             // 

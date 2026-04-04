@@ -21,6 +21,26 @@ namespace PC_Devices.FRM
             Load += FRM_ACCOUNT_MANAGEMENT_Load;
             view.RowClick += View_RowClick;
             btnSave.Click += BtnSave_Click;
+            ConfigureGridView();
+        }
+
+
+        private void ConfigureGridView()
+        {
+            view.OptionsView.ShowAutoFilterRow = true;
+            view.OptionsView.ShowGroupPanel = false;
+            view.OptionsView.ColumnAutoWidth = false;
+            view.Appearance.HeaderPanel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            view.Appearance.HeaderPanel.Options.UseFont = true;
+        }
+
+        private void ApplyColumnCaptions()
+        {
+            if (view.Columns["USER_ID"] != null) view.Columns["USER_ID"].Caption = "Mã tài khoản";
+            if (view.Columns["FULL_NAME"] != null) view.Columns["FULL_NAME"].Caption = "Họ tên";
+            if (view.Columns["IS_ACTIVE"] != null) view.Columns["IS_ACTIVE"].Caption = "Kích hoạt";
+            if (view.Columns["ROLES"] != null) view.Columns["ROLES"].Caption = "Phân quyền";
+            view.BestFitColumns();
         }
 
         private void FRM_ACCOUNT_MANAGEMENT_Load(object sender, EventArgs e)
@@ -37,7 +57,7 @@ namespace PC_Devices.FRM
         private void LoadUsers()
         {
             grid.DataSource = _userDto.GetUsers();
-            view.BestFitColumns();
+            ApplyColumnCaptions();
         }
 
         private void BtnSave_Click(object sender, EventArgs e)
