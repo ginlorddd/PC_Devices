@@ -78,7 +78,6 @@
             this.gridFY.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.viewFY });
             this.btnSaveFY.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.btnSaveFY.Height = 36;
-            this.btnSaveFY.ImageOptions.Image = global::PC_Devices.Properties.Resources.AssignTo_32x32;
             this.btnSaveFY.Text = "Lưu bảng kế hoạch FY";
             // tab Ratio
             this.tabRatio.Controls.Add(this.gridRatio);
@@ -90,7 +89,6 @@
             this.gridRatio.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.viewRatio });
             this.btnSaveRatio.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.btnSaveRatio.Height = 36;
-            this.btnSaveRatio.ImageOptions.Image = global::PC_Devices.Properties.Resources.AssignTo_32x32;
             this.btnSaveRatio.Text = "Lưu bảng tỉ lệ chạy máy";
             // tab Output
             this.tabOutput.Controls.Add(this.gridOutput);
@@ -102,7 +100,6 @@
             this.gridOutput.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.viewOutput });
             this.btnSaveOutput.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.btnSaveOutput.Height = 36;
-            this.btnSaveOutput.ImageOptions.Image = global::PC_Devices.Properties.Resources.AssignTo_32x32;
             this.btnSaveOutput.Text = "Lưu bảng sản lượng khuôn";
             // tab Master
             this.tabMaster.Controls.Add(this.gridMaster);
@@ -114,7 +111,6 @@
             this.gridMaster.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.viewMaster });
             this.btnGenerateMaster.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.btnGenerateMaster.Height = 36;
-            this.btnGenerateMaster.ImageOptions.Image = global::PC_Devices.Properties.Resources.BO_Role_32x32;
             this.btnGenerateMaster.Text = "Tạo bảng kế hoạch OHD (master)";
             // form
             this.ClientSize = new System.Drawing.Size(1280, 720);

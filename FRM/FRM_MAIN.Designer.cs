@@ -59,7 +59,6 @@
             // 
             this.btnDieMaster.Caption = "Die Master";
             this.btnDieMaster.Id = 1;
-            this.btnDieMaster.ImageOptions.Image = global::PC_Devices.Properties.Resources.AssignTo_32x32;
             this.btnDieMaster.Name = "btnDieMaster";
             this.btnDieMaster.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
             this.btnDieMaster.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnDieMaster_ItemClick);
@@ -68,7 +67,6 @@
             // 
             this.btnAccount.Caption = "Quản lý tài khoản";
             this.btnAccount.Id = 2;
-            this.btnAccount.ImageOptions.Image = global::PC_Devices.Properties.Resources.BO_User_32x32;
             this.btnAccount.Name = "btnAccount";
             this.btnAccount.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
             this.btnAccount.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnAccount_ItemClick);
@@ -77,7 +75,6 @@
             // 
             this.btnChangePassword.Caption = "Đổi mật khẩu";
             this.btnChangePassword.Id = 3;
-            this.btnChangePassword.ImageOptions.Image = global::PC_Devices.Properties.Resources.Action_ResetPassword_32x32;
             this.btnChangePassword.Name = "btnChangePassword";
             this.btnChangePassword.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
             this.btnChangePassword.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnChangePassword_ItemClick);
@@ -87,7 +84,6 @@
             // 
             this.btnProductionPlan.Caption = "Kế hoạch sản xuất";
             this.btnProductionPlan.Id = 4;
-            this.btnProductionPlan.ImageOptions.Image = global::PC_Devices.Properties.Resources.BO_Role_32x32;
             this.btnProductionPlan.Name = "btnProductionPlan";
             this.btnProductionPlan.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
             this.btnProductionPlan.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnProductionPlan_ItemClick);

@@ -84,7 +84,6 @@
             this.chkRoles.Size = new System.Drawing.Size(280, 130);
             this.btnSave.Location = new System.Drawing.Point(700, 20);
             this.btnSave.Size = new System.Drawing.Size(120, 30);
-            this.btnSave.ImageOptions.Image = global::PC_Devices.Properties.Resources.AssignTo_32x32;
             this.btnSave.Text = "Lưu";
             // grid
             this.grid.Dock = System.Windows.Forms.DockStyle.Fill;
