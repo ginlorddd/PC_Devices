@@ -60,7 +60,6 @@ namespace DM_OHD.FRM
             view.OptionsView.ColumnAutoWidth = false;
             view.Appearance.HeaderPanel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             view.Appearance.HeaderPanel.Options.UseFont = true;
-            EnsureSttColumn();
         }
 
         private void ApplyColumnCaptions()
@@ -99,6 +98,8 @@ namespace DM_OHD.FRM
         private void LoadData()
         {
             grid.DataSource = _dto.GetAll();
+            view.PopulateColumns();
+            EnsureSttColumn();
             ApplyColumnCaptions();
         }
 

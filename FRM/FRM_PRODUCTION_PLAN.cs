@@ -271,6 +271,14 @@ namespace DM_OHD.FRM
             gridRatio.DataSource = _dto.GetMachineRatio();
             gridOutput.DataSource = _dto.GetDieOutput();
             gridMaster.DataSource = _dto.GetMaster();
+            viewFY.PopulateColumns();
+            viewRatio.PopulateColumns();
+            viewOutput.PopulateColumns();
+            viewMaster.PopulateColumns();
+            EnsureSttColumn(viewFY);
+            EnsureSttColumn(viewRatio);
+            EnsureSttColumn(viewOutput);
+            EnsureSttColumn(viewMaster);
             SetCaptions();
             ApplyMonthFilterToAllViews();
         }
