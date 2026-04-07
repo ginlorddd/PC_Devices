@@ -271,14 +271,10 @@ namespace DM_OHD.FRM
             gridRatio.DataSource = _dto.GetMachineRatio();
             gridOutput.DataSource = _dto.GetDieOutput();
             gridMaster.DataSource = _dto.GetMaster();
-            viewFY.PopulateColumns();
-            viewRatio.PopulateColumns();
-            viewOutput.PopulateColumns();
-            viewMaster.PopulateColumns();
-            EnsureSttColumn(viewFY);
-            EnsureSttColumn(viewRatio);
-            EnsureSttColumn(viewOutput);
-            EnsureSttColumn(viewMaster);
+            EnsureColumnsAndStt(viewFY);
+            EnsureColumnsAndStt(viewRatio);
+            EnsureColumnsAndStt(viewOutput);
+            EnsureColumnsAndStt(viewMaster);
             SetCaptions();
             ApplyMonthFilterToAllViews();
         }
@@ -469,6 +465,16 @@ namespace DM_OHD.FRM
 
             view.CustomUnboundColumnData -= View_CustomUnboundColumnData;
             view.CustomUnboundColumnData += View_CustomUnboundColumnData;
+        }
+
+        private void EnsureColumnsAndStt(GridView view)
+        {
+            bool hasDataColumn = view.Columns.Cast<GridColumn>().Any(c => c.FieldName != "STT");
+            if (!hasDataColumn)
+            {
+                view.PopulateColumns();
+            }
+            EnsureSttColumn(view);
         }
 
         private void View_CustomUnboundColumnData(object sender, DevExpress.XtraGrid.Views.Base.CustomColumnDataEventArgs e)

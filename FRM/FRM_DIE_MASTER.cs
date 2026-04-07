@@ -98,7 +98,11 @@ namespace DM_OHD.FRM
         private void LoadData()
         {
             grid.DataSource = _dto.GetAll();
-            view.PopulateColumns();
+            bool hasDataColumn = view.Columns.Cast<GridColumn>().Any(c => c.FieldName != "STT");
+            if (!hasDataColumn)
+            {
+                view.PopulateColumns();
+            }
             EnsureSttColumn();
             ApplyColumnCaptions();
         }
