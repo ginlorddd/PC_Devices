@@ -39,8 +39,14 @@ namespace DM_OHD.FRM
             btnSaveRatio.Click += (s, e) => { _dto.SaveMachineRatio(gridRatio.DataSource as DataTable); LoadData(); };
             btnSaveOutput.Click += (s, e) => { _dto.SaveDieOutput(gridOutput.DataSource as DataTable); LoadData(); };
             btnGenerateMaster.Click += (s, e) => { _dto.GenerateMasterPlan(); LoadData(); };
+            btnExportFY.Click += (s, e) => ExportGrid(viewFY);
+            btnImportFY.Click += (s, e) => ImportCsvToGrid(gridFY.DataSource as DataTable, viewFY);
+            btnExportRatio.Click += (s, e) => ExportGrid(viewRatio);
+            btnImportRatio.Click += (s, e) => ImportCsvToGrid(gridRatio.DataSource as DataTable, viewRatio);
+            btnExportOutput.Click += (s, e) => ExportGrid(viewOutput);
+            btnImportOutput.Click += (s, e) => ImportCsvToGrid(gridOutput.DataSource as DataTable, viewOutput);
+            btnExportMaster.Click += (s, e) => ExportGrid(viewMaster);
 
-            SetupActionButtons();
             SetupGridEditingBehavior(viewFY);
             SetupGridEditingBehavior(viewRatio);
             SetupGridEditingBehavior(viewOutput);
@@ -50,52 +56,6 @@ namespace DM_OHD.FRM
             ApplyPermissions();
             Load += (s, e) => LoadData();
         }
-
-
-        private void SetupActionButtons()
-        {
-            AddActionButtons(tabFY, gridFY, viewFY, btnSaveFY, canImport: true);
-            AddActionButtons(tabRatio, gridRatio, viewRatio, btnSaveRatio, canImport: true);
-            AddActionButtons(tabOutput, gridOutput, viewOutput, btnSaveOutput, canImport: true);
-            AddActionButtons(tabMaster, gridMaster, viewMaster, btnGenerateMaster, canImport: false);
-        }
-
-        private void AddActionButtons(TabPage tab, DevExpress.XtraGrid.GridControl grid, GridView view, SimpleButton mainButton, bool canImport)
-        {
-            var panel = new Panel { Dock = DockStyle.Bottom, Height = 38, BackColor = Color.WhiteSmoke };
-            tab.Controls.Remove(mainButton);
-            mainButton.Dock = DockStyle.Left;
-            mainButton.Width = 240;
-            mainButton.Appearance.BackColor = Color.MediumSeaGreen;
-            mainButton.Appearance.ForeColor = Color.White;
-            mainButton.Appearance.Options.UseBackColor = true;
-            mainButton.Appearance.Options.UseForeColor = true;
-
-            var btnExport = new SimpleButton { Text = "Export", Dock = DockStyle.Left, Width = 90 };
-            btnExport.Appearance.BackColor = Color.SteelBlue;
-            btnExport.Appearance.ForeColor = Color.White;
-            btnExport.Appearance.Options.UseBackColor = true;
-            btnExport.Appearance.Options.UseForeColor = true;
-            btnExport.Click += (s, e) => ExportGrid(view);
-
-            panel.Controls.Add(btnExport);
-
-            if (canImport)
-            {
-                var btnImport = new SimpleButton { Text = "Import CSV", Dock = DockStyle.Left, Width = 110 };
-                btnImport.Appearance.BackColor = Color.DarkOrange;
-                btnImport.Appearance.ForeColor = Color.White;
-                btnImport.Appearance.Options.UseBackColor = true;
-                btnImport.Appearance.Options.UseForeColor = true;
-                btnImport.Click += (s, e) => ImportCsvToGrid(grid.DataSource as DataTable, view);
-                panel.Controls.Add(btnImport);
-            }
-
-            panel.Controls.Add(mainButton);
-            tab.Controls.Add(panel);
-            panel.BringToFront();
-        }
-
         private void StyleButtons()
         {
             btnApplyFilter.Appearance.BackColor = Color.RoyalBlue;
@@ -106,6 +66,27 @@ namespace DM_OHD.FRM
             btnGenerateMaster.Appearance.ForeColor = Color.White;
             btnGenerateMaster.Appearance.Options.UseBackColor = true;
             btnGenerateMaster.Appearance.Options.UseForeColor = true;
+
+            Color exportColor = Color.SteelBlue;
+            Color importColor = Color.DarkOrange;
+            ApplyButtonColor(btnExportFY, exportColor);
+            ApplyButtonColor(btnExportRatio, exportColor);
+            ApplyButtonColor(btnExportOutput, exportColor);
+            ApplyButtonColor(btnExportMaster, exportColor);
+            ApplyButtonColor(btnImportFY, importColor);
+            ApplyButtonColor(btnImportRatio, importColor);
+            ApplyButtonColor(btnImportOutput, importColor);
+            ApplyButtonColor(btnSaveFY, Color.MediumSeaGreen);
+            ApplyButtonColor(btnSaveRatio, Color.MediumSeaGreen);
+            ApplyButtonColor(btnSaveOutput, Color.MediumSeaGreen);
+        }
+
+        private void ApplyButtonColor(SimpleButton button, Color color)
+        {
+            button.Appearance.BackColor = color;
+            button.Appearance.ForeColor = Color.White;
+            button.Appearance.Options.UseBackColor = true;
+            button.Appearance.Options.UseForeColor = true;
         }
 
         private void SetupGridEditingBehavior(GridView view)

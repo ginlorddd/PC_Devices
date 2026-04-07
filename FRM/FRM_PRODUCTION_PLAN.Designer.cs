@@ -20,6 +20,13 @@
         private DevExpress.XtraEditors.SimpleButton btnSaveRatio;
         private DevExpress.XtraEditors.SimpleButton btnSaveOutput;
         private DevExpress.XtraEditors.SimpleButton btnGenerateMaster;
+        private DevExpress.XtraEditors.SimpleButton btnExportFY;
+        private DevExpress.XtraEditors.SimpleButton btnImportFY;
+        private DevExpress.XtraEditors.SimpleButton btnExportRatio;
+        private DevExpress.XtraEditors.SimpleButton btnImportRatio;
+        private DevExpress.XtraEditors.SimpleButton btnExportOutput;
+        private DevExpress.XtraEditors.SimpleButton btnImportOutput;
+        private DevExpress.XtraEditors.SimpleButton btnExportMaster;
         private DevExpress.XtraEditors.PanelControl panelFilter;
         private DevExpress.XtraEditors.LabelControl lblFrom;
         private DevExpress.XtraEditors.LabelControl lblTo;
@@ -52,6 +59,13 @@
             this.btnSaveRatio = new DevExpress.XtraEditors.SimpleButton();
             this.btnSaveOutput = new DevExpress.XtraEditors.SimpleButton();
             this.btnGenerateMaster = new DevExpress.XtraEditors.SimpleButton();
+            this.btnExportFY = new DevExpress.XtraEditors.SimpleButton();
+            this.btnImportFY = new DevExpress.XtraEditors.SimpleButton();
+            this.btnExportRatio = new DevExpress.XtraEditors.SimpleButton();
+            this.btnImportRatio = new DevExpress.XtraEditors.SimpleButton();
+            this.btnExportOutput = new DevExpress.XtraEditors.SimpleButton();
+            this.btnImportOutput = new DevExpress.XtraEditors.SimpleButton();
+            this.btnExportMaster = new DevExpress.XtraEditors.SimpleButton();
             this.panelFilter = new DevExpress.XtraEditors.PanelControl();
             this.lblFrom = new DevExpress.XtraEditors.LabelControl();
             this.lblTo = new DevExpress.XtraEditors.LabelControl();
@@ -88,6 +102,8 @@
             this.tabControl1.Size = new System.Drawing.Size(1280, 678);
             // tab FY
             this.tabFY.Controls.Add(this.gridFY);
+            this.tabFY.Controls.Add(this.btnExportFY);
+            this.tabFY.Controls.Add(this.btnImportFY);
             this.tabFY.Controls.Add(this.btnSaveFY);
             this.tabFY.Text = "Bảng 2 - Kế hoạch FY";
             this.tabFY.UseVisualStyleBackColor = true;
@@ -97,8 +113,16 @@
             this.btnSaveFY.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.btnSaveFY.Height = 36;
             this.btnSaveFY.Text = "Lưu bảng kế hoạch FY";
+            this.btnImportFY.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.btnImportFY.Height = 30;
+            this.btnImportFY.Text = "Import CSV";
+            this.btnExportFY.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.btnExportFY.Height = 30;
+            this.btnExportFY.Text = "Export";
             // tab Ratio
             this.tabRatio.Controls.Add(this.gridRatio);
+            this.tabRatio.Controls.Add(this.btnExportRatio);
+            this.tabRatio.Controls.Add(this.btnImportRatio);
             this.tabRatio.Controls.Add(this.btnSaveRatio);
             this.tabRatio.Text = "Bảng 3 - Tỉ lệ chạy máy";
             this.tabRatio.UseVisualStyleBackColor = true;
@@ -108,8 +132,16 @@
             this.btnSaveRatio.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.btnSaveRatio.Height = 36;
             this.btnSaveRatio.Text = "Lưu bảng tỉ lệ chạy máy";
+            this.btnImportRatio.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.btnImportRatio.Height = 30;
+            this.btnImportRatio.Text = "Import CSV";
+            this.btnExportRatio.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.btnExportRatio.Height = 30;
+            this.btnExportRatio.Text = "Export";
             // tab Output
             this.tabOutput.Controls.Add(this.gridOutput);
+            this.tabOutput.Controls.Add(this.btnExportOutput);
+            this.tabOutput.Controls.Add(this.btnImportOutput);
             this.tabOutput.Controls.Add(this.btnSaveOutput);
             this.tabOutput.Text = "Bảng 4 - Sản lượng khuôn";
             this.tabOutput.UseVisualStyleBackColor = true;
@@ -119,8 +151,15 @@
             this.btnSaveOutput.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.btnSaveOutput.Height = 36;
             this.btnSaveOutput.Text = "Lưu bảng sản lượng khuôn";
+            this.btnImportOutput.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.btnImportOutput.Height = 30;
+            this.btnImportOutput.Text = "Import CSV";
+            this.btnExportOutput.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.btnExportOutput.Height = 30;
+            this.btnExportOutput.Text = "Export";
             // tab Master
             this.tabMaster.Controls.Add(this.gridMaster);
+            this.tabMaster.Controls.Add(this.btnExportMaster);
             this.tabMaster.Controls.Add(this.btnGenerateMaster);
             this.tabMaster.Text = "Bảng 1 - Kế hoạch OHD";
             this.tabMaster.UseVisualStyleBackColor = true;
@@ -130,6 +169,9 @@
             this.btnGenerateMaster.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.btnGenerateMaster.Height = 36;
             this.btnGenerateMaster.Text = "Tạo bảng kế hoạch OHD (master)";
+            this.btnExportMaster.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.btnExportMaster.Height = 30;
+            this.btnExportMaster.Text = "Export";
             // panelFilter
             this.panelFilter.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.panelFilter.Controls.Add(this.btnApplyFilter);
