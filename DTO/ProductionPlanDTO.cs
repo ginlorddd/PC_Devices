@@ -234,38 +234,24 @@ namespace DM_OHD.DTO
             foreach (DataRow row in wideTable.Rows)
             {
                 if (row.RowState == DataRowState.Deleted) continue;
-                string dieNo = Convert.ToString(row["DIE_NO"]);
+                string dieNo = NormalizeKey(row["DIE_NO"]);
                 if (string.IsNullOrWhiteSpace(dieNo)) continue;
                 if (!validDieNoSet.Contains(dieNo)) continue;
 
+                bool inserted = false;
                 foreach (var ym in YearMonths())
                 {
                     string monthCol = BuildMonthColumnName(ym.year, ym.month);
                     decimal value = ToDecimal(row[monthCol]);
                     if (value == 0) continue;
+                    InsertWideRow(tableName, valueColumn, includeProductNo, row, dieNo, ym.year, ym.month, value);
+                    inserted = true;
+                }
 
-                    string sql = includeProductNo
-                        ? $@"INSERT INTO {tableName}(PRODUCT_NO,DIE_NO,DIE_NAME,CAVITY,PLAN_YEAR,PLAN_MONTH,{valueColumn})
-                            VALUES(@P,@D,@N,@C,@Y,@M,@V)"
-                        : $@"INSERT INTO {tableName}(DIE_NO,DIE_NAME,CAVITY,PLAN_YEAR,PLAN_MONTH,{valueColumn})
-                            VALUES(@D,@N,@C,@Y,@M,@V)";
-
-                    var parameters = new List<SqlParameter>
-                    {
-                        new SqlParameter("@D", dieNo),
-                        new SqlParameter("@N", Convert.ToString(row["DIE_NAME"] ?? string.Empty)),
-                        new SqlParameter("@C", Convert.ToString(row["CAVITY"] ?? string.Empty)),
-                        new SqlParameter("@Y", ym.year),
-                        new SqlParameter("@M", ym.month),
-                        new SqlParameter("@V", value)
-                    };
-
-                    if (includeProductNo)
-                    {
-                        parameters.Insert(0, new SqlParameter("@P", Convert.ToString(row["PRODUCT_NO"] ?? string.Empty)));
-                    }
-
-                    DBUtils.Exec(sql, parameters.ToArray());
+                if (!inserted)
+                {
+                    var firstYm = YearMonths().First();
+                    InsertWideRow(tableName, valueColumn, includeProductNo, row, dieNo, firstYm.year, firstYm.month, 0m);
                 }
             }
         }
@@ -285,10 +271,36 @@ namespace DM_OHD.DTO
             var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (DataRow row in dt.Rows)
             {
-                string dieNo = Convert.ToString(row["DIE_NO"]);
+                string dieNo = NormalizeKey(row["DIE_NO"]);
                 if (!string.IsNullOrWhiteSpace(dieNo)) set.Add(dieNo);
             }
             return set;
+        }
+
+        private void InsertWideRow(string tableName, string valueColumn, bool includeProductNo, DataRow row, string dieNo, int year, int month, decimal value)
+        {
+            string sql = includeProductNo
+                ? $@"INSERT INTO {tableName}(PRODUCT_NO,DIE_NO,DIE_NAME,CAVITY,PLAN_YEAR,PLAN_MONTH,{valueColumn})
+                    VALUES(@P,@D,@N,@C,@Y,@M,@V)"
+                : $@"INSERT INTO {tableName}(DIE_NO,DIE_NAME,CAVITY,PLAN_YEAR,PLAN_MONTH,{valueColumn})
+                    VALUES(@D,@N,@C,@Y,@M,@V)";
+
+            var parameters = new List<SqlParameter>
+            {
+                new SqlParameter("@D", dieNo),
+                new SqlParameter("@N", Convert.ToString(row["DIE_NAME"] ?? string.Empty)),
+                new SqlParameter("@C", Convert.ToString(row["CAVITY"] ?? string.Empty)),
+                new SqlParameter("@Y", year),
+                new SqlParameter("@M", month),
+                new SqlParameter("@V", value)
+            };
+
+            if (includeProductNo)
+            {
+                parameters.Insert(0, new SqlParameter("@P", Convert.ToString(row["PRODUCT_NO"] ?? string.Empty)));
+            }
+
+            DBUtils.Exec(sql, parameters.ToArray());
         }
 
         private IEnumerable<(int year, int month)> YearMonths()
@@ -303,6 +315,7 @@ namespace DM_OHD.DTO
         }
 
         private string BuildMonthColumnName(int year, int month) => $"M{year}{month:00}";
+        private string NormalizeKey(object value) => Convert.ToString(value ?? string.Empty).Trim();
 
         private int ToInt(object value) => int.TryParse(Convert.ToString(value), out int x) ? x : 0;
         private decimal ToDecimal(object value) => decimal.TryParse(Convert.ToString(value), out decimal x) ? x : 0;
