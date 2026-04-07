@@ -246,6 +246,44 @@ namespace DM_OHD.FRM
                 if (month >= 1 && month <= 12) return $"M{year}{month:00}";
             }
 
+            string[] dateFormats = { "d/M/yyyy", "dd/MM/yyyy", "M/d/yyyy", "MM/dd/yyyy", "d-M-yyyy", "M-d-yyyy" };
+            List<DateTime> parsedDates = new List<DateTime>();
+            foreach (string format in dateFormats)
+            {
+                if (DateTime.TryParseExact(header, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsed))
+                {
+                    parsedDates.Add(parsed);
+                }
+            }
+            DateTime firstDayCandidate = parsedDates.FirstOrDefault(d => d.Day == 1);
+            if (firstDayCandidate != default(DateTime))
+            {
+                return $"M{firstDayCandidate.Year}{firstDayCandidate.Month:00}";
+            }
+            if (parsedDates.Count > 0)
+            {
+                DateTime parsed = parsedDates[0];
+                return $"M{parsed.Year}{parsed.Month:00}";
+            }
+
+            string[] monthNameFormats = { "MMM-yy", "MMM-yyyy", "MMMM-yy", "MMMM-yyyy", "MMM yy", "MMM/yyyy" };
+            foreach (string format in monthNameFormats)
+            {
+                if (DateTime.TryParseExact(header, format, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime parsed))
+                {
+                    return $"M{parsed.Year}{parsed.Month:00}";
+                }
+            }
+
+            if (double.TryParse(header, NumberStyles.Any, CultureInfo.InvariantCulture, out double oaDate))
+            {
+                if (oaDate > 20000 && oaDate < 70000)
+                {
+                    DateTime parsed = DateTime.FromOADate(oaDate);
+                    return $"M{parsed.Year}{parsed.Month:00}";
+                }
+            }
+
             return null;
         }
 
