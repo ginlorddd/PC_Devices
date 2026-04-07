@@ -7,6 +7,10 @@ using System.Data;
 using DevExpress.XtraGrid.Columns;
 using DevExpress.Utils;
 using System.Globalization;
+using System.Windows.Forms;
+using System.IO;
+using System.Drawing;
+using System.Linq;
 
 namespace DM_OHD.FRM
 {
@@ -36,8 +40,180 @@ namespace DM_OHD.FRM
             btnSaveOutput.Click += (s, e) => { _dto.SaveDieOutput(gridOutput.DataSource as DataTable); LoadData(); };
             btnGenerateMaster.Click += (s, e) => { _dto.GenerateMasterPlan(); LoadData(); };
 
+            SetupActionButtons();
+            SetupGridEditingBehavior(viewFY);
+            SetupGridEditingBehavior(viewRatio);
+            SetupGridEditingBehavior(viewOutput);
+            SetupGridEditingBehavior(viewMaster);
+            StyleButtons();
+
             ApplyPermissions();
             Load += (s, e) => LoadData();
+        }
+
+
+        private void SetupActionButtons()
+        {
+            AddActionButtons(tabFY, gridFY, viewFY, btnSaveFY, canImport: true);
+            AddActionButtons(tabRatio, gridRatio, viewRatio, btnSaveRatio, canImport: true);
+            AddActionButtons(tabOutput, gridOutput, viewOutput, btnSaveOutput, canImport: true);
+            AddActionButtons(tabMaster, gridMaster, viewMaster, btnGenerateMaster, canImport: false);
+        }
+
+        private void AddActionButtons(TabPage tab, DevExpress.XtraGrid.GridControl grid, GridView view, SimpleButton mainButton, bool canImport)
+        {
+            var panel = new Panel { Dock = DockStyle.Bottom, Height = 38, BackColor = Color.WhiteSmoke };
+            tab.Controls.Remove(mainButton);
+            mainButton.Dock = DockStyle.Left;
+            mainButton.Width = 240;
+            mainButton.Appearance.BackColor = Color.MediumSeaGreen;
+            mainButton.Appearance.ForeColor = Color.White;
+            mainButton.Appearance.Options.UseBackColor = true;
+            mainButton.Appearance.Options.UseForeColor = true;
+
+            var btnExport = new SimpleButton { Text = "Export", Dock = DockStyle.Left, Width = 90 };
+            btnExport.Appearance.BackColor = Color.SteelBlue;
+            btnExport.Appearance.ForeColor = Color.White;
+            btnExport.Appearance.Options.UseBackColor = true;
+            btnExport.Appearance.Options.UseForeColor = true;
+            btnExport.Click += (s, e) => ExportGrid(view);
+
+            panel.Controls.Add(btnExport);
+
+            if (canImport)
+            {
+                var btnImport = new SimpleButton { Text = "Import CSV", Dock = DockStyle.Left, Width = 110 };
+                btnImport.Appearance.BackColor = Color.DarkOrange;
+                btnImport.Appearance.ForeColor = Color.White;
+                btnImport.Appearance.Options.UseBackColor = true;
+                btnImport.Appearance.Options.UseForeColor = true;
+                btnImport.Click += (s, e) => ImportCsvToGrid(grid.DataSource as DataTable, view);
+                panel.Controls.Add(btnImport);
+            }
+
+            panel.Controls.Add(mainButton);
+            tab.Controls.Add(panel);
+            panel.BringToFront();
+        }
+
+        private void StyleButtons()
+        {
+            btnApplyFilter.Appearance.BackColor = Color.RoyalBlue;
+            btnApplyFilter.Appearance.ForeColor = Color.White;
+            btnApplyFilter.Appearance.Options.UseBackColor = true;
+            btnApplyFilter.Appearance.Options.UseForeColor = true;
+            btnGenerateMaster.Appearance.BackColor = Color.MediumPurple;
+            btnGenerateMaster.Appearance.ForeColor = Color.White;
+            btnGenerateMaster.Appearance.Options.UseBackColor = true;
+            btnGenerateMaster.Appearance.Options.UseForeColor = true;
+        }
+
+        private void SetupGridEditingBehavior(GridView view)
+        {
+            view.KeyDown -= View_KeyDown;
+            view.KeyDown += View_KeyDown;
+            view.ValidatingEditor -= View_ValidatingEditor;
+            view.ValidatingEditor += View_ValidatingEditor;
+        }
+
+        private void View_ValidatingEditor(object sender, DevExpress.XtraEditors.Controls.BaseContainerValidateEditorEventArgs e)
+        {
+            var view = sender as GridView;
+            if (view?.FocusedColumn == null) return;
+            string field = view.FocusedColumn.FieldName;
+            if (!field.StartsWith("M") || field.Length != 7) return;
+
+            if (decimal.TryParse(Convert.ToString(e.Value)?.Replace(".", "").Replace(",", ""), out decimal num))
+            {
+                e.Value = Math.Round(num, 0);
+            }
+            else
+            {
+                e.Value = 0m;
+            }
+        }
+
+        private void View_KeyDown(object sender, KeyEventArgs e)
+        {
+            var view = sender as GridView;
+            if (view == null) return;
+            if (e.Control && e.KeyCode == Keys.V)
+            {
+                PasteFromClipboard(view);
+                e.Handled = true;
+            }
+        }
+
+        private void PasteFromClipboard(GridView view)
+        {
+            string text = Clipboard.GetText();
+            if (string.IsNullOrWhiteSpace(text)) return;
+
+            string[] rows = text.Replace("\r", string.Empty)
+                                .Split(new[] { "\n" }, StringSplitOptions.None);
+            int startRow = view.FocusedRowHandle;
+            int startCol = view.FocusedColumn.VisibleIndex;
+
+            for (int r = 0; r < rows.Length; r++)
+            {
+                if (string.IsNullOrWhiteSpace(rows[r])) continue;
+                string[] cells = rows[r].Split('	');
+                int targetRow = startRow + r;
+                if (targetRow >= view.RowCount) view.AddNewRow();
+                targetRow = Math.Min(targetRow, view.RowCount - 1);
+
+                for (int c = 0; c < cells.Length; c++)
+                {
+                    int targetColIndex = startCol + c;
+                    var col = view.VisibleColumns.FirstOrDefault(x => x.VisibleIndex == targetColIndex);
+                    if (col == null || col.OptionsColumn.AllowEdit == false) continue;
+                    if (!col.FieldName.StartsWith("M")) continue;
+                    view.SetRowCellValue(targetRow, col, ParseNumber(cells[c]));
+                }
+            }
+        }
+
+        private decimal ParseNumber(string value)
+        {
+            string clean = (value ?? string.Empty).Trim().Replace(".", "").Replace(",", "");
+            return decimal.TryParse(clean, out decimal num) ? Math.Round(num, 0) : 0m;
+        }
+
+        private void ExportGrid(GridView view)
+        {
+            using (var dialog = new SaveFileDialog { Filter = "Excel file (*.xlsx)|*.xlsx" })
+            {
+                if (dialog.ShowDialog() != DialogResult.OK) return;
+                view.ExportToXlsx(dialog.FileName);
+                XtraMessageBox.Show("Export thành công.", "Thông báo");
+            }
+        }
+
+        private void ImportCsvToGrid(DataTable dt, GridView view)
+        {
+            if (dt == null) return;
+            using (var dialog = new OpenFileDialog { Filter = "CSV file (*.csv)|*.csv|Text file (*.txt)|*.txt" })
+            {
+                if (dialog.ShowDialog() != DialogResult.OK) return;
+                var lines = File.ReadAllLines(dialog.FileName);
+                if (lines.Length < 2) return;
+
+                string[] headers = lines[0].Split(',');
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(lines[i])) continue;
+                    string[] cells = lines[i].Split(',');
+                    DataRow row = dt.NewRow();
+                    for (int c = 0; c < headers.Length && c < cells.Length; c++)
+                    {
+                        string h = headers[c].Trim();
+                        if (!dt.Columns.Contains(h)) continue;
+                        row[h] = dt.Columns[h].DataType == typeof(decimal) ? ParseNumber(cells[c]) : (object)cells[c].Trim();
+                    }
+                    dt.Rows.Add(row);
+                }
+                view.RefreshData();
+            }
         }
 
         private void ConfigureMonthEditor(DateEdit editor)
@@ -148,6 +324,7 @@ namespace DM_OHD.FRM
 
                 col.Caption = $"{month:00}/{year}";
                 col.DisplayFormat.FormatType = FormatType.Custom;
+                col.OptionsColumn.AllowEdit = view.OptionsBehavior.Editable;
                 col.Width = 92;
                 col.ToolTip = valueCaption;
             }
