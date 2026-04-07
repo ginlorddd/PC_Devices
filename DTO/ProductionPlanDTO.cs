@@ -14,25 +14,25 @@ namespace DM_OHD.DTO
 
         public DataTable GetPlanFY()
         {
-            DataTable raw = DBUtils.GetData("SELECT PRODUCT_NO, DIE_NO, DIE_NAME, CAVITY, PLAN_YEAR, PLAN_MONTH, FY_SHOTS FROM OHD_PLAN_FY ORDER BY DIE_NO, CAVITY, PLAN_YEAR, PLAN_MONTH");
+            DataTable raw = DBUtils.GetData("SELECT f.PRODUCT_NO, f.DIE_NO, ISNULL(m.DIE_NAME,f.DIE_NAME) AS DIE_NAME, f.CAVITY, f.PLAN_YEAR, f.PLAN_MONTH, f.FY_SHOTS FROM OHD_PLAN_FY f INNER JOIN DIE_MST m ON f.DIE_NO = m.DIE_NO ORDER BY f.DIE_NO, f.CAVITY, f.PLAN_YEAR, f.PLAN_MONTH");
             return BuildWideTable(raw, "FY_SHOTS", includeProductNo: true);
         }
 
         public DataTable GetMachineRatio()
         {
-            DataTable raw = DBUtils.GetData("SELECT DIE_NO, DIE_NAME, CAVITY, PLAN_YEAR, PLAN_MONTH, RUN_RATIO FROM OHD_MACHINE_RATIO ORDER BY DIE_NO, CAVITY, PLAN_YEAR, PLAN_MONTH");
+            DataTable raw = DBUtils.GetData("SELECT r.DIE_NO, ISNULL(m.DIE_NAME,r.DIE_NAME) AS DIE_NAME, r.CAVITY, r.PLAN_YEAR, r.PLAN_MONTH, r.RUN_RATIO FROM OHD_MACHINE_RATIO r INNER JOIN DIE_MST m ON r.DIE_NO = m.DIE_NO ORDER BY r.DIE_NO, r.CAVITY, r.PLAN_YEAR, r.PLAN_MONTH");
             return BuildWideTable(raw, "RUN_RATIO");
         }
 
         public DataTable GetDieOutput()
         {
-            DataTable raw = DBUtils.GetData("SELECT DIE_NO, DIE_NAME, CAVITY, PLAN_YEAR, PLAN_MONTH, OUTPUT_QTY FROM OHD_DIE_OUTPUT ORDER BY DIE_NO, CAVITY, PLAN_YEAR, PLAN_MONTH");
+            DataTable raw = DBUtils.GetData("SELECT o.DIE_NO, ISNULL(m.DIE_NAME,o.DIE_NAME) AS DIE_NAME, o.CAVITY, o.PLAN_YEAR, o.PLAN_MONTH, o.OUTPUT_QTY FROM OHD_DIE_OUTPUT o INNER JOIN DIE_MST m ON o.DIE_NO = m.DIE_NO ORDER BY o.DIE_NO, o.CAVITY, o.PLAN_YEAR, o.PLAN_MONTH");
             return BuildWideTable(raw, "OUTPUT_QTY");
         }
 
         public DataTable GetMaster()
         {
-            DataTable raw = DBUtils.GetData("SELECT DIE_NO, DIE_NAME, CAVITY, PLAN_YEAR, PLAN_MONTH, FY_SHOTS, RUN_RATIO, REQUIRED_QTY, OHD_MOC FROM OHD_PLAN_MASTER ORDER BY DIE_NO, CAVITY, PLAN_YEAR, PLAN_MONTH");
+            DataTable raw = DBUtils.GetData("SELECT p.DIE_NO, ISNULL(m.DIE_NAME,p.DIE_NAME) AS DIE_NAME, p.CAVITY, ISNULL(m.TOTAL_CAVITY,0) AS TOTAL_CAVITY, p.PLAN_YEAR, p.PLAN_MONTH, p.FY_SHOTS, p.RUN_RATIO, p.REQUIRED_QTY, p.OHD_MOC FROM OHD_PLAN_MASTER p INNER JOIN DIE_MST m ON p.DIE_NO = m.DIE_NO ORDER BY p.DIE_NO, p.CAVITY, p.PLAN_YEAR, p.PLAN_MONTH");
             return BuildWideMasterTable(raw);
         }
 
@@ -150,6 +150,7 @@ namespace DM_OHD.DTO
             wide.Columns.Add("DIE_NO", typeof(string));
             wide.Columns.Add("DIE_NAME", typeof(string));
             wide.Columns.Add("CAVITY", typeof(string));
+            wide.Columns.Add("TOTAL_CAVITY", typeof(int));
             wide.Columns.Add("QTY_TYPE", typeof(string));
 
             foreach (var ym in YearMonths())
@@ -160,7 +161,8 @@ namespace DM_OHD.DTO
             var grouped = raw.AsEnumerable().GroupBy(r => (
                 DieNo: Convert.ToString(r["DIE_NO"]),
                 DieName: Convert.ToString(r["DIE_NAME"]),
-                Cavity: Convert.ToString(r["CAVITY"]) ));
+                Cavity: Convert.ToString(r["CAVITY"]),
+                TotalCavity: ToInt(r["TOTAL_CAVITY"]) ));
 
             foreach (var g in grouped)
             {
@@ -172,12 +174,13 @@ namespace DM_OHD.DTO
             return wide;
         }
 
-        private void AddMasterTypeRow(DataTable target, IGrouping<(string DieNo, string DieName, string Cavity), DataRow> group, string valueField, string qtyType)
+        private void AddMasterTypeRow(DataTable target, IGrouping<(string DieNo, string DieName, string Cavity, int TotalCavity), DataRow> group, string valueField, string qtyType)
         {
             DataRow row = target.NewRow();
             row["DIE_NO"] = group.Key.DieNo;
             row["DIE_NAME"] = group.Key.DieName;
             row["CAVITY"] = group.Key.Cavity;
+            row["TOTAL_CAVITY"] = group.Key.TotalCavity;
             row["QTY_TYPE"] = qtyType;
 
             foreach (DataRow src in group)
@@ -195,12 +198,14 @@ namespace DM_OHD.DTO
         {
             DBUtils.Exec($"DELETE FROM {tableName}");
             if (wideTable == null) return;
+            HashSet<string> validDieNoSet = GetValidDieNoSet();
 
             foreach (DataRow row in wideTable.Rows)
             {
                 if (row.RowState == DataRowState.Deleted) continue;
                 string dieNo = Convert.ToString(row["DIE_NO"]);
                 if (string.IsNullOrWhiteSpace(dieNo)) continue;
+                if (!validDieNoSet.Contains(dieNo)) continue;
 
                 foreach (var ym in YearMonths())
                 {
@@ -232,6 +237,18 @@ namespace DM_OHD.DTO
                     DBUtils.Exec(sql, parameters.ToArray());
                 }
             }
+        }
+
+        private HashSet<string> GetValidDieNoSet()
+        {
+            DataTable dt = DBUtils.GetData("SELECT DIE_NO FROM DIE_MST");
+            var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (DataRow row in dt.Rows)
+            {
+                string dieNo = Convert.ToString(row["DIE_NO"]);
+                if (!string.IsNullOrWhiteSpace(dieNo)) set.Add(dieNo);
+            }
+            return set;
         }
 
         private IEnumerable<(int year, int month)> YearMonths()

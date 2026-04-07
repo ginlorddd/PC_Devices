@@ -107,22 +107,23 @@ namespace DM_OHD.FRM
             SetGridCaption(viewFY, "PRODUCT_NO", "ITEM_CODE");
             SetGridCaption(viewFY, "DIE_NAME", "ITEM_DESC");
             SetGridCaption(viewFY, "DIE_NO", "MOLD_NO");
-            SetGridCaption(viewFY, "CAVITY", "MACHINE_NO");
+            SetGridCaption(viewFY, "CAVITY", "CAVITY");
             ConfigureMonthColumns(viewFY, "Kế hoạch FY");
 
             SetGridCaption(viewRatio, "DIE_NAME", "ITEM_DESC");
             SetGridCaption(viewRatio, "DIE_NO", "MOLD_NO");
-            SetGridCaption(viewRatio, "CAVITY", "MACHINE_NO");
+            SetGridCaption(viewRatio, "CAVITY", "CAVITY");
             ConfigureMonthColumns(viewRatio, "Tỉ lệ chạy máy (%)");
 
             SetGridCaption(viewOutput, "DIE_NAME", "ITEM_DESC");
             SetGridCaption(viewOutput, "DIE_NO", "MOLD_NO");
-            SetGridCaption(viewOutput, "CAVITY", "MACHINE_NO");
+            SetGridCaption(viewOutput, "CAVITY", "CAVITY");
             ConfigureMonthColumns(viewOutput, "Sản lượng khuôn");
 
             SetGridCaption(viewMaster, "DIE_NAME", "ITEM_DESC");
             SetGridCaption(viewMaster, "DIE_NO", "MOLD_NO");
-            SetGridCaption(viewMaster, "CAVITY", "MACHINE_NO");
+            SetGridCaption(viewMaster, "TOTAL_CAVITY", "TOTAL_CAVITY");
+            if (viewMaster.Columns["CAVITY"] != null) viewMaster.Columns["CAVITY"].Visible = false;
             SetGridCaption(viewMaster, "QTY_TYPE", "QTY_TYPE");
             ConfigureMonthColumns(viewMaster, "Bảng 1 - Kế hoạch OHD");
 
@@ -155,7 +156,8 @@ namespace DM_OHD.FRM
             if (view.Columns["DIE_NAME"] != null) view.Columns["DIE_NAME"].Width = 180;
             if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].Width = 110;
             if (view.Columns["CAVITY"] != null) view.Columns["CAVITY"].Width = 100;
-            if (view.Columns["QTY_TYPE"] != null) view.Columns["QTY_TYPE"].Width = 110;
+            if (view.Columns["TOTAL_CAVITY"] != null) view.Columns["TOTAL_CAVITY"].Width = 110;
+            if (view.Columns["QTY_TYPE"] != null) view.Columns["QTY_TYPE"].Width = 150;
         }
 
         private void ApplySort(GridView view, bool includeProductNo, bool includeQtyType)
@@ -173,6 +175,8 @@ namespace DM_OHD.FRM
                     view.Columns["DIE_NO"].SortIndex = i++;
                 if (view.Columns["CAVITY"] != null)
                     view.Columns["CAVITY"].SortIndex = i++;
+                if (includeQtyType && view.Columns["TOTAL_CAVITY"] != null)
+                    view.Columns["TOTAL_CAVITY"].SortIndex = i++;
                 if (includeQtyType && view.Columns["QTY_TYPE"] != null)
                     view.Columns["QTY_TYPE"].SortIndex = i;
             }
@@ -192,6 +196,8 @@ namespace DM_OHD.FRM
                 view.Columns["DIE_NO"].Fixed = FixedStyle.Left;
             if (view.Columns["CAVITY"] != null)
                 view.Columns["CAVITY"].Fixed = FixedStyle.Left;
+            if (includeQtyType && view.Columns["TOTAL_CAVITY"] != null)
+                view.Columns["TOTAL_CAVITY"].Fixed = FixedStyle.Left;
             if (includeQtyType && view.Columns["QTY_TYPE"] != null)
                 view.Columns["QTY_TYPE"].Fixed = FixedStyle.Left;
         }
