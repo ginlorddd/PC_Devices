@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using DevExpress.XtraGrid.Columns;
 
 namespace DM_OHD.FRM
 {
@@ -59,14 +60,40 @@ namespace DM_OHD.FRM
             view.OptionsView.ColumnAutoWidth = false;
             view.Appearance.HeaderPanel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             view.Appearance.HeaderPanel.Options.UseFont = true;
+            EnsureSttColumn();
         }
 
         private void ApplyColumnCaptions()
         {
+            if (view.Columns["STT"] != null) view.Columns["STT"].Caption = "STT";
             if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].Caption = "Số khuôn";
             if (view.Columns["DIE_NAME"] != null) view.Columns["DIE_NAME"].Caption = "Tên khuôn";
             if (view.Columns["TOTAL_CAVITY"] != null) view.Columns["TOTAL_CAVITY"].Caption = "Tổng số cavity";
             view.BestFitColumns();
+        }
+
+        private void EnsureSttColumn()
+        {
+            if (view.Columns["STT"] == null)
+            {
+                GridColumn col = view.Columns.AddVisible("STT", "STT");
+                col.UnboundType = DevExpress.Data.UnboundColumnType.Integer;
+                col.OptionsColumn.AllowEdit = false;
+                col.VisibleIndex = 0;
+                col.Width = 55;
+                col.Fixed = DevExpress.XtraGrid.Columns.FixedStyle.Left;
+            }
+
+            view.CustomUnboundColumnData -= View_CustomUnboundColumnData;
+            view.CustomUnboundColumnData += View_CustomUnboundColumnData;
+        }
+
+        private void View_CustomUnboundColumnData(object sender, DevExpress.XtraGrid.Views.Base.CustomColumnDataEventArgs e)
+        {
+            if (e.Column.FieldName == "STT" && e.IsGetData)
+            {
+                e.Value = e.ListSourceRowIndex + 1;
+            }
         }
 
         private void LoadData()

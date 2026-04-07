@@ -98,82 +98,49 @@
             this.tabControl1.Controls.Add(this.tabOutput);
             this.tabControl1.Controls.Add(this.tabMaster);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 42);
-            this.tabControl1.Size = new System.Drawing.Size(1280, 678);
+            this.tabControl1.Location = new System.Drawing.Point(0, 74);
+            this.tabControl1.Size = new System.Drawing.Size(1280, 646);
             // tab FY
             this.tabFY.Controls.Add(this.gridFY);
-            this.tabFY.Controls.Add(this.btnExportFY);
-            this.tabFY.Controls.Add(this.btnImportFY);
-            this.tabFY.Controls.Add(this.btnSaveFY);
             this.tabFY.Text = "Bảng 2 - Kế hoạch FY";
             this.tabFY.UseVisualStyleBackColor = true;
             this.gridFY.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridFY.MainView = this.viewFY;
             this.gridFY.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.viewFY });
-            this.btnSaveFY.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnSaveFY.Height = 36;
-            this.btnSaveFY.Text = "Lưu bảng kế hoạch FY";
-            this.btnImportFY.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnImportFY.Height = 30;
-            this.btnImportFY.Text = "Import CSV";
-            this.btnExportFY.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnExportFY.Height = 30;
-            this.btnExportFY.Text = "Export";
             // tab Ratio
             this.tabRatio.Controls.Add(this.gridRatio);
-            this.tabRatio.Controls.Add(this.btnExportRatio);
-            this.tabRatio.Controls.Add(this.btnImportRatio);
-            this.tabRatio.Controls.Add(this.btnSaveRatio);
             this.tabRatio.Text = "Bảng 3 - Tỉ lệ chạy máy";
             this.tabRatio.UseVisualStyleBackColor = true;
             this.gridRatio.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridRatio.MainView = this.viewRatio;
             this.gridRatio.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.viewRatio });
-            this.btnSaveRatio.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnSaveRatio.Height = 36;
-            this.btnSaveRatio.Text = "Lưu bảng tỉ lệ chạy máy";
-            this.btnImportRatio.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnImportRatio.Height = 30;
-            this.btnImportRatio.Text = "Import CSV";
-            this.btnExportRatio.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnExportRatio.Height = 30;
-            this.btnExportRatio.Text = "Export";
             // tab Output
             this.tabOutput.Controls.Add(this.gridOutput);
-            this.tabOutput.Controls.Add(this.btnExportOutput);
-            this.tabOutput.Controls.Add(this.btnImportOutput);
-            this.tabOutput.Controls.Add(this.btnSaveOutput);
             this.tabOutput.Text = "Bảng 4 - Sản lượng khuôn";
             this.tabOutput.UseVisualStyleBackColor = true;
             this.gridOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridOutput.MainView = this.viewOutput;
             this.gridOutput.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.viewOutput });
-            this.btnSaveOutput.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnSaveOutput.Height = 36;
-            this.btnSaveOutput.Text = "Lưu bảng sản lượng khuôn";
-            this.btnImportOutput.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnImportOutput.Height = 30;
-            this.btnImportOutput.Text = "Import CSV";
-            this.btnExportOutput.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnExportOutput.Height = 30;
-            this.btnExportOutput.Text = "Export";
             // tab Master
             this.tabMaster.Controls.Add(this.gridMaster);
-            this.tabMaster.Controls.Add(this.btnExportMaster);
-            this.tabMaster.Controls.Add(this.btnGenerateMaster);
             this.tabMaster.Text = "Bảng 1 - Kế hoạch OHD";
             this.tabMaster.UseVisualStyleBackColor = true;
             this.gridMaster.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridMaster.MainView = this.viewMaster;
             this.gridMaster.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.viewMaster });
-            this.btnGenerateMaster.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnGenerateMaster.Height = 36;
-            this.btnGenerateMaster.Text = "Tạo bảng kế hoạch OHD (master)";
-            this.btnExportMaster.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.btnExportMaster.Height = 30;
-            this.btnExportMaster.Text = "Export";
             // panelFilter
             this.panelFilter.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.panelFilter.Controls.Add(this.btnSaveFY);
+            this.panelFilter.Controls.Add(this.btnImportFY);
+            this.panelFilter.Controls.Add(this.btnExportFY);
+            this.panelFilter.Controls.Add(this.btnSaveRatio);
+            this.panelFilter.Controls.Add(this.btnImportRatio);
+            this.panelFilter.Controls.Add(this.btnExportRatio);
+            this.panelFilter.Controls.Add(this.btnSaveOutput);
+            this.panelFilter.Controls.Add(this.btnImportOutput);
+            this.panelFilter.Controls.Add(this.btnExportOutput);
+            this.panelFilter.Controls.Add(this.btnGenerateMaster);
+            this.panelFilter.Controls.Add(this.btnExportMaster);
             this.panelFilter.Controls.Add(this.btnApplyFilter);
             this.panelFilter.Controls.Add(this.deTo);
             this.panelFilter.Controls.Add(this.deFrom);
@@ -182,15 +149,15 @@
             this.panelFilter.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelFilter.Location = new System.Drawing.Point(0, 0);
             this.panelFilter.Name = "panelFilter";
-            this.panelFilter.Size = new System.Drawing.Size(1280, 42);
+            this.panelFilter.Size = new System.Drawing.Size(1280, 74);
 
             this.lblFrom.Location = new System.Drawing.Point(10, 13);
             this.lblFrom.Name = "lblFrom";
-            this.lblFrom.Size = new System.Drawing.Size(29, 13);
-            this.lblFrom.Text = "From:";
+            this.lblFrom.Size = new System.Drawing.Size(17, 13);
+            this.lblFrom.Text = "Từ";
 
             this.deFrom.EditValue = null;
-            this.deFrom.Location = new System.Drawing.Point(50, 10);
+            this.deFrom.Location = new System.Drawing.Point(34, 10);
             this.deFrom.Name = "deFrom";
             this.deFrom.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -198,13 +165,13 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.deFrom.Size = new System.Drawing.Size(100, 20);
 
-            this.lblTo.Location = new System.Drawing.Point(168, 13);
+            this.lblTo.Location = new System.Drawing.Point(145, 13);
             this.lblTo.Name = "lblTo";
-            this.lblTo.Size = new System.Drawing.Size(16, 13);
-            this.lblTo.Text = "To:";
+            this.lblTo.Size = new System.Drawing.Size(21, 13);
+            this.lblTo.Text = "Đến";
 
             this.deTo.EditValue = null;
-            this.deTo.Location = new System.Drawing.Point(190, 10);
+            this.deTo.Location = new System.Drawing.Point(172, 10);
             this.deTo.Name = "deTo";
             this.deTo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -212,10 +179,47 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.deTo.Size = new System.Drawing.Size(100, 20);
 
-            this.btnApplyFilter.Location = new System.Drawing.Point(300, 9);
+            this.btnApplyFilter.Location = new System.Drawing.Point(278, 8);
             this.btnApplyFilter.Name = "btnApplyFilter";
-            this.btnApplyFilter.Size = new System.Drawing.Size(52, 23);
-            this.btnApplyFilter.Text = "🔍";
+            this.btnApplyFilter.Size = new System.Drawing.Size(62, 23);
+            this.btnApplyFilter.Text = "Lọc";
+
+            this.btnSaveFY.Location = new System.Drawing.Point(10, 40);
+            this.btnSaveFY.Size = new System.Drawing.Size(98, 26);
+            this.btnSaveFY.Text = "Lưu FY";
+            this.btnImportFY.Location = new System.Drawing.Point(112, 40);
+            this.btnImportFY.Size = new System.Drawing.Size(98, 26);
+            this.btnImportFY.Text = "Import FY";
+            this.btnExportFY.Location = new System.Drawing.Point(214, 40);
+            this.btnExportFY.Size = new System.Drawing.Size(98, 26);
+            this.btnExportFY.Text = "Export FY";
+
+            this.btnSaveRatio.Location = new System.Drawing.Point(316, 40);
+            this.btnSaveRatio.Size = new System.Drawing.Size(98, 26);
+            this.btnSaveRatio.Text = "Lưu Tỉ lệ";
+            this.btnImportRatio.Location = new System.Drawing.Point(418, 40);
+            this.btnImportRatio.Size = new System.Drawing.Size(98, 26);
+            this.btnImportRatio.Text = "Import Tỉ lệ";
+            this.btnExportRatio.Location = new System.Drawing.Point(520, 40);
+            this.btnExportRatio.Size = new System.Drawing.Size(98, 26);
+            this.btnExportRatio.Text = "Export Tỉ lệ";
+
+            this.btnSaveOutput.Location = new System.Drawing.Point(622, 40);
+            this.btnSaveOutput.Size = new System.Drawing.Size(98, 26);
+            this.btnSaveOutput.Text = "Lưu Sản lượng";
+            this.btnImportOutput.Location = new System.Drawing.Point(724, 40);
+            this.btnImportOutput.Size = new System.Drawing.Size(98, 26);
+            this.btnImportOutput.Text = "Import Sản lượng";
+            this.btnExportOutput.Location = new System.Drawing.Point(826, 40);
+            this.btnExportOutput.Size = new System.Drawing.Size(98, 26);
+            this.btnExportOutput.Text = "Export Sản lượng";
+
+            this.btnGenerateMaster.Location = new System.Drawing.Point(928, 40);
+            this.btnGenerateMaster.Size = new System.Drawing.Size(160, 26);
+            this.btnGenerateMaster.Text = "Tạo Master OHD";
+            this.btnExportMaster.Location = new System.Drawing.Point(1092, 40);
+            this.btnExportMaster.Size = new System.Drawing.Size(98, 26);
+            this.btnExportMaster.Text = "Export Master";
 
             // form
             this.ClientSize = new System.Drawing.Size(1280, 720);

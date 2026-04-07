@@ -181,6 +181,7 @@ namespace DM_OHD.DTO
             wide.Columns.Add("CAVITY_DETAIL", typeof(string));
             wide.Columns.Add("TOTAL_CAVITY", typeof(int));
             wide.Columns.Add("QTY_TYPE", typeof(string));
+            wide.Columns.Add("QTY_ORDER", typeof(int));
 
             foreach (var ym in YearMonths())
             {
@@ -195,15 +196,15 @@ namespace DM_OHD.DTO
 
             foreach (var g in grouped)
             {
-                AddMasterTypeRow(wide, g, "FY_SHOTS", "Số shot SX theo FY");
-                AddMasterTypeRow(wide, g, "REQUIRED_QTY", "Shot cộng dồn qua tháng");
-                AddMasterTypeRow(wide, g, "OHD_MOC", "Mốc OHD");
+                AddMasterTypeRow(wide, g, "FY_SHOTS", "Số shot sẽ chạy sản xuất theo FY", 1);
+                AddMasterTypeRow(wide, g, "REQUIRED_QTY", "Shot cộng đồn qua các tháng", 2);
+                AddMasterTypeRow(wide, g, "OHD_MOC", "Mốc OHD", 3);
             }
 
             return wide;
         }
 
-        private void AddMasterTypeRow(DataTable target, IGrouping<(string DieNo, string DieName, string CavityDetail, int TotalCavity), DataRow> group, string valueField, string qtyType)
+        private void AddMasterTypeRow(DataTable target, IGrouping<(string DieNo, string DieName, string CavityDetail, int TotalCavity), DataRow> group, string valueField, string qtyType, int qtyOrder)
         {
             DataRow row = target.NewRow();
             row["DIE_NO"] = group.Key.DieNo;
@@ -211,6 +212,7 @@ namespace DM_OHD.DTO
             row["CAVITY_DETAIL"] = group.Key.CavityDetail;
             row["TOTAL_CAVITY"] = group.Key.TotalCavity;
             row["QTY_TYPE"] = qtyType;
+            row["QTY_ORDER"] = qtyOrder;
 
             foreach (DataRow src in group)
             {

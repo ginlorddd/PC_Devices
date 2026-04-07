@@ -11,6 +11,9 @@ using System.Windows.Forms;
 using System.IO;
 using System.Drawing;
 using System.Linq;
+using System.Xml;
+using System.IO.Compression;
+using System.Collections.Generic;
 
 namespace DM_OHD.FRM
 {
@@ -40,11 +43,11 @@ namespace DM_OHD.FRM
             btnSaveOutput.Click += (s, e) => { _dto.SaveDieOutput(gridOutput.DataSource as DataTable); LoadData(); };
             btnGenerateMaster.Click += (s, e) => { _dto.GenerateMasterPlan(); LoadData(); };
             btnExportFY.Click += (s, e) => ExportGrid(viewFY);
-            btnImportFY.Click += (s, e) => ImportCsvToGrid(gridFY.DataSource as DataTable, viewFY);
+            btnImportFY.Click += (s, e) => ImportExcelToGrid(gridFY.DataSource as DataTable, viewFY);
             btnExportRatio.Click += (s, e) => ExportGrid(viewRatio);
-            btnImportRatio.Click += (s, e) => ImportCsvToGrid(gridRatio.DataSource as DataTable, viewRatio);
+            btnImportRatio.Click += (s, e) => ImportExcelToGrid(gridRatio.DataSource as DataTable, viewRatio);
             btnExportOutput.Click += (s, e) => ExportGrid(viewOutput);
-            btnImportOutput.Click += (s, e) => ImportCsvToGrid(gridOutput.DataSource as DataTable, viewOutput);
+            btnImportOutput.Click += (s, e) => ImportExcelToGrid(gridOutput.DataSource as DataTable, viewOutput);
             btnExportMaster.Click += (s, e) => ExportGrid(viewMaster);
 
             SetupGridEditingBehavior(viewFY);
@@ -56,6 +59,7 @@ namespace DM_OHD.FRM
             ApplyPermissions();
             Load += (s, e) => LoadData();
         }
+
         private void StyleButtons()
         {
             btnApplyFilter.Appearance.BackColor = Color.RoyalBlue;
@@ -138,7 +142,7 @@ namespace DM_OHD.FRM
             for (int r = 0; r < rows.Length; r++)
             {
                 if (string.IsNullOrWhiteSpace(rows[r])) continue;
-                string[] cells = rows[r].Split('	');
+                string[] cells = rows[r].Split('\t');
                 int targetRow = startRow + r;
                 if (targetRow >= view.RowCount) view.AddNewRow();
                 targetRow = Math.Min(targetRow, view.RowCount - 1);
@@ -170,26 +174,22 @@ namespace DM_OHD.FRM
             }
         }
 
-        private void ImportCsvToGrid(DataTable dt, GridView view)
+        private void ImportExcelToGrid(DataTable dt, GridView view)
         {
             if (dt == null) return;
-            using (var dialog = new OpenFileDialog { Filter = "CSV file (*.csv)|*.csv|Text file (*.txt)|*.txt" })
+            using (var dialog = new OpenFileDialog { Filter = "Excel (*.xlsx)|*.xlsx" })
             {
                 if (dialog.ShowDialog() != DialogResult.OK) return;
-                var lines = File.ReadAllLines(dialog.FileName);
-                if (lines.Length < 2) return;
-
-                string[] headers = lines[0].Split(',');
-                for (int i = 1; i < lines.Length; i++)
+                DataTable source = ReadXlsx(dialog.FileName);
+                foreach (DataRow srcRow in source.Rows)
                 {
-                    if (string.IsNullOrWhiteSpace(lines[i])) continue;
-                    string[] cells = lines[i].Split(',');
                     DataRow row = dt.NewRow();
-                    for (int c = 0; c < headers.Length && c < cells.Length; c++)
+                    foreach (DataColumn sourceCol in source.Columns)
                     {
-                        string h = headers[c].Trim();
-                        if (!dt.Columns.Contains(h)) continue;
-                        row[h] = dt.Columns[h].DataType == typeof(decimal) ? ParseNumber(cells[c]) : (object)cells[c].Trim();
+                        string header = sourceCol.ColumnName.Trim();
+                        if (!dt.Columns.Contains(header)) continue;
+                        string value = Convert.ToString(srcRow[sourceCol] ?? string.Empty).Trim();
+                        row[header] = dt.Columns[header].DataType == typeof(decimal) ? ParseNumber(value) : (object)value;
                     }
                     dt.Rows.Add(row);
                 }
@@ -230,13 +230,29 @@ namespace DM_OHD.FRM
             view.OptionsView.AllowCellMerge = true;
             view.CellMerge -= View_CellMerge;
             view.CellMerge += View_CellMerge;
+            EnsureSttColumn(view);
         }
 
         private void View_CellMerge(object sender, CellMergeEventArgs e)
         {
             var view = sender as GridView;
             string field = e.Column.FieldName;
-            if (field != "PRODUCT_NO" && field != "DIE_NO" && field != "DIE_NAME")
+            if (field == "STT")
+            {
+                e.Merge = false;
+                e.Handled = true;
+                return;
+            }
+
+            bool isMaster = view == viewMaster;
+            if (!isMaster && field != "PRODUCT_NO" && field != "DIE_NO" && field != "DIE_NAME")
+            {
+                e.Merge = false;
+                e.Handled = true;
+                return;
+            }
+
+            if (isMaster && field != "DIE_NO" && field != "DIE_NAME" && field != "TOTAL_CAVITY")
             {
                 e.Merge = false;
                 e.Handled = true;
@@ -261,27 +277,32 @@ namespace DM_OHD.FRM
 
         private void SetCaptions()
         {
-            SetGridCaption(viewFY, "PRODUCT_NO", "ITEM_CODE");
-            SetGridCaption(viewFY, "DIE_NAME", "ITEM_DESC");
-            SetGridCaption(viewFY, "DIE_NO", "MOLD_NO");
-            SetGridCaption(viewFY, "CAVITY", "CAVITY");
+            SetGridCaption(viewFY, "STT", "STT");
+            SetGridCaption(viewFY, "PRODUCT_NO", "Mã hàng");
+            SetGridCaption(viewFY, "DIE_NAME", "Tên khuôn");
+            SetGridCaption(viewFY, "DIE_NO", "Số khuôn");
+            SetGridCaption(viewFY, "CAVITY", "Số cavity");
             ConfigureMonthColumns(viewFY, "Kế hoạch FY");
 
-            SetGridCaption(viewRatio, "DIE_NAME", "ITEM_DESC");
-            SetGridCaption(viewRatio, "DIE_NO", "MOLD_NO");
-            SetGridCaption(viewRatio, "CAVITY", "CAVITY");
+            SetGridCaption(viewRatio, "STT", "STT");
+            SetGridCaption(viewRatio, "DIE_NAME", "Tên khuôn");
+            SetGridCaption(viewRatio, "DIE_NO", "Số khuôn");
+            SetGridCaption(viewRatio, "CAVITY", "Số cavity");
             ConfigureMonthColumns(viewRatio, "Tỉ lệ chạy máy (%)");
 
-            SetGridCaption(viewOutput, "DIE_NAME", "ITEM_DESC");
-            SetGridCaption(viewOutput, "DIE_NO", "MOLD_NO");
-            SetGridCaption(viewOutput, "CAVITY", "CAVITY");
+            SetGridCaption(viewOutput, "STT", "STT");
+            SetGridCaption(viewOutput, "DIE_NAME", "Tên khuôn");
+            SetGridCaption(viewOutput, "DIE_NO", "Số khuôn");
+            SetGridCaption(viewOutput, "CAVITY", "Số cavity");
             ConfigureMonthColumns(viewOutput, "Sản lượng khuôn");
 
-            SetGridCaption(viewMaster, "DIE_NAME", "ITEM_DESC");
-            SetGridCaption(viewMaster, "DIE_NO", "MOLD_NO");
-            SetGridCaption(viewMaster, "TOTAL_CAVITY", "TOTAL_CAVITY");
+            SetGridCaption(viewMaster, "STT", "STT");
+            SetGridCaption(viewMaster, "DIE_NAME", "Tên khuôn");
+            SetGridCaption(viewMaster, "DIE_NO", "Số khuôn");
+            SetGridCaption(viewMaster, "TOTAL_CAVITY", "Tổng số cavity");
             if (viewMaster.Columns["CAVITY_DETAIL"] != null) viewMaster.Columns["CAVITY_DETAIL"].Visible = false;
-            SetGridCaption(viewMaster, "QTY_TYPE", "QTY_TYPE");
+            if (viewMaster.Columns["QTY_ORDER"] != null) viewMaster.Columns["QTY_ORDER"].Visible = false;
+            SetGridCaption(viewMaster, "QTY_TYPE", "Loại dữ liệu");
             ConfigureMonthColumns(viewMaster, "Bảng 1 - Kế hoạch OHD");
 
             ApplyFixedColumns(viewFY, true, false);
@@ -310,12 +331,13 @@ namespace DM_OHD.FRM
                 col.ToolTip = valueCaption;
             }
 
+            if (view.Columns["STT"] != null) view.Columns["STT"].Width = 55;
             if (view.Columns["PRODUCT_NO"] != null) view.Columns["PRODUCT_NO"].Width = 110;
             if (view.Columns["DIE_NAME"] != null) view.Columns["DIE_NAME"].Width = 180;
             if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].Width = 110;
             if (view.Columns["CAVITY"] != null) view.Columns["CAVITY"].Width = 100;
             if (view.Columns["TOTAL_CAVITY"] != null) view.Columns["TOTAL_CAVITY"].Width = 110;
-            if (view.Columns["QTY_TYPE"] != null) view.Columns["QTY_TYPE"].Width = 150;
+            if (view.Columns["QTY_TYPE"] != null) view.Columns["QTY_TYPE"].Width = 230;
         }
 
         private void ApplySort(GridView view, bool includeProductNo, bool includeQtyType)
@@ -335,6 +357,8 @@ namespace DM_OHD.FRM
                     view.Columns["CAVITY"].SortIndex = i++;
                 if (includeQtyType && view.Columns["TOTAL_CAVITY"] != null)
                     view.Columns["TOTAL_CAVITY"].SortIndex = i++;
+                if (includeQtyType && view.Columns["QTY_ORDER"] != null)
+                    view.Columns["QTY_ORDER"].SortIndex = i++;
                 if (includeQtyType && view.Columns["QTY_TYPE"] != null)
                     view.Columns["QTY_TYPE"].SortIndex = i;
             }
@@ -346,6 +370,7 @@ namespace DM_OHD.FRM
 
         private void ApplyFixedColumns(GridView view, bool includeProductNo, bool includeQtyType)
         {
+            if (view.Columns["STT"] != null) view.Columns["STT"].Fixed = FixedStyle.Left;
             if (includeProductNo && view.Columns["PRODUCT_NO"] != null)
                 view.Columns["PRODUCT_NO"].Fixed = FixedStyle.Left;
             if (view.Columns["DIE_NAME"] != null)
@@ -406,12 +431,175 @@ namespace DM_OHD.FRM
             if (!isMonthValue) return;
 
             if (!decimal.TryParse(Convert.ToString(e.Value), out decimal number)) return;
-            e.DisplayText = number.ToString("N0", CultureInfo.InvariantCulture).Replace(",", ".");
+            bool isRatioView = sender == viewRatio;
+            if (isRatioView)
+            {
+                e.DisplayText = $"{number.ToString("N0", CultureInfo.InvariantCulture).Replace(",", ".")}%";
+            }
+            else
+            {
+                e.DisplayText = number.ToString("N0", CultureInfo.InvariantCulture).Replace(",", ".");
+            }
         }
 
         private void SetGridCaption(GridView view, string field, string caption)
         {
             if (view.Columns[field] != null) view.Columns[field].Caption = caption;
+        }
+
+        private void EnsureSttColumn(GridView view)
+        {
+            if (view.Columns["STT"] == null)
+            {
+                GridColumn col = view.Columns.AddVisible("STT", "STT");
+                col.UnboundType = DevExpress.Data.UnboundColumnType.Integer;
+                col.OptionsColumn.AllowEdit = false;
+                col.Fixed = FixedStyle.Left;
+                col.Width = 55;
+                col.VisibleIndex = 0;
+            }
+
+            view.CustomUnboundColumnData -= View_CustomUnboundColumnData;
+            view.CustomUnboundColumnData += View_CustomUnboundColumnData;
+        }
+
+        private void View_CustomUnboundColumnData(object sender, DevExpress.XtraGrid.Views.Base.CustomColumnDataEventArgs e)
+        {
+            if (e.Column.FieldName != "STT" || !e.IsGetData) return;
+            e.Value = e.ListSourceRowIndex + 1;
+        }
+
+        private DataTable ReadXlsx(string filePath)
+        {
+            DataTable table = new DataTable();
+            using (ZipArchive archive = ZipFile.OpenRead(filePath))
+            {
+                List<string> sharedStrings = ReadSharedStrings(archive);
+                string sheetPath = GetFirstSheetPath(archive);
+                ZipArchiveEntry sheetEntry = archive.GetEntry(sheetPath);
+                if (sheetEntry == null) return table;
+
+                XmlDocument doc = new XmlDocument();
+                using (Stream stream = sheetEntry.Open())
+                {
+                    doc.Load(stream);
+                }
+
+                XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
+                ns.AddNamespace("x", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+                XmlNodeList rows = doc.SelectNodes("//x:sheetData/x:row", ns);
+                if (rows == null || rows.Count == 0) return table;
+
+                bool headerDone = false;
+                foreach (XmlNode row in rows)
+                {
+                    Dictionary<int, string> values = new Dictionary<int, string>();
+                    foreach (XmlNode cell in row.SelectNodes("x:c", ns))
+                    {
+                        string r = cell.Attributes?["r"]?.Value ?? string.Empty;
+                        int colIndex = GetColumnIndex(r);
+                        values[colIndex] = ReadCellValue(cell, ns, sharedStrings);
+                    }
+
+                    if (!headerDone)
+                    {
+                        int maxCol = values.Count == 0 ? 0 : values.Keys.Max();
+                        for (int i = 0; i <= maxCol; i++)
+                        {
+                            string colName = values.ContainsKey(i) ? values[i] : $"Column{i + 1}";
+                            if (string.IsNullOrWhiteSpace(colName)) colName = $"Column{i + 1}";
+                            if (table.Columns.Contains(colName)) colName += "_" + i;
+                            table.Columns.Add(colName);
+                        }
+                        headerDone = true;
+                        continue;
+                    }
+
+                    DataRow dr = table.NewRow();
+                    for (int i = 0; i < table.Columns.Count; i++)
+                    {
+                        dr[i] = values.ContainsKey(i) ? values[i] : string.Empty;
+                    }
+                    table.Rows.Add(dr);
+                }
+            }
+
+            return table;
+        }
+
+        private List<string> ReadSharedStrings(ZipArchive archive)
+        {
+            List<string> list = new List<string>();
+            ZipArchiveEntry entry = archive.GetEntry("xl/sharedStrings.xml");
+            if (entry == null) return list;
+
+            XmlDocument doc = new XmlDocument();
+            using (Stream stream = entry.Open())
+            {
+                doc.Load(stream);
+            }
+
+            XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
+            ns.AddNamespace("x", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+            XmlNodeList nodes = doc.SelectNodes("//x:sst/x:si", ns);
+            foreach (XmlNode node in nodes)
+            {
+                XmlNode t = node.SelectSingleNode(".//x:t", ns);
+                list.Add(t?.InnerText ?? string.Empty);
+            }
+            return list;
+        }
+
+        private string GetFirstSheetPath(ZipArchive archive)
+        {
+            XmlDocument wbDoc = new XmlDocument();
+            using (Stream s = archive.GetEntry("xl/workbook.xml").Open())
+            {
+                wbDoc.Load(s);
+            }
+
+            XmlNamespaceManager wbNs = new XmlNamespaceManager(wbDoc.NameTable);
+            wbNs.AddNamespace("x", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+            wbNs.AddNamespace("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
+            XmlNode firstSheet = wbDoc.SelectSingleNode("//x:sheets/x:sheet", wbNs);
+            string rId = firstSheet?.Attributes?["r:id"]?.Value;
+            if (string.IsNullOrWhiteSpace(rId)) return "xl/worksheets/sheet1.xml";
+
+            XmlDocument relDoc = new XmlDocument();
+            using (Stream s = archive.GetEntry("xl/_rels/workbook.xml.rels").Open())
+            {
+                relDoc.Load(s);
+            }
+
+            XmlNamespaceManager relNs = new XmlNamespaceManager(relDoc.NameTable);
+            relNs.AddNamespace("r", "http://schemas.openxmlformats.org/package/2006/relationships");
+            XmlNode relNode = relDoc.SelectSingleNode($"//r:Relationship[@Id='{rId}']", relNs);
+            string target = relNode?.Attributes?["Target"]?.Value ?? "worksheets/sheet1.xml";
+            return target.StartsWith("xl/") ? target : "xl/" + target.TrimStart('/');
+        }
+
+        private int GetColumnIndex(string cellRef)
+        {
+            if (string.IsNullOrWhiteSpace(cellRef)) return 0;
+            int i = 0;
+            while (i < cellRef.Length && char.IsLetter(cellRef[i])) i++;
+            string letters = cellRef.Substring(0, i).ToUpperInvariant();
+            int index = 0;
+            foreach (char c in letters) index = index * 26 + (c - 'A' + 1);
+            return Math.Max(0, index - 1);
+        }
+
+        private string ReadCellValue(XmlNode cell, XmlNamespaceManager ns, List<string> sharedStrings)
+        {
+            string type = cell.Attributes?["t"]?.Value ?? string.Empty;
+            XmlNode valNode = cell.SelectSingleNode("x:v", ns);
+            if (valNode == null) return string.Empty;
+            string raw = valNode.InnerText ?? string.Empty;
+            if (type == "s" && int.TryParse(raw, out int idx) && idx >= 0 && idx < sharedStrings.Count)
+            {
+                return sharedStrings[idx];
+            }
+            return raw;
         }
     }
 }
