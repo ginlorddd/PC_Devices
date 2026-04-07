@@ -123,7 +123,7 @@ namespace DM_OHD.FRM
             SetGridCaption(viewMaster, "DIE_NAME", "ITEM_DESC");
             SetGridCaption(viewMaster, "DIE_NO", "MOLD_NO");
             SetGridCaption(viewMaster, "TOTAL_CAVITY", "TOTAL_CAVITY");
-            if (viewMaster.Columns["CAVITY"] != null) viewMaster.Columns["CAVITY"].Visible = false;
+            if (viewMaster.Columns["CAVITY_DETAIL"] != null) viewMaster.Columns["CAVITY_DETAIL"].Visible = false;
             SetGridCaption(viewMaster, "QTY_TYPE", "QTY_TYPE");
             ConfigureMonthColumns(viewMaster, "Bảng 1 - Kế hoạch OHD");
 

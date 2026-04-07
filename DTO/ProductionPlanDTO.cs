@@ -32,7 +32,7 @@ namespace DM_OHD.DTO
 
         public DataTable GetMaster()
         {
-            DataTable raw = DBUtils.GetData("SELECT p.DIE_NO, ISNULL(m.DIE_NAME,p.DIE_NAME) AS DIE_NAME, p.CAVITY, ISNULL(m.TOTAL_CAVITY,0) AS TOTAL_CAVITY, p.PLAN_YEAR, p.PLAN_MONTH, p.FY_SHOTS, p.RUN_RATIO, p.REQUIRED_QTY, p.OHD_MOC FROM OHD_PLAN_MASTER p INNER JOIN DIE_MST m ON p.DIE_NO = m.DIE_NO ORDER BY p.DIE_NO, p.CAVITY, p.PLAN_YEAR, p.PLAN_MONTH");
+            DataTable raw = DBUtils.GetData("SELECT p.DIE_NO, ISNULL(m.DIE_NAME,p.DIE_NAME) AS DIE_NAME, p.CAVITY AS CAVITY_DETAIL, ISNULL(m.TOTAL_CAVITY,0) AS TOTAL_CAVITY, p.PLAN_YEAR, p.PLAN_MONTH, p.FY_SHOTS, p.RUN_RATIO, p.REQUIRED_QTY, p.OHD_MOC FROM OHD_PLAN_MASTER p INNER JOIN DIE_MST m ON p.DIE_NO = m.DIE_NO ORDER BY p.DIE_NO, p.CAVITY, p.PLAN_YEAR, p.PLAN_MONTH");
             return BuildWideMasterTable(raw);
         }
 
@@ -149,7 +149,7 @@ namespace DM_OHD.DTO
             DataTable wide = new DataTable();
             wide.Columns.Add("DIE_NO", typeof(string));
             wide.Columns.Add("DIE_NAME", typeof(string));
-            wide.Columns.Add("CAVITY", typeof(string));
+            wide.Columns.Add("CAVITY_DETAIL", typeof(string));
             wide.Columns.Add("TOTAL_CAVITY", typeof(int));
             wide.Columns.Add("QTY_TYPE", typeof(string));
 
@@ -161,7 +161,7 @@ namespace DM_OHD.DTO
             var grouped = raw.AsEnumerable().GroupBy(r => (
                 DieNo: Convert.ToString(r["DIE_NO"]),
                 DieName: Convert.ToString(r["DIE_NAME"]),
-                Cavity: Convert.ToString(r["CAVITY"]),
+                CavityDetail: Convert.ToString(r["CAVITY_DETAIL"]),
                 TotalCavity: ToInt(r["TOTAL_CAVITY"]) ));
 
             foreach (var g in grouped)
@@ -174,12 +174,12 @@ namespace DM_OHD.DTO
             return wide;
         }
 
-        private void AddMasterTypeRow(DataTable target, IGrouping<(string DieNo, string DieName, string Cavity, int TotalCavity), DataRow> group, string valueField, string qtyType)
+        private void AddMasterTypeRow(DataTable target, IGrouping<(string DieNo, string DieName, string CavityDetail, int TotalCavity), DataRow> group, string valueField, string qtyType)
         {
             DataRow row = target.NewRow();
             row["DIE_NO"] = group.Key.DieNo;
             row["DIE_NAME"] = group.Key.DieName;
-            row["CAVITY"] = group.Key.Cavity;
+            row["CAVITY_DETAIL"] = group.Key.CavityDetail;
             row["TOTAL_CAVITY"] = group.Key.TotalCavity;
             row["QTY_TYPE"] = qtyType;
 
