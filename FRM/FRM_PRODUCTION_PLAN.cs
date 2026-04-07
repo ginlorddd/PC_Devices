@@ -161,8 +161,32 @@ namespace DM_OHD.FRM
 
         private decimal ParseNumber(string value)
         {
-            string clean = (value ?? string.Empty).Trim().Replace(".", "").Replace(",", "");
-            return decimal.TryParse(clean, out decimal num) ? Math.Round(num, 0) : 0m;
+            string clean = (value ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(clean) || clean == "-") return 0m;
+
+            NumberStyles styles = NumberStyles.Number | NumberStyles.AllowExponent;
+            if (decimal.TryParse(clean, styles, CultureInfo.InvariantCulture, out decimal numInvariant))
+                return Math.Round(numInvariant, 0);
+            if (decimal.TryParse(clean, styles, CultureInfo.GetCultureInfo("vi-VN"), out decimal numVi))
+                return Math.Round(numVi, 0);
+            if (decimal.TryParse(clean, styles, CultureInfo.GetCultureInfo("en-US"), out decimal numEn))
+                return Math.Round(numEn, 0);
+
+            if (Regex.IsMatch(clean, @"^\d{1,3}(\.\d{3})+$"))
+            {
+                string normalized = clean.Replace(".", "");
+                if (decimal.TryParse(normalized, styles, CultureInfo.InvariantCulture, out decimal numDotGrouped))
+                    return Math.Round(numDotGrouped, 0);
+            }
+
+            if (Regex.IsMatch(clean, @"^\d{1,3}(,\d{3})+$"))
+            {
+                string normalized = clean.Replace(",", "");
+                if (decimal.TryParse(normalized, styles, CultureInfo.InvariantCulture, out decimal numCommaGrouped))
+                    return Math.Round(numCommaGrouped, 0);
+            }
+
+            return 0m;
         }
 
         private void ExportGrid(GridView view)
