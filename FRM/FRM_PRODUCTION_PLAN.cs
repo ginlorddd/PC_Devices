@@ -14,6 +14,7 @@ using System.Linq;
 using System.Xml;
 using System.IO.Compression;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace DM_OHD.FRM
 {
@@ -181,20 +182,71 @@ namespace DM_OHD.FRM
             {
                 if (dialog.ShowDialog() != DialogResult.OK) return;
                 DataTable source = ReadXlsx(dialog.FileName);
+                dt.Rows.Clear();
                 foreach (DataRow srcRow in source.Rows)
                 {
                     DataRow row = dt.NewRow();
+                    bool hasMappedValue = false;
                     foreach (DataColumn sourceCol in source.Columns)
                     {
                         string header = sourceCol.ColumnName.Trim();
-                        if (!dt.Columns.Contains(header)) continue;
+                        string targetColumn = ResolveTargetColumnName(view, dt, header);
+                        if (string.IsNullOrWhiteSpace(targetColumn)) continue;
                         string value = Convert.ToString(srcRow[sourceCol] ?? string.Empty).Trim();
-                        row[header] = dt.Columns[header].DataType == typeof(decimal) ? ParseNumber(value) : (object)value;
+                        row[targetColumn] = dt.Columns[targetColumn].DataType == typeof(decimal) ? ParseNumber(value) : (object)value;
+                        hasMappedValue = hasMappedValue || !string.IsNullOrWhiteSpace(value);
                     }
-                    dt.Rows.Add(row);
+
+                    bool hasKey = HasAnyValue(row, "PRODUCT_NO", "DIE_NO", "DIE_NAME", "CAVITY");
+                    if (hasMappedValue && hasKey) dt.Rows.Add(row);
                 }
                 view.RefreshData();
             }
+        }
+
+        private bool HasAnyValue(DataRow row, params string[] columns)
+        {
+            return columns.Any(c => row.Table.Columns.Contains(c) && !string.IsNullOrWhiteSpace(Convert.ToString(row[c])));
+        }
+
+        private string ResolveTargetColumnName(GridView view, DataTable dt, string sourceHeader)
+        {
+            if (string.IsNullOrWhiteSpace(sourceHeader)) return null;
+            string header = sourceHeader.Trim();
+            if (dt.Columns.Contains(header)) return header;
+
+            GridColumn byCaption = view.Columns
+                .Cast<GridColumn>()
+                .FirstOrDefault(c => string.Equals(c.Caption?.Trim(), header, StringComparison.OrdinalIgnoreCase)
+                                     && dt.Columns.Contains(c.FieldName));
+            if (byCaption != null) return byCaption.FieldName;
+
+            string monthField = TryParseMonthHeaderToFieldName(header);
+            if (!string.IsNullOrWhiteSpace(monthField) && dt.Columns.Contains(monthField)) return monthField;
+
+            return null;
+        }
+
+        private string TryParseMonthHeaderToFieldName(string header)
+        {
+            Match slashPattern = Regex.Match(header, @"^(?<m>\d{1,2})[\/\-](?<y>\d{4})$");
+            if (slashPattern.Success)
+            {
+                int month = int.Parse(slashPattern.Groups["m"].Value);
+                int year = int.Parse(slashPattern.Groups["y"].Value);
+                if (month >= 1 && month <= 12) return $"M{year}{month:00}";
+            }
+
+            Match thgPattern = Regex.Match(header, @"^(Thg|THG)\s*(?<m>\d{1,2})[-\/](?<y>\d{2,4})$");
+            if (thgPattern.Success)
+            {
+                int month = int.Parse(thgPattern.Groups["m"].Value);
+                string yearText = thgPattern.Groups["y"].Value;
+                int year = yearText.Length == 2 ? 2000 + int.Parse(yearText) : int.Parse(yearText);
+                if (month >= 1 && month <= 12) return $"M{year}{month:00}";
+            }
+
+            return null;
         }
 
         private void ConfigureMonthEditor(DateEdit editor)
