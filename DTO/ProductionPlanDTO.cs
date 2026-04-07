@@ -108,6 +108,7 @@ namespace DM_OHD.DTO
                            MONTHLY_SHOTS,
                            RUN_RATIO,
                            TOTAL_CAVITY,
+                           SHOT_PER_CAVITY,
                            SUM(SHOT_PER_CAVITY) OVER(PARTITION BY DIE_NO, CAVITY ORDER BY PLAN_YEAR, PLAN_MONTH ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS SHOT_CUMULATIVE
                     FROM src
                 )
@@ -117,7 +118,7 @@ namespace DM_OHD.DTO
                        CAVITY{totalSelectCol},
                        PLAN_YEAR,
                        PLAN_MONTH,
-                       MONTHLY_SHOTS,
+                       SHOT_PER_CAVITY,
                        RUN_RATIO,
                        SHOT_CUMULATIVE,
                        CASE
