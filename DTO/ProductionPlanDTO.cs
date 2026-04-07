@@ -32,7 +32,27 @@ namespace DM_OHD.DTO
 
         public DataTable GetMaster()
         {
-            DataTable raw = DBUtils.GetData("SELECT p.DIE_NO, ISNULL(m.DIE_NAME,p.DIE_NAME) AS DIE_NAME, p.CAVITY_DETAIL, ISNULL(m.TOTAL_CAVITY,0) AS TOTAL_CAVITY, p.PLAN_YEAR, p.PLAN_MONTH, p.FY_SHOTS, p.RUN_RATIO, p.REQUIRED_QTY, p.OHD_MOC FROM OHD_PLAN_MASTER p INNER JOIN DIE_MST m ON p.DIE_NO = m.DIE_NO ORDER BY p.DIE_NO, p.CAVITY_DETAIL, p.PLAN_YEAR, p.PLAN_MONTH");
+            bool hasCavityDetail = HasColumn("OHD_PLAN_MASTER", "CAVITY_DETAIL");
+            bool hasTotalCavity = HasColumn("OHD_PLAN_MASTER", "TOTAL_CAVITY");
+
+            string cavitySelect = hasCavityDetail ? "p.CAVITY_DETAIL" : "p.CAVITY";
+            string orderCavity = hasCavityDetail ? "p.CAVITY_DETAIL" : "p.CAVITY";
+            string totalSelect = hasTotalCavity ? "ISNULL(p.TOTAL_CAVITY, ISNULL(m.TOTAL_CAVITY,0))" : "ISNULL(m.TOTAL_CAVITY,0)";
+
+            string sql = $@"SELECT p.DIE_NO,
+                                   ISNULL(m.DIE_NAME,p.DIE_NAME) AS DIE_NAME,
+                                   {cavitySelect} AS CAVITY_DETAIL,
+                                   {totalSelect} AS TOTAL_CAVITY,
+                                   p.PLAN_YEAR,
+                                   p.PLAN_MONTH,
+                                   p.FY_SHOTS,
+                                   p.RUN_RATIO,
+                                   p.REQUIRED_QTY,
+                                   p.OHD_MOC
+                            FROM OHD_PLAN_MASTER p
+                            INNER JOIN DIE_MST m ON p.DIE_NO = m.DIE_NO
+                            ORDER BY p.DIE_NO, {orderCavity}, p.PLAN_YEAR, p.PLAN_MONTH";
+            DataTable raw = DBUtils.GetData(sql);
             return BuildWideMasterTable(raw);
         }
 
@@ -53,7 +73,14 @@ namespace DM_OHD.DTO
 
         public void GenerateMasterPlan()
         {
-            string sql = @"
+            bool hasCavityDetail = HasColumn("OHD_PLAN_MASTER", "CAVITY_DETAIL");
+            bool hasTotalCavity = HasColumn("OHD_PLAN_MASTER", "TOTAL_CAVITY");
+
+            string cavityCol = hasCavityDetail ? "CAVITY_DETAIL" : "CAVITY";
+            string totalInsertCol = hasTotalCavity ? ",TOTAL_CAVITY" : string.Empty;
+            string totalSelectCol = hasTotalCavity ? ",TOTAL_CAVITY" : string.Empty;
+
+            string sql = $@"
                 DELETE FROM OHD_PLAN_MASTER;
 
                 ;WITH src AS (
@@ -80,14 +107,14 @@ namespace DM_OHD.DTO
                            PLAN_MONTH,
                            MONTHLY_SHOTS,
                            RUN_RATIO,
+                           TOTAL_CAVITY,
                            SUM(SHOT_PER_CAVITY) OVER(PARTITION BY DIE_NO, CAVITY ORDER BY PLAN_YEAR, PLAN_MONTH ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS SHOT_CUMULATIVE
                     FROM src
                 )
-                INSERT INTO OHD_PLAN_MASTER(DIE_NO,DIE_NAME,CAVITY_DETAIL,TOTAL_CAVITY,PLAN_YEAR,PLAN_MONTH,FY_SHOTS,RUN_RATIO,REQUIRED_QTY,OHD_MOC)
+                INSERT INTO OHD_PLAN_MASTER(DIE_NO,DIE_NAME,{cavityCol}{totalInsertCol},PLAN_YEAR,PLAN_MONTH,FY_SHOTS,RUN_RATIO,REQUIRED_QTY,OHD_MOC)
                 SELECT DIE_NO,
                        DIE_NAME,
-                       CAVITY,
-                       TOTAL_CAVITY,
+                       CAVITY{totalSelectCol},
                        PLAN_YEAR,
                        PLAN_MONTH,
                        MONTHLY_SHOTS,
@@ -238,6 +265,15 @@ namespace DM_OHD.DTO
                     DBUtils.Exec(sql, parameters.ToArray());
                 }
             }
+        }
+
+        private bool HasColumn(string tableName, string columnName)
+        {
+            object result = DBUtils.GetData(
+                "SELECT COUNT(1) CNT FROM sys.columns WHERE object_id = OBJECT_ID(@T) AND name = @C",
+                new SqlParameter("@T", "dbo." + tableName),
+                new SqlParameter("@C", columnName)).Rows[0]["CNT"];
+            return ToInt(result) > 0;
         }
 
         private HashSet<string> GetValidDieNoSet()
