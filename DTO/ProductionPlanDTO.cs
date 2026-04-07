@@ -93,9 +93,9 @@ namespace DM_OHD.DTO
                        RUN_RATIO,
                        SHOT_CUMULATIVE,
                        CASE
-                           WHEN SHOT_CUMULATIVE <= 0 THEN 0
-                           WHEN FLOOR(SHOT_CUMULATIVE / 30.0) * 30 > 240 THEN 240
-                           ELSE FLOOR(SHOT_CUMULATIVE / 30.0) * 30
+                           WHEN SHOT_CUMULATIVE < 30000000 THEN 0
+                           WHEN FLOOR(SHOT_CUMULATIVE / 30000000.0) * 30 > 240 THEN 240
+                           ELSE FLOOR(SHOT_CUMULATIVE / 30000000.0) * 30
                        END AS OHD_MOC
                 FROM agg;";
             DBUtils.Exec(sql);
