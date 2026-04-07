@@ -15,26 +15,17 @@ namespace DM_OHD.DTO
         {
             DBUtils.Exec(@"MERGE DIE_MST AS t
                           USING (SELECT @DIE_NO DIE_NO, @DIE_NAME DIE_NAME, @TOTAL_CAVITY TOTAL_CAVITY) s
-                          ON (t.DIE_NO = s.DIE_NO AND t.DIE_NAME = s.DIE_NAME)
-                          WHEN MATCHED THEN UPDATE SET TOTAL_CAVITY=s.TOTAL_CAVITY
+                          ON (t.DIE_NO = s.DIE_NO)
+                          WHEN MATCHED THEN UPDATE SET DIE_NAME=s.DIE_NAME, TOTAL_CAVITY=s.TOTAL_CAVITY
                           WHEN NOT MATCHED THEN INSERT(DIE_NO,DIE_NAME,TOTAL_CAVITY) VALUES(s.DIE_NO,s.DIE_NAME,s.TOTAL_CAVITY);",
                 new SqlParameter("@DIE_NO", dieNo),
                 new SqlParameter("@DIE_NAME", dieName),
                 new SqlParameter("@TOTAL_CAVITY", cavity));
         }
 
-        public void Delete(string dieNo, string dieName = "")
+        public void Delete(string dieNo)
         {
-            if (string.IsNullOrWhiteSpace(dieName))
-            {
-                DBUtils.Exec("DELETE FROM DIE_MST WHERE DIE_NO=@DIE_NO", new SqlParameter("@DIE_NO", dieNo));
-            }
-            else
-            {
-                DBUtils.Exec("DELETE FROM DIE_MST WHERE DIE_NO=@DIE_NO AND DIE_NAME=@DIE_NAME",
-                    new SqlParameter("@DIE_NO", dieNo),
-                    new SqlParameter("@DIE_NAME", dieName));
-            }
+            DBUtils.Exec("DELETE FROM DIE_MST WHERE DIE_NO=@DIE_NO", new SqlParameter("@DIE_NO", dieNo));
         }
     }
 }

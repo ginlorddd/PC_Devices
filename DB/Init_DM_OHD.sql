@@ -41,6 +41,29 @@ BEGIN
 END
 GO
 
+IF EXISTS (SELECT 1 FROM sys.tables WHERE name = 'DIE_MST')
+   AND NOT EXISTS (
+       SELECT 1
+       FROM sys.key_constraints kc
+       INNER JOIN sys.index_columns ic ON kc.parent_object_id = ic.object_id AND kc.unique_index_id = ic.index_id
+       INNER JOIN sys.columns c ON ic.object_id = c.object_id AND ic.column_id = c.column_id
+       WHERE kc.parent_object_id = OBJECT_ID('dbo.DIE_MST')
+         AND kc.type = 'PK'
+         AND c.name = 'DIE_NO'
+   )
+BEGIN
+    DECLARE @PkName NVARCHAR(128);
+    SELECT @PkName = kc.name
+    FROM sys.key_constraints kc
+    WHERE kc.parent_object_id = OBJECT_ID('dbo.DIE_MST') AND kc.type = 'PK';
+
+    IF @PkName IS NOT NULL
+        EXEC ('ALTER TABLE dbo.DIE_MST DROP CONSTRAINT ' + QUOTENAME(@PkName));
+
+    ALTER TABLE dbo.DIE_MST ADD CONSTRAINT PK_DIE_MST PRIMARY KEY (DIE_NO);
+END
+GO
+
 IF NOT EXISTS (SELECT 1 FROM dbo.APP_ROLE WHERE ROLE_CODE = 'ADMIN')
     INSERT INTO dbo.APP_ROLE (ROLE_CODE, ROLE_NAME) VALUES ('ADMIN', N'Quản trị hệ thống');
 IF NOT EXISTS (SELECT 1 FROM dbo.APP_ROLE WHERE ROLE_CODE = 'ACCOUNT_MGMT')

@@ -115,7 +115,7 @@ namespace DM_OHD.FRM
 
         private void BtnDelete_Click(object sender, EventArgs e)
         {
-            _dto.Delete(txtDieNo.Text.Trim(), txtDieName.Text.Trim());
+            _dto.Delete(txtDieNo.Text.Trim());
             LoadData();
         }
 
