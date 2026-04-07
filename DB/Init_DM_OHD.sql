@@ -58,7 +58,11 @@ BEGIN
     WHERE kc.parent_object_id = OBJECT_ID('dbo.DIE_MST') AND kc.type = 'PK';
 
     IF @PkName IS NOT NULL
-        EXEC ('ALTER TABLE dbo.DIE_MST DROP CONSTRAINT ' + QUOTENAME(@PkName));
+    BEGIN
+        DECLARE @SqlDropPk NVARCHAR(MAX);
+        SET @SqlDropPk = N'ALTER TABLE dbo.DIE_MST DROP CONSTRAINT ' + QUOTENAME(@PkName) + N';';
+        EXEC sys.sp_executesql @SqlDropPk;
+    END
 
     ALTER TABLE dbo.DIE_MST ADD CONSTRAINT PK_DIE_MST PRIMARY KEY (DIE_NO);
 END
