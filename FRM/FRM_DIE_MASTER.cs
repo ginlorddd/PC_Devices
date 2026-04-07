@@ -58,6 +58,9 @@ namespace DM_OHD.FRM
             view.OptionsView.ShowAutoFilterRow = true;
             view.OptionsView.ShowGroupPanel = false;
             view.OptionsView.ColumnAutoWidth = false;
+            view.OptionsSelection.MultiSelect = true;
+            view.OptionsSelection.MultiSelectMode = GridMultiSelectMode.CheckBoxRowSelect;
+            view.OptionsSelection.CheckBoxSelectorColumnWidth = 36;
             view.Appearance.HeaderPanel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             view.Appearance.HeaderPanel.Options.UseFont = true;
         }
@@ -115,6 +118,24 @@ namespace DM_OHD.FRM
 
         private void BtnDelete_Click(object sender, EventArgs e)
         {
+            int[] selectedRows = view.GetSelectedRows();
+            if (selectedRows != null && selectedRows.Length > 0)
+            {
+                int deletedCount = 0;
+                foreach (int rowHandle in selectedRows)
+                {
+                    if (rowHandle < 0) continue;
+                    string dieNo = Convert.ToString(view.GetRowCellValue(rowHandle, "DIE_NO"));
+                    if (string.IsNullOrWhiteSpace(dieNo)) continue;
+                    _dto.Delete(dieNo.Trim());
+                    deletedCount++;
+                }
+
+                LoadData();
+                XtraMessageBox.Show($"Đã xóa {deletedCount} dòng được chọn.");
+                return;
+            }
+
             _dto.Delete(txtDieNo.Text.Trim());
             LoadData();
         }
