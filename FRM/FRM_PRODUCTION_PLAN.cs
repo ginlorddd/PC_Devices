@@ -372,16 +372,6 @@ namespace DM_OHD.FRM
                     row[SelectFieldName] = false;
                 }
             }
-
-            if (view.Columns[SelectFieldName] == null)
-            {
-                GridColumn selectCol = view.Columns.AddVisible(SelectFieldName, "Chọn");
-                selectCol.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
-                selectCol.OptionsColumn.AllowEdit = true;
-                selectCol.Width = 52;
-                selectCol.Fixed = FixedStyle.Left;
-                selectCol.VisibleIndex = 0;
-            }
         }
 
         private void View_CellMerge(object sender, CellMergeEventArgs e)
