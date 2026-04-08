@@ -20,6 +20,7 @@ namespace DM_OHD.FRM
 {
     public partial class FRM_PRODUCTION_PLAN : XtraForm
     {
+        private const string SelectFieldName = "ROW_SELECTED";
         private readonly ProductionPlanDTO _dto = new ProductionPlanDTO();
 
         public FRM_PRODUCTION_PLAN()
@@ -354,17 +355,33 @@ namespace DM_OHD.FRM
             view.CellMerge -= View_CellMerge;
             view.CellMerge += View_CellMerge;
             EnsureSttColumn(view);
-            ConfigureSelector(view);
+            EnsureSelectionColumn(view);
         }
 
-        private void ConfigureSelector(GridView view)
+        private void EnsureSelectionColumn(GridView view)
         {
-            bool allowMultiDelete = view == viewFY || view == viewRatio || view == viewOutput;
-            view.OptionsSelection.MultiSelect = allowMultiDelete;
-            view.OptionsSelection.MultiSelectMode = allowMultiDelete
-                ? GridMultiSelectMode.CheckBoxRowSelect
-                : GridMultiSelectMode.RowSelect;
-            view.OptionsSelection.CheckBoxSelectorColumnWidth = allowMultiDelete ? 36 : 0;
+            bool allowDeleteBySelect = view == viewFY || view == viewRatio || view == viewOutput;
+            if (!allowDeleteBySelect) return;
+
+            DataTable dt = view.GridControl?.DataSource as DataTable;
+            if (dt != null && !dt.Columns.Contains(SelectFieldName))
+            {
+                dt.Columns.Add(SelectFieldName, typeof(bool));
+                foreach (DataRow row in dt.Rows)
+                {
+                    row[SelectFieldName] = false;
+                }
+            }
+
+            if (view.Columns[SelectFieldName] == null)
+            {
+                GridColumn selectCol = view.Columns.AddVisible(SelectFieldName, "Chọn");
+                selectCol.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
+                selectCol.OptionsColumn.AllowEdit = true;
+                selectCol.Width = 52;
+                selectCol.Fixed = FixedStyle.Left;
+                selectCol.VisibleIndex = 0;
+            }
         }
 
         private void View_CellMerge(object sender, CellMergeEventArgs e)
@@ -594,7 +611,7 @@ namespace DM_OHD.FRM
                 col.OptionsColumn.AllowEdit = false;
                 col.Fixed = FixedStyle.Left;
                 col.Width = 55;
-                col.VisibleIndex = 0;
+                col.VisibleIndex = view.Columns[SelectFieldName] != null ? 1 : 0;
             }
 
             view.CustomUnboundColumnData -= View_CustomUnboundColumnData;
@@ -608,6 +625,7 @@ namespace DM_OHD.FRM
             {
                 view.PopulateColumns();
             }
+            EnsureSelectionColumn(view);
             EnsureSttColumn(view);
         }
 
@@ -619,14 +637,17 @@ namespace DM_OHD.FRM
 
         private void DeleteSelectedRows(GridView view)
         {
-            int[] selectedRows = view.GetSelectedRows();
-            if (selectedRows == null || selectedRows.Length == 0) return;
+            DataTable dt = view.GridControl?.DataSource as DataTable;
+            if (dt == null || !dt.Columns.Contains(SelectFieldName)) return;
 
-            foreach (int rowHandle in selectedRows.OrderByDescending(x => x))
+            for (int i = dt.Rows.Count - 1; i >= 0; i--)
             {
-                if (rowHandle < 0) continue;
-                view.DeleteRow(rowHandle);
+                bool isSelected = false;
+                bool.TryParse(Convert.ToString(dt.Rows[i][SelectFieldName]), out isSelected);
+                if (!isSelected) continue;
+                dt.Rows.RemoveAt(i);
             }
+            view.RefreshData();
         }
 
         private DataTable ReadXlsx(string filePath)
