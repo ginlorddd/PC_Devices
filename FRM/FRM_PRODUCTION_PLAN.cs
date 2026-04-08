@@ -217,6 +217,8 @@ namespace DM_OHD.FRM
                 if (dialog.ShowDialog() != DialogResult.OK) return;
                 DataTable source = ReadXlsx(dialog.FileName);
                 dt.Rows.Clear();
+                string[] keyColumns = { "PRODUCT_NO", "DIE_NO", "DIE_NAME", "CAVITY" };
+                Dictionary<string, string> lastKeyValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 foreach (DataRow srcRow in source.Rows)
                 {
                     DataRow row = dt.NewRow();
@@ -229,6 +231,22 @@ namespace DM_OHD.FRM
                         string value = Convert.ToString(srcRow[sourceCol] ?? string.Empty).Trim();
                         row[targetColumn] = dt.Columns[targetColumn].DataType == typeof(decimal) ? ParseNumber(value) : (object)value;
                         hasMappedValue = hasMappedValue || !string.IsNullOrWhiteSpace(value);
+                    }
+
+                    foreach (string keyCol in keyColumns)
+                    {
+                        if (!dt.Columns.Contains(keyCol)) continue;
+                        string current = Convert.ToString(row[keyCol]);
+                        if (string.IsNullOrWhiteSpace(current))
+                        {
+                            if (lastKeyValues.TryGetValue(keyCol, out string lastValue))
+                                row[keyCol] = lastValue;
+                        }
+                        else
+                        {
+                            lastKeyValues[keyCol] = current.Trim();
+                            row[keyCol] = current.Trim();
+                        }
                     }
 
                     bool hasKey = HasAnyValue(row, "PRODUCT_NO", "DIE_NO", "DIE_NAME", "CAVITY");
@@ -416,10 +434,10 @@ namespace DM_OHD.FRM
             gridRatio.DataSource = _dto.GetMachineRatio();
             gridOutput.DataSource = _dto.GetDieOutput();
             gridMaster.DataSource = _dto.GetMaster();
-            EnsureColumnsAndStt(viewFY);
-            EnsureColumnsAndStt(viewRatio);
-            EnsureColumnsAndStt(viewOutput);
-            EnsureColumnsAndStt(viewMaster);
+            RebuildViewColumns(viewFY, true);
+            RebuildViewColumns(viewRatio, true);
+            RebuildViewColumns(viewOutput, true);
+            RebuildViewColumns(viewMaster, false);
             SetCaptions();
             ApplyMonthFilterToAllViews();
         }
@@ -612,16 +630,28 @@ namespace DM_OHD.FRM
             view.CustomUnboundColumnData += View_CustomUnboundColumnData;
         }
 
-        private void EnsureColumnsAndStt(GridView view)
+        private void RebuildViewColumns(GridView view, bool includeSelectColumn)
         {
-            bool hasDataColumn = view.Columns.Cast<GridColumn>()
-                .Any(c => c.FieldName != "STT" && c.FieldName != SelectFieldName);
-            if (!hasDataColumn)
-            {
-                view.PopulateColumns();
-            }
+            view.Columns.Clear();
+            view.PopulateColumns();
+            if (includeSelectColumn) EnsureSelectionColumn(view);
             ConfigureSelector(view);
             EnsureSttColumn(view);
+        }
+
+        private void EnsureSelectionColumn(GridView view)
+        {
+            ConfigureSelector(view);
+            GridColumn selectCol = view.Columns[SelectFieldName];
+            if (selectCol == null)
+            {
+                selectCol = view.Columns.AddVisible(SelectFieldName, "Chọn");
+            }
+            selectCol.Visible = true;
+            selectCol.VisibleIndex = 0;
+            selectCol.Fixed = FixedStyle.Left;
+            selectCol.Width = 52;
+            selectCol.OptionsColumn.AllowEdit = true;
         }
 
         private void View_CustomUnboundColumnData(object sender, DevExpress.XtraGrid.Views.Base.CustomColumnDataEventArgs e)
