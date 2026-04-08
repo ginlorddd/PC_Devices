@@ -144,10 +144,10 @@ namespace DM_OHD.DTO
 
             var grouped = raw.AsEnumerable().GroupBy(r => new
             {
-                ProductNo = includeProductNo ? Convert.ToString(r["PRODUCT_NO"]) : string.Empty,
-                DieNo = Convert.ToString(r["DIE_NO"]),
-                DieName = includeProductNo ? string.Empty : Convert.ToString(r["DIE_NAME"]),
-                Cavity = Convert.ToString(r["CAVITY"])
+                ProductNo = includeProductNo ? NormalizeKey(r["PRODUCT_NO"]) : string.Empty,
+                DieNo = NormalizeKey(r["DIE_NO"]),
+                DieName = includeProductNo ? string.Empty : NormalizeKey(r["DIE_NAME"]),
+                Cavity = NormalizeKey(r["CAVITY"])
             });
 
             foreach (var g in grouped)
@@ -156,7 +156,7 @@ namespace DM_OHD.DTO
                 if (includeProductNo) row["PRODUCT_NO"] = g.Key.ProductNo;
                 row["DIE_NO"] = g.Key.DieNo;
                 row["DIE_NAME"] = includeProductNo
-                    ? g.Select(x => Convert.ToString(x["DIE_NAME"])).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x))
+                    ? g.Select(x => NormalizeKey(x["DIE_NAME"])).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x))
                     : g.Key.DieName;
                 row["CAVITY"] = g.Key.Cavity;
 
@@ -289,8 +289,8 @@ namespace DM_OHD.DTO
             var parameters = new List<SqlParameter>
             {
                 new SqlParameter("@D", dieNo),
-                new SqlParameter("@N", Convert.ToString(row["DIE_NAME"] ?? string.Empty)),
-                new SqlParameter("@C", Convert.ToString(row["CAVITY"] ?? string.Empty)),
+                new SqlParameter("@N", NormalizeKey(row["DIE_NAME"])),
+                new SqlParameter("@C", NormalizeKey(row["CAVITY"])),
                 new SqlParameter("@Y", year),
                 new SqlParameter("@M", month),
                 new SqlParameter("@V", value)
@@ -298,7 +298,7 @@ namespace DM_OHD.DTO
 
             if (includeProductNo)
             {
-                parameters.Insert(0, new SqlParameter("@P", Convert.ToString(row["PRODUCT_NO"] ?? string.Empty)));
+                parameters.Insert(0, new SqlParameter("@P", NormalizeKey(row["PRODUCT_NO"])));
             }
 
             DBUtils.Exec(sql, parameters.ToArray());
