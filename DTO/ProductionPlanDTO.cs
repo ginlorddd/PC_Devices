@@ -14,19 +14,19 @@ namespace DM_OHD.DTO
 
         public DataTable GetPlanFY()
         {
-            DataTable raw = DBUtils.GetData("SELECT f.PRODUCT_NO, f.DIE_NO, ISNULL(m.DIE_NAME,f.DIE_NAME) AS DIE_NAME, f.CAVITY, f.PLAN_YEAR, f.PLAN_MONTH, f.FY_SHOTS FROM OHD_PLAN_FY f INNER JOIN DIE_MST m ON f.DIE_NO = m.DIE_NO ORDER BY f.DIE_NO, f.CAVITY, f.PLAN_YEAR, f.PLAN_MONTH");
+            DataTable raw = DBUtils.GetData("SELECT f.PRODUCT_NO, f.DIE_NO, ISNULL(f.DIE_NAME,'') AS DIE_NAME, f.CAVITY, f.PLAN_YEAR, f.PLAN_MONTH, f.FY_SHOTS FROM OHD_PLAN_FY f ORDER BY f.DIE_NO, f.CAVITY, f.PLAN_YEAR, f.PLAN_MONTH");
             return BuildWideTable(raw, "FY_SHOTS", includeProductNo: true);
         }
 
         public DataTable GetMachineRatio()
         {
-            DataTable raw = DBUtils.GetData("SELECT r.DIE_NO, ISNULL(m.DIE_NAME,r.DIE_NAME) AS DIE_NAME, r.CAVITY, r.PLAN_YEAR, r.PLAN_MONTH, r.RUN_RATIO FROM OHD_MACHINE_RATIO r INNER JOIN DIE_MST m ON r.DIE_NO = m.DIE_NO ORDER BY r.DIE_NO, r.CAVITY, r.PLAN_YEAR, r.PLAN_MONTH");
+            DataTable raw = DBUtils.GetData("SELECT r.DIE_NO, ISNULL(r.DIE_NAME,'') AS DIE_NAME, r.CAVITY, r.PLAN_YEAR, r.PLAN_MONTH, r.RUN_RATIO FROM OHD_MACHINE_RATIO r ORDER BY r.DIE_NO, r.CAVITY, r.PLAN_YEAR, r.PLAN_MONTH");
             return BuildWideTable(raw, "RUN_RATIO");
         }
 
         public DataTable GetDieOutput()
         {
-            DataTable raw = DBUtils.GetData("SELECT o.DIE_NO, ISNULL(m.DIE_NAME,o.DIE_NAME) AS DIE_NAME, o.CAVITY, o.PLAN_YEAR, o.PLAN_MONTH, o.OUTPUT_QTY FROM OHD_DIE_OUTPUT o INNER JOIN DIE_MST m ON o.DIE_NO = m.DIE_NO ORDER BY o.DIE_NO, o.CAVITY, o.PLAN_YEAR, o.PLAN_MONTH");
+            DataTable raw = DBUtils.GetData("SELECT o.DIE_NO, ISNULL(o.DIE_NAME,'') AS DIE_NAME, o.CAVITY, o.PLAN_YEAR, o.PLAN_MONTH, o.OUTPUT_QTY FROM OHD_DIE_OUTPUT o ORDER BY o.DIE_NO, o.CAVITY, o.PLAN_YEAR, o.PLAN_MONTH");
             return BuildWideTable(raw, "OUTPUT_QTY");
         }
 
@@ -37,10 +37,10 @@ namespace DM_OHD.DTO
 
             string cavitySelect = hasCavityDetail ? "p.CAVITY_DETAIL" : "p.CAVITY";
             string orderCavity = hasCavityDetail ? "p.CAVITY_DETAIL" : "p.CAVITY";
-            string totalSelect = hasTotalCavity ? "ISNULL(p.TOTAL_CAVITY, ISNULL(m.TOTAL_CAVITY,0))" : "ISNULL(m.TOTAL_CAVITY,0)";
+            string totalSelect = hasTotalCavity ? "ISNULL(p.TOTAL_CAVITY,0)" : "0";
 
             string sql = $@"SELECT p.DIE_NO,
-                                   ISNULL(m.DIE_NAME,p.DIE_NAME) AS DIE_NAME,
+                                   ISNULL(p.DIE_NAME,'') AS DIE_NAME,
                                    {cavitySelect} AS CAVITY_DETAIL,
                                    {totalSelect} AS TOTAL_CAVITY,
                                    p.PLAN_YEAR,
@@ -50,7 +50,6 @@ namespace DM_OHD.DTO
                                    p.REQUIRED_QTY,
                                    p.OHD_MOC
                             FROM OHD_PLAN_MASTER p
-                            INNER JOIN DIE_MST m ON p.DIE_NO = m.DIE_NO
                             ORDER BY p.DIE_NO, {orderCavity}, p.PLAN_YEAR, p.PLAN_MONTH";
             DataTable raw = DBUtils.GetData(sql);
             return BuildWideMasterTable(raw);

@@ -20,7 +20,6 @@ namespace DM_OHD.FRM
 {
     public partial class FRM_PRODUCTION_PLAN : XtraForm
     {
-        private const string SelectFieldName = "ROW_SELECTED";
         private readonly ProductionPlanDTO _dto = new ProductionPlanDTO();
 
         public FRM_PRODUCTION_PLAN()
@@ -37,7 +36,7 @@ namespace DM_OHD.FRM
             ConfigureMonthEditor(deFrom);
             ConfigureMonthEditor(deTo);
             deFrom.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-            deTo.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            deTo.EditValue = new DateTime(DateTime.Today.Year + 1, 12, 1);
             btnApplyFilter.Click += (s, e) => ApplyMonthFilterToAllViews();
 
             btnSaveFY.Click += (s, e) => { _dto.SavePlanFY(gridFY.DataSource as DataTable); LoadData(); };
@@ -355,34 +354,16 @@ namespace DM_OHD.FRM
             view.CellMerge -= View_CellMerge;
             view.CellMerge += View_CellMerge;
             EnsureSttColumn(view);
-            EnsureSelectionColumn(view);
+            ConfigureSelector(view);
         }
 
-        private void EnsureSelectionColumn(GridView view)
+        private void ConfigureSelector(GridView view)
         {
-            bool allowDeleteBySelect = view == viewFY || view == viewRatio || view == viewOutput;
-            if (!allowDeleteBySelect) return;
-
-            DataTable dt = view.GridControl?.DataSource as DataTable;
-            if (dt != null && !dt.Columns.Contains(SelectFieldName))
-            {
-                dt.Columns.Add(SelectFieldName, typeof(bool));
-                foreach (DataRow row in dt.Rows)
-                {
-                    row[SelectFieldName] = false;
-                }
-            }
-
-            GridColumn selectCol = view.Columns[SelectFieldName];
-            if (selectCol == null)
-            {
-                selectCol = view.Columns.AddVisible(SelectFieldName, "Chọn");
-            }
-            selectCol.Visible = true;
-            selectCol.VisibleIndex = 0;
-            selectCol.Fixed = FixedStyle.Left;
-            selectCol.Width = 52;
-            selectCol.OptionsColumn.AllowEdit = true;
+            bool allowSelector = view == viewFY || view == viewRatio || view == viewOutput;
+            view.OptionsSelection.MultiSelect = allowSelector;
+            view.OptionsSelection.MultiSelectMode = allowSelector ? GridMultiSelectMode.CheckBoxRowSelect : GridMultiSelectMode.RowSelect;
+            view.OptionsSelection.ShowCheckBoxSelectorInColumnHeader = allowSelector ? DefaultBoolean.True : DefaultBoolean.False;
+            view.OptionsSelection.CheckBoxSelectorColumnWidth = allowSelector ? 40 : 0;
         }
 
         private void View_CellMerge(object sender, CellMergeEventArgs e)
@@ -612,7 +593,7 @@ namespace DM_OHD.FRM
                 col.OptionsColumn.AllowEdit = false;
                 col.Fixed = FixedStyle.Left;
                 col.Width = 55;
-                col.VisibleIndex = view.Columns[SelectFieldName] != null ? 1 : 0;
+                col.VisibleIndex = 0;
             }
 
             view.CustomUnboundColumnData -= View_CustomUnboundColumnData;
@@ -622,12 +603,12 @@ namespace DM_OHD.FRM
         private void EnsureColumnsAndStt(GridView view)
         {
             bool hasDataColumn = view.Columns.Cast<GridColumn>()
-                .Any(c => c.FieldName != "STT" && c.FieldName != SelectFieldName);
+                .Any(c => c.FieldName != "STT");
             if (!hasDataColumn)
             {
                 view.PopulateColumns();
             }
-            EnsureSelectionColumn(view);
+            ConfigureSelector(view);
             EnsureSttColumn(view);
         }
 
@@ -639,17 +620,13 @@ namespace DM_OHD.FRM
 
         private void DeleteSelectedRows(GridView view)
         {
-            DataTable dt = view.GridControl?.DataSource as DataTable;
-            if (dt == null || !dt.Columns.Contains(SelectFieldName)) return;
-
-            for (int i = dt.Rows.Count - 1; i >= 0; i--)
+            int[] selectedRows = view.GetSelectedRows();
+            if (selectedRows == null || selectedRows.Length == 0) return;
+            foreach (int rowHandle in selectedRows.OrderByDescending(x => x))
             {
-                bool isSelected = false;
-                bool.TryParse(Convert.ToString(dt.Rows[i][SelectFieldName]), out isSelected);
-                if (!isSelected) continue;
-                dt.Rows.RemoveAt(i);
+                if (rowHandle < 0) continue;
+                view.DeleteRow(rowHandle);
             }
-            view.RefreshData();
         }
 
         private DataTable ReadXlsx(string filePath)
