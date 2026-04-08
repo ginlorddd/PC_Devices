@@ -615,7 +615,7 @@ namespace DM_OHD.FRM
         private void EnsureColumnsAndStt(GridView view)
         {
             bool hasDataColumn = view.Columns.Cast<GridColumn>()
-                .Any(c => c.FieldName != "STT");
+                .Any(c => c.FieldName != "STT" && c.FieldName != SelectFieldName);
             if (!hasDataColumn)
             {
                 view.PopulateColumns();
