@@ -146,7 +146,7 @@ namespace DM_OHD.DTO
             {
                 ProductNo = includeProductNo ? Convert.ToString(r["PRODUCT_NO"]) : string.Empty,
                 DieNo = Convert.ToString(r["DIE_NO"]),
-                DieName = Convert.ToString(r["DIE_NAME"]),
+                DieName = includeProductNo ? string.Empty : Convert.ToString(r["DIE_NAME"]),
                 Cavity = Convert.ToString(r["CAVITY"])
             });
 
@@ -155,7 +155,9 @@ namespace DM_OHD.DTO
                 DataRow row = wide.NewRow();
                 if (includeProductNo) row["PRODUCT_NO"] = g.Key.ProductNo;
                 row["DIE_NO"] = g.Key.DieNo;
-                row["DIE_NAME"] = g.Key.DieName;
+                row["DIE_NAME"] = includeProductNo
+                    ? g.Select(x => Convert.ToString(x["DIE_NAME"])).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x))
+                    : g.Key.DieName;
                 row["CAVITY"] = g.Key.Cavity;
 
                 foreach (DataRow src in g)

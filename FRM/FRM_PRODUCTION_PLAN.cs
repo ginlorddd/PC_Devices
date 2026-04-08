@@ -20,6 +20,7 @@ namespace DM_OHD.FRM
 {
     public partial class FRM_PRODUCTION_PLAN : XtraForm
     {
+        private const string SelectFieldName = "ROW_SELECTED";
         private readonly ProductionPlanDTO _dto = new ProductionPlanDTO();
 
         public FRM_PRODUCTION_PLAN()
@@ -58,6 +59,9 @@ namespace DM_OHD.FRM
             SetupGridEditingBehavior(viewRatio);
             SetupGridEditingBehavior(viewOutput);
             SetupGridEditingBehavior(viewMaster);
+            viewFY.MouseDown += View_MouseDownSelectHeader;
+            viewRatio.MouseDown += View_MouseDownSelectHeader;
+            viewOutput.MouseDown += View_MouseDownSelectHeader;
             StyleButtons();
 
             ApplyPermissions();
@@ -360,10 +364,18 @@ namespace DM_OHD.FRM
         private void ConfigureSelector(GridView view)
         {
             bool allowSelector = view == viewFY || view == viewRatio || view == viewOutput;
-            view.OptionsSelection.MultiSelect = allowSelector;
-            view.OptionsSelection.MultiSelectMode = allowSelector ? GridMultiSelectMode.CheckBoxRowSelect : GridMultiSelectMode.RowSelect;
-            view.OptionsSelection.ShowCheckBoxSelectorInColumnHeader = allowSelector ? DefaultBoolean.True : DefaultBoolean.False;
-            view.OptionsSelection.CheckBoxSelectorColumnWidth = allowSelector ? 40 : 0;
+            view.OptionsSelection.MultiSelect = false;
+            view.OptionsSelection.MultiSelectMode = GridMultiSelectMode.RowSelect;
+            view.OptionsSelection.ShowCheckBoxSelectorInColumnHeader = DefaultBoolean.False;
+            view.OptionsSelection.CheckBoxSelectorColumnWidth = 0;
+            if (!allowSelector) return;
+
+            DataTable dt = view.GridControl?.DataSource as DataTable;
+            if (dt != null && !dt.Columns.Contains(SelectFieldName))
+            {
+                dt.Columns.Add(SelectFieldName, typeof(bool));
+                foreach (DataRow row in dt.Rows) row[SelectFieldName] = false;
+            }
         }
 
         private void View_CellMerge(object sender, CellMergeEventArgs e)
@@ -593,7 +605,7 @@ namespace DM_OHD.FRM
                 col.OptionsColumn.AllowEdit = false;
                 col.Fixed = FixedStyle.Left;
                 col.Width = 55;
-                col.VisibleIndex = 0;
+                col.VisibleIndex = 1;
             }
 
             view.CustomUnboundColumnData -= View_CustomUnboundColumnData;
@@ -620,13 +632,32 @@ namespace DM_OHD.FRM
 
         private void DeleteSelectedRows(GridView view)
         {
-            int[] selectedRows = view.GetSelectedRows();
-            if (selectedRows == null || selectedRows.Length == 0) return;
-            foreach (int rowHandle in selectedRows.OrderByDescending(x => x))
+            DataTable dt = view.GridControl?.DataSource as DataTable;
+            if (dt == null || !dt.Columns.Contains(SelectFieldName)) return;
+            for (int i = dt.Rows.Count - 1; i >= 0; i--)
             {
-                if (rowHandle < 0) continue;
-                view.DeleteRow(rowHandle);
+                if (!Convert.ToBoolean(dt.Rows[i][SelectFieldName])) continue;
+                dt.Rows.RemoveAt(i);
             }
+            view.RefreshData();
+        }
+
+        private void View_MouseDownSelectHeader(object sender, MouseEventArgs e)
+        {
+            GridView view = sender as GridView;
+            if (view == null) return;
+            var hit = view.CalcHitInfo(e.Location);
+            if (hit.HitTest != GridHitTest.Column || hit.Column == null || hit.Column.FieldName != SelectFieldName) return;
+
+            DataTable dt = view.GridControl?.DataSource as DataTable;
+            if (dt == null || !dt.Columns.Contains(SelectFieldName)) return;
+
+            bool shouldSelectAll = dt.AsEnumerable().Any(r => !Convert.ToBoolean(r[SelectFieldName]));
+            foreach (DataRow row in dt.Rows)
+            {
+                row[SelectFieldName] = shouldSelectAll;
+            }
+            view.RefreshData();
         }
 
         private DataTable ReadXlsx(string filePath)
