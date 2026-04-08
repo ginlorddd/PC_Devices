@@ -34,7 +34,8 @@ GO
 IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'DIE_MST')
 BEGIN
     CREATE TABLE dbo.DIE_MST (
-        DIE_NO NVARCHAR(50) NOT NULL PRIMARY KEY,
+        ID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        DIE_NO NVARCHAR(50) NOT NULL,
         DIE_NAME NVARCHAR(255) NOT NULL,
         TOTAL_CAVITY INT NOT NULL
     );
@@ -42,29 +43,26 @@ END
 GO
 
 IF EXISTS (SELECT 1 FROM sys.tables WHERE name = 'DIE_MST')
-   AND NOT EXISTS (
-       SELECT 1
-       FROM sys.key_constraints kc
-       INNER JOIN sys.index_columns ic ON kc.parent_object_id = ic.object_id AND kc.unique_index_id = ic.index_id
-       INNER JOIN sys.columns c ON ic.object_id = c.object_id AND ic.column_id = c.column_id
-       WHERE kc.parent_object_id = OBJECT_ID('dbo.DIE_MST')
-         AND kc.type = 'PK'
-         AND c.name = 'DIE_NO'
-   )
+   AND NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.DIE_MST') AND name = 'ID')
 BEGIN
-    DECLARE @PkName NVARCHAR(128);
-    SELECT @PkName = kc.name
-    FROM sys.key_constraints kc
-    WHERE kc.parent_object_id = OBJECT_ID('dbo.DIE_MST') AND kc.type = 'PK';
+    SELECT DIE_NO, DIE_NAME, TOTAL_CAVITY
+    INTO #DIE_MST_OLD
+    FROM dbo.DIE_MST;
 
-    IF @PkName IS NOT NULL
-    BEGIN
-        DECLARE @SqlDropPk NVARCHAR(MAX);
-        SET @SqlDropPk = N'ALTER TABLE dbo.DIE_MST DROP CONSTRAINT ' + QUOTENAME(@PkName) + N';';
-        EXEC sys.sp_executesql @SqlDropPk;
-    END
+    DROP TABLE dbo.DIE_MST;
 
-    ALTER TABLE dbo.DIE_MST ADD CONSTRAINT PK_DIE_MST PRIMARY KEY (DIE_NO);
+    CREATE TABLE dbo.DIE_MST (
+        ID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        DIE_NO NVARCHAR(50) NOT NULL,
+        DIE_NAME NVARCHAR(255) NOT NULL,
+        TOTAL_CAVITY INT NOT NULL
+    );
+
+    INSERT INTO dbo.DIE_MST (DIE_NO, DIE_NAME, TOTAL_CAVITY)
+    SELECT DIE_NO, DIE_NAME, TOTAL_CAVITY
+    FROM #DIE_MST_OLD;
+
+    DROP TABLE #DIE_MST_OLD;
 END
 GO
 

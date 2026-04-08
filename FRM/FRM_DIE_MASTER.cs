@@ -67,6 +67,7 @@ namespace DM_OHD.FRM
 
         private void ApplyColumnCaptions()
         {
+            if (view.Columns["ID"] != null) view.Columns["ID"].Visible = false;
             if (view.Columns["STT"] != null) view.Columns["STT"].Caption = "STT";
             if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].Caption = "Số khuôn";
             if (view.Columns["DIE_NAME"] != null) view.Columns["DIE_NAME"].Caption = "Tên khuôn";
@@ -125,9 +126,9 @@ namespace DM_OHD.FRM
                 foreach (int rowHandle in selectedRows)
                 {
                     if (rowHandle < 0) continue;
-                    string dieNo = Convert.ToString(view.GetRowCellValue(rowHandle, "DIE_NO"));
-                    if (string.IsNullOrWhiteSpace(dieNo)) continue;
-                    _dto.Delete(dieNo.Trim());
+                    object idValue = view.GetRowCellValue(rowHandle, "ID");
+                    if (!int.TryParse(Convert.ToString(idValue), out int id) || id <= 0) continue;
+                    _dto.DeleteById(id);
                     deletedCount++;
                 }
 
@@ -136,7 +137,7 @@ namespace DM_OHD.FRM
                 return;
             }
 
-            _dto.Delete(txtDieNo.Text.Trim());
+            _dto.Delete(txtDieNo.Text.Trim(), txtDieName.Text.Trim());
             LoadData();
         }
 
