@@ -42,6 +42,9 @@ namespace DM_OHD.FRM
             btnSaveFY.Click += (s, e) => { _dto.SavePlanFY(gridFY.DataSource as DataTable); LoadData(); };
             btnSaveRatio.Click += (s, e) => { _dto.SaveMachineRatio(gridRatio.DataSource as DataTable); LoadData(); };
             btnSaveOutput.Click += (s, e) => { _dto.SaveDieOutput(gridOutput.DataSource as DataTable); LoadData(); };
+            btnDeleteFY.Click += (s, e) => DeleteSelectedRows(viewFY);
+            btnDeleteRatio.Click += (s, e) => DeleteSelectedRows(viewRatio);
+            btnDeleteOutput.Click += (s, e) => DeleteSelectedRows(viewOutput);
             btnGenerateMaster.Click += (s, e) => { _dto.GenerateMasterPlan(); LoadData(); };
             btnExportFY.Click += (s, e) => ExportGrid(viewFY);
             btnImportFY.Click += (s, e) => ImportExcelToGrid(gridFY.DataSource as DataTable, viewFY);
@@ -84,6 +87,9 @@ namespace DM_OHD.FRM
             ApplyButtonColor(btnSaveFY, Color.MediumSeaGreen);
             ApplyButtonColor(btnSaveRatio, Color.MediumSeaGreen);
             ApplyButtonColor(btnSaveOutput, Color.MediumSeaGreen);
+            ApplyButtonColor(btnDeleteFY, Color.IndianRed);
+            ApplyButtonColor(btnDeleteRatio, Color.IndianRed);
+            ApplyButtonColor(btnDeleteOutput, Color.IndianRed);
         }
 
         private void ApplyButtonColor(SimpleButton button, Color color)
@@ -327,6 +333,9 @@ namespace DM_OHD.FRM
             btnSaveFY.Enabled = canEdit;
             btnSaveRatio.Enabled = canEdit;
             btnSaveOutput.Enabled = canEdit;
+            btnDeleteFY.Enabled = canEdit;
+            btnDeleteRatio.Enabled = canEdit;
+            btnDeleteOutput.Enabled = canEdit;
             btnGenerateMaster.Enabled = canEdit;
             viewFY.OptionsBehavior.Editable = canEdit;
             viewRatio.OptionsBehavior.Editable = canEdit;
@@ -345,6 +354,17 @@ namespace DM_OHD.FRM
             view.CellMerge -= View_CellMerge;
             view.CellMerge += View_CellMerge;
             EnsureSttColumn(view);
+            ConfigureSelector(view);
+        }
+
+        private void ConfigureSelector(GridView view)
+        {
+            bool allowMultiDelete = view == viewFY || view == viewRatio || view == viewOutput;
+            view.OptionsSelection.MultiSelect = allowMultiDelete;
+            view.OptionsSelection.MultiSelectMode = allowMultiDelete
+                ? GridMultiSelectMode.CheckBoxRowSelect
+                : GridMultiSelectMode.RowSelect;
+            view.OptionsSelection.CheckBoxSelectorColumnWidth = allowMultiDelete ? 36 : 0;
         }
 
         private void View_CellMerge(object sender, CellMergeEventArgs e)
@@ -595,6 +615,18 @@ namespace DM_OHD.FRM
         {
             if (e.Column.FieldName != "STT" || !e.IsGetData) return;
             e.Value = e.ListSourceRowIndex + 1;
+        }
+
+        private void DeleteSelectedRows(GridView view)
+        {
+            int[] selectedRows = view.GetSelectedRows();
+            if (selectedRows == null || selectedRows.Length == 0) return;
+
+            foreach (int rowHandle in selectedRows.OrderByDescending(x => x))
+            {
+                if (rowHandle < 0) continue;
+                view.DeleteRow(rowHandle);
+            }
         }
 
         private DataTable ReadXlsx(string filePath)
