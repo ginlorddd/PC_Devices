@@ -372,6 +372,17 @@ namespace DM_OHD.FRM
                     row[SelectFieldName] = false;
                 }
             }
+
+            GridColumn selectCol = view.Columns[SelectFieldName];
+            if (selectCol == null)
+            {
+                selectCol = view.Columns.AddVisible(SelectFieldName, "Chọn");
+            }
+            selectCol.Visible = true;
+            selectCol.VisibleIndex = 0;
+            selectCol.Fixed = FixedStyle.Left;
+            selectCol.Width = 52;
+            selectCol.OptionsColumn.AllowEdit = true;
         }
 
         private void View_CellMerge(object sender, CellMergeEventArgs e)
