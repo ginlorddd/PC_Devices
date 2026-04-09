@@ -115,6 +115,7 @@ namespace DM_OHD.FRM
         {
             _dto.Save(txtDieNo.Text.Trim(), txtDieName.Text.Trim(), Convert.ToInt32(spCavity.Value));
             LoadData();
+            XtraMessageBox.Show("Đã lưu dữ liệu khuôn.", "Thông báo");
         }
 
         private void BtnDelete_Click(object sender, EventArgs e)
@@ -139,6 +140,7 @@ namespace DM_OHD.FRM
 
             _dto.Delete(txtDieNo.Text.Trim(), txtDieName.Text.Trim());
             LoadData();
+            XtraMessageBox.Show("Đã xóa dữ liệu khuôn.", "Thông báo");
         }
 
         private void View_DoubleClick(object sender, EventArgs e)

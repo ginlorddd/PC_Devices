@@ -38,23 +38,22 @@ namespace DM_OHD.FRM
             ConfigureMonthEditor(deTo);
             deFrom.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             deTo.EditValue = new DateTime(DateTime.Today.Year + 1, 12, 1);
-            btnApplyFilter.Click += (s, e) => ApplyMonthFilterToAllViews();
-
-            btnSaveFY.Click += (s, e) => { _dto.SavePlanFY(gridFY.DataSource as DataTable); LoadData(); };
-            btnSaveRatio.Click += (s, e) => { _dto.SaveMachineRatio(gridRatio.DataSource as DataTable); LoadData(); };
-            btnSaveOutput.Click += (s, e) => { _dto.SaveDieOutput(gridOutput.DataSource as DataTable); LoadData(); };
-            btnSaveMaster.Click += (s, e) => { _dto.SaveMaster(gridMaster.DataSource as DataTable); LoadData(); };
-            btnDeleteFY.Click += (s, e) => DeleteSelectedRows(viewFY);
-            btnDeleteRatio.Click += (s, e) => DeleteSelectedRows(viewRatio);
-            btnDeleteOutput.Click += (s, e) => DeleteSelectedRows(viewOutput);
-            btnGenerateMaster.Click += (s, e) => { _dto.GenerateMasterPlan(); LoadData(); };
-            btnExportFY.Click += (s, e) => ExportGrid(viewFY);
-            btnImportFY.Click += (s, e) => ImportExcelToGrid(gridFY.DataSource as DataTable, viewFY);
-            btnExportRatio.Click += (s, e) => ExportGrid(viewRatio);
-            btnImportRatio.Click += (s, e) => ImportExcelToGrid(gridRatio.DataSource as DataTable, viewRatio);
-            btnExportOutput.Click += (s, e) => ExportGrid(viewOutput);
-            btnImportOutput.Click += (s, e) => ImportExcelToGrid(gridOutput.DataSource as DataTable, viewOutput);
-            btnExportMaster.Click += (s, e) => ExportGrid(viewMaster);
+            btnApplyFilter.Click += BtnApplyFilter_Click;
+            btnSaveFY.Click += BtnSaveFY_Click;
+            btnSaveRatio.Click += BtnSaveRatio_Click;
+            btnSaveOutput.Click += BtnSaveOutput_Click;
+            btnSaveMaster.Click += BtnSaveMaster_Click;
+            btnDeleteFY.Click += BtnDeleteFY_Click;
+            btnDeleteRatio.Click += BtnDeleteRatio_Click;
+            btnDeleteOutput.Click += BtnDeleteOutput_Click;
+            btnGenerateMaster.Click += BtnGenerateMaster_Click;
+            btnExportFY.Click += BtnExportFY_Click;
+            btnImportFY.Click += BtnImportFY_Click;
+            btnExportRatio.Click += BtnExportRatio_Click;
+            btnImportRatio.Click += BtnImportRatio_Click;
+            btnExportOutput.Click += BtnExportOutput_Click;
+            btnImportOutput.Click += BtnImportOutput_Click;
+            btnExportMaster.Click += BtnExportMaster_Click;
 
             SetupGridEditingBehavior(viewFY);
             SetupGridEditingBehavior(viewRatio);
@@ -105,6 +104,96 @@ namespace DM_OHD.FRM
             button.Appearance.ForeColor = Color.White;
             button.Appearance.Options.UseBackColor = true;
             button.Appearance.Options.UseForeColor = true;
+        }
+
+        private void NotifyAction(string message)
+        {
+            XtraMessageBox.Show(message, "Thông báo");
+        }
+
+        private void BtnApplyFilter_Click(object sender, EventArgs e)
+        {
+            ApplyMonthFilterToAllViews();
+            NotifyAction("Đã áp dụng bộ lọc tháng.");
+        }
+
+        private void BtnSaveFY_Click(object sender, EventArgs e)
+        {
+            _dto.SavePlanFY(gridFY.DataSource as DataTable);
+            LoadData();
+            NotifyAction("Đã lưu kế hoạch FY.");
+        }
+
+        private void BtnSaveRatio_Click(object sender, EventArgs e)
+        {
+            _dto.SaveMachineRatio(gridRatio.DataSource as DataTable);
+            LoadData();
+            NotifyAction("Đã lưu tỉ lệ chạy máy.");
+        }
+
+        private void BtnSaveOutput_Click(object sender, EventArgs e)
+        {
+            _dto.SaveDieOutput(gridOutput.DataSource as DataTable);
+            LoadData();
+            NotifyAction("Đã lưu sản lượng khuôn.");
+        }
+
+        private void BtnSaveMaster_Click(object sender, EventArgs e)
+        {
+            _dto.SaveMaster(gridMaster.DataSource as DataTable);
+            LoadData();
+            NotifyAction("Đã lưu bảng kế hoạch OHD.");
+        }
+
+        private void BtnDeleteFY_Click(object sender, EventArgs e)
+        {
+            int deleted = DeleteSelectedRows(viewFY);
+            NotifyAction($"Đã xóa {deleted} dòng FY được chọn.");
+        }
+
+        private void BtnDeleteRatio_Click(object sender, EventArgs e)
+        {
+            int deleted = DeleteSelectedRows(viewRatio);
+            NotifyAction($"Đã xóa {deleted} dòng tỉ lệ được chọn.");
+        }
+
+        private void BtnDeleteOutput_Click(object sender, EventArgs e)
+        {
+            int deleted = DeleteSelectedRows(viewOutput);
+            NotifyAction($"Đã xóa {deleted} dòng sản lượng được chọn.");
+        }
+
+        private void BtnGenerateMaster_Click(object sender, EventArgs e)
+        {
+            _dto.GenerateMasterPlan();
+            LoadData();
+            NotifyAction("Đã tạo bảng kế hoạch OHD.");
+        }
+
+        private void BtnExportFY_Click(object sender, EventArgs e) => ExportGrid(viewFY);
+        private void BtnExportRatio_Click(object sender, EventArgs e) => ExportGrid(viewRatio);
+        private void BtnExportOutput_Click(object sender, EventArgs e) => ExportGrid(viewOutput);
+        private void BtnExportMaster_Click(object sender, EventArgs e) => ExportGrid(viewMaster);
+
+        private void BtnImportFY_Click(object sender, EventArgs e)
+        {
+            int imported = ImportExcelToGrid(gridFY.DataSource as DataTable, viewFY);
+            if (imported < 0) return;
+            NotifyAction($"Đã import {imported} dòng cho kế hoạch FY.");
+        }
+
+        private void BtnImportRatio_Click(object sender, EventArgs e)
+        {
+            int imported = ImportExcelToGrid(gridRatio.DataSource as DataTable, viewRatio);
+            if (imported < 0) return;
+            NotifyAction($"Đã import {imported} dòng cho tỉ lệ chạy máy.");
+        }
+
+        private void BtnImportOutput_Click(object sender, EventArgs e)
+        {
+            int imported = ImportExcelToGrid(gridOutput.DataSource as DataTable, viewOutput);
+            if (imported < 0) return;
+            NotifyAction($"Đã import {imported} dòng cho sản lượng khuôn.");
         }
 
         private void SetupGridEditingBehavior(GridView view)
@@ -242,14 +331,15 @@ namespace DM_OHD.FRM
             }
         }
 
-        private void ImportExcelToGrid(DataTable dt, GridView view)
+        private int ImportExcelToGrid(DataTable dt, GridView view)
         {
-            if (dt == null) return;
+            if (dt == null) return 0;
             using (var dialog = new OpenFileDialog { Filter = "Excel (*.xlsx)|*.xlsx" })
             {
-                if (dialog.ShowDialog() != DialogResult.OK) return;
+                if (dialog.ShowDialog() != DialogResult.OK) return -1;
                 DataTable source = ReadXlsx(dialog.FileName);
                 dt.Rows.Clear();
+                int importedCount = 0;
                 string[] keyColumns = { "PRODUCT_NO", "DIE_NO", "DIE_NAME", "CAVITY" };
                 Dictionary<string, string> lastKeyValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 foreach (DataRow srcRow in source.Rows)
@@ -293,9 +383,14 @@ namespace DM_OHD.FRM
                     }
 
                     bool hasKey = HasAnyValue(row, "PRODUCT_NO", "DIE_NO", "DIE_NAME", "CAVITY");
-                    if (hasMappedValue && hasKey) dt.Rows.Add(row);
+                    if (hasMappedValue && hasKey)
+                    {
+                        dt.Rows.Add(row);
+                        importedCount++;
+                    }
                 }
                 view.RefreshData();
+                return importedCount;
             }
         }
 
@@ -741,16 +836,19 @@ namespace DM_OHD.FRM
             e.Value = e.ListSourceRowIndex + 1;
         }
 
-        private void DeleteSelectedRows(GridView view)
+        private int DeleteSelectedRows(GridView view)
         {
             DataTable dt = view.GridControl?.DataSource as DataTable;
-            if (dt == null || !dt.Columns.Contains(SelectFieldName)) return;
+            if (dt == null || !dt.Columns.Contains(SelectFieldName)) return 0;
+            int deleted = 0;
             for (int i = dt.Rows.Count - 1; i >= 0; i--)
             {
                 if (!Convert.ToBoolean(dt.Rows[i][SelectFieldName])) continue;
                 dt.Rows.RemoveAt(i);
+                deleted++;
             }
             view.RefreshData();
+            return deleted;
         }
 
         private void View_MouseDownSelectHeader(object sender, MouseEventArgs e)

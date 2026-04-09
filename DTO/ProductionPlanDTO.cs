@@ -80,6 +80,15 @@ namespace DM_OHD.DTO
             string totalSelectCol = hasTotalCavity ? ",TOTAL_CAVITY" : string.Empty;
 
             string sql = $@"
+                IF OBJECT_ID('tempdb..#OLD_REQUIRED') IS NOT NULL DROP TABLE #OLD_REQUIRED;
+                SELECT LTRIM(RTRIM(DIE_NO)) AS DIE_NO,
+                       LTRIM(RTRIM(ISNULL(CAVITY_DETAIL,''))) AS CAVITY,
+                       PLAN_YEAR,
+                       PLAN_MONTH,
+                       ISNULL(REQUIRED_QTY,0) AS REQUIRED_QTY
+                INTO #OLD_REQUIRED
+                FROM OHD_PLAN_MASTER;
+
                 DELETE FROM OHD_PLAN_MASTER;
 
                 ;WITH src AS (
@@ -90,11 +99,7 @@ namespace DM_OHD.DTO
                            o.PLAN_MONTH,
                            ISNULL(o.OUTPUT_QTY,0) AS MONTHLY_SHOTS,
                            ISNULL(r.RUN_RATIO,0) AS RUN_RATIO,
-                           COALESCE(NULLIF(dm.TOTAL_CAVITY,0), NULLIF(TRY_CONVERT(int, o.CAVITY),0), 0) AS TOTAL_CAVITY,
-                           CASE
-                               WHEN ISNULL(dm.TOTAL_CAVITY,0) <= 0 THEN 0
-                               ELSE ISNULL(o.OUTPUT_QTY,0) / NULLIF(CONVERT(decimal(18,4), dm.TOTAL_CAVITY),0)
-                           END AS SHOT_PER_CAVITY
+                           COALESCE(NULLIF(dm.TOTAL_CAVITY,0), NULLIF(cav.OUTPUT_CAVITY,0), NULLIF(TRY_CONVERT(int, o.CAVITY),0), 0) AS TOTAL_CAVITY
                     FROM OHD_DIE_OUTPUT o
                     LEFT JOIN OHD_MACHINE_RATIO r ON o.DIE_NO = r.DIE_NO AND o.CAVITY = r.CAVITY AND o.PLAN_YEAR = r.PLAN_YEAR AND o.PLAN_MONTH = r.PLAN_MONTH
                     OUTER APPLY (
@@ -103,7 +108,14 @@ namespace DM_OHD.DTO
                         WHERE LTRIM(RTRIM(DIE_NO)) = LTRIM(RTRIM(o.DIE_NO))
                         ORDER BY TOTAL_CAVITY DESC, ID DESC
                     ) dm
-                ), agg AS (
+                    OUTER APPLY (
+                        SELECT TOP 1 TRY_CONVERT(int, NULLIF(LTRIM(RTRIM(od.CAVITY)),'')) AS OUTPUT_CAVITY
+                        FROM OHD_DIE_OUTPUT od
+                        WHERE LTRIM(RTRIM(od.DIE_NO)) = LTRIM(RTRIM(o.DIE_NO))
+                          AND TRY_CONVERT(int, NULLIF(LTRIM(RTRIM(od.CAVITY)),'')) > 0
+                        ORDER BY od.PLAN_YEAR DESC, od.PLAN_MONTH DESC
+                    ) cav
+                ), src_shot AS (
                     SELECT DIE_NO,
                            DIE_NAME,
                            CAVITY,
@@ -112,9 +124,43 @@ namespace DM_OHD.DTO
                            MONTHLY_SHOTS,
                            RUN_RATIO,
                            TOTAL_CAVITY,
-                           SHOT_PER_CAVITY,
-                           SUM(SHOT_PER_CAVITY) OVER(PARTITION BY DIE_NO, CAVITY ORDER BY PLAN_YEAR, PLAN_MONTH ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS SHOT_CUMULATIVE
+                           CASE
+                               WHEN TOTAL_CAVITY <= 0 THEN 0
+                               ELSE MONTHLY_SHOTS / NULLIF(CONVERT(decimal(18,4), TOTAL_CAVITY),0)
+                           END AS SHOT_PER_CAVITY,
+                           (PLAN_YEAR * 100 + PLAN_MONTH) AS YM
                     FROM src
+                ), first_month AS (
+                    SELECT DIE_NO,
+                           CAVITY,
+                           MIN(YM) AS FIRST_YM
+                    FROM src_shot
+                    GROUP BY DIE_NO, CAVITY
+                ), carry AS (
+                    SELECT f.DIE_NO,
+                           f.CAVITY,
+                           ISNULL((
+                               SELECT TOP 1 om.REQUIRED_QTY
+                               FROM #OLD_REQUIRED om
+                               WHERE om.DIE_NO = LTRIM(RTRIM(f.DIE_NO))
+                                 AND om.CAVITY = LTRIM(RTRIM(f.CAVITY))
+                                 AND (om.PLAN_YEAR * 100 + om.PLAN_MONTH) < f.FIRST_YM
+                               ORDER BY om.PLAN_YEAR DESC, om.PLAN_MONTH DESC
+                           ), 0) AS PREV_REQUIRED
+                    FROM first_month f
+                ), agg AS (
+                    SELECT s.DIE_NO,
+                           s.DIE_NAME,
+                           s.CAVITY,
+                           s.PLAN_YEAR,
+                           s.PLAN_MONTH,
+                           s.MONTHLY_SHOTS,
+                           s.RUN_RATIO,
+                           s.TOTAL_CAVITY,
+                           s.SHOT_PER_CAVITY,
+                           ISNULL(c.PREV_REQUIRED,0) + SUM(s.SHOT_PER_CAVITY) OVER(PARTITION BY s.DIE_NO, s.CAVITY ORDER BY s.PLAN_YEAR, s.PLAN_MONTH ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS SHOT_CUMULATIVE
+                    FROM src_shot s
+                    LEFT JOIN carry c ON s.DIE_NO = c.DIE_NO AND s.CAVITY = c.CAVITY
                 )
                 ,moc_raw AS (
                     SELECT DIE_NO,
@@ -147,7 +193,9 @@ namespace DM_OHD.DTO
                            WHEN RAW_OHD <> ISNULL(LAG(RAW_OHD) OVER(PARTITION BY DIE_NO, CAVITY ORDER BY PLAN_YEAR, PLAN_MONTH), 0) THEN RAW_OHD
                            ELSE 0
                        END AS OHD_MOC
-                FROM moc_raw;";
+                FROM moc_raw;
+
+                DROP TABLE #OLD_REQUIRED;";
             DBUtils.Exec(sql);
         }
 
