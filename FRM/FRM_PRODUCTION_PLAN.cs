@@ -63,6 +63,7 @@ namespace DM_OHD.FRM
             viewFY.MouseDown += View_MouseDownSelectHeader;
             viewRatio.MouseDown += View_MouseDownSelectHeader;
             viewOutput.MouseDown += View_MouseDownSelectHeader;
+            viewMaster.RowStyle += ViewMaster_RowStyle;
             StyleButtons();
 
             ApplyPermissions();
@@ -768,6 +769,20 @@ namespace DM_OHD.FRM
                 row[SelectFieldName] = shouldSelectAll;
             }
             view.RefreshData();
+        }
+
+        private void ViewMaster_RowStyle(object sender, RowStyleEventArgs e)
+        {
+            if (e.RowHandle < 0) return;
+            int dataIndex = viewMaster.GetDataSourceRowIndex(e.RowHandle);
+            if (dataIndex < 0) return;
+
+            int groupIndex = dataIndex / 3;
+            if (groupIndex % 2 == 1)
+            {
+                e.Appearance.BackColor = Color.FromArgb(220, 242, 245);
+                e.HighPriority = true;
+            }
         }
 
         private DataTable ReadXlsx(string filePath)

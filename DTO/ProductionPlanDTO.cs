@@ -97,7 +97,12 @@ namespace DM_OHD.DTO
                            END AS SHOT_PER_CAVITY
                     FROM OHD_DIE_OUTPUT o
                     LEFT JOIN OHD_MACHINE_RATIO r ON o.DIE_NO = r.DIE_NO AND o.CAVITY = r.CAVITY AND o.PLAN_YEAR = r.PLAN_YEAR AND o.PLAN_MONTH = r.PLAN_MONTH
-                    LEFT JOIN DIE_MST dm ON o.DIE_NO = dm.DIE_NO
+                    OUTER APPLY (
+                        SELECT TOP 1 DIE_NAME, TOTAL_CAVITY
+                        FROM DIE_MST
+                        WHERE LTRIM(RTRIM(DIE_NO)) = LTRIM(RTRIM(o.DIE_NO))
+                        ORDER BY TOTAL_CAVITY DESC, ID DESC
+                    ) dm
                 ), agg AS (
                     SELECT DIE_NO,
                            DIE_NAME,
