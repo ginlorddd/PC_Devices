@@ -243,7 +243,17 @@ namespace DM_OHD.FRM
                         string targetColumn = ResolveTargetColumnName(view, dt, header);
                         if (string.IsNullOrWhiteSpace(targetColumn)) continue;
                         string value = Convert.ToString(srcRow[sourceCol] ?? string.Empty).Trim();
-                        row[targetColumn] = dt.Columns[targetColumn].DataType == typeof(decimal) ? ParseNumber(value) : (object)value;
+                        if (dt.Columns[targetColumn].DataType == typeof(decimal))
+                        {
+                            decimal number = ParseNumber(value);
+                            bool isRatioMonth = view == viewRatio && targetColumn.StartsWith("M") && targetColumn.Length == 7;
+                            if (isRatioMonth && number >= 0m && number <= 1m) number *= 100m;
+                            row[targetColumn] = number;
+                        }
+                        else
+                        {
+                            row[targetColumn] = value;
+                        }
                         hasMappedValue = hasMappedValue || !string.IsNullOrWhiteSpace(value);
                     }
 
