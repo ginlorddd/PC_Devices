@@ -90,7 +90,7 @@ namespace DM_OHD.DTO
                            o.PLAN_MONTH,
                            ISNULL(o.OUTPUT_QTY,0) AS MONTHLY_SHOTS,
                            ISNULL(r.RUN_RATIO,0) AS RUN_RATIO,
-                           ISNULL(dm.TOTAL_CAVITY,0) AS TOTAL_CAVITY,
+                           COALESCE(NULLIF(dm.TOTAL_CAVITY,0), NULLIF(TRY_CONVERT(int, o.CAVITY),0), 0) AS TOTAL_CAVITY,
                            CASE
                                WHEN ISNULL(dm.TOTAL_CAVITY,0) <= 0 THEN 0
                                ELSE ISNULL(o.OUTPUT_QTY,0) / NULLIF(CONVERT(decimal(18,4), dm.TOTAL_CAVITY),0)
@@ -129,8 +129,7 @@ namespace DM_OHD.DTO
                            SHOT_CUMULATIVE,
                            CASE
                                WHEN SHOT_CUMULATIVE < 30000000 THEN 0
-                               WHEN FLOOR(SHOT_CUMULATIVE / 30000000.0) * 30 > 240 THEN 240
-                               ELSE FLOOR(SHOT_CUMULATIVE / 30000000.0) * 30
+                               ELSE ((FLOOR(SHOT_CUMULATIVE / 30000000.0) - 1) % 8 + 1) * 30
                            END AS RAW_OHD
                     FROM agg
                 )

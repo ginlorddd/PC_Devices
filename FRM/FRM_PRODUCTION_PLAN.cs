@@ -63,7 +63,7 @@ namespace DM_OHD.FRM
             viewFY.MouseDown += View_MouseDownSelectHeader;
             viewRatio.MouseDown += View_MouseDownSelectHeader;
             viewOutput.MouseDown += View_MouseDownSelectHeader;
-            viewMaster.RowStyle += ViewMaster_RowStyle;
+            viewMaster.RowCellStyle += ViewMaster_RowCellStyle;
             StyleButtons();
 
             ApplyPermissions();
@@ -771,16 +771,37 @@ namespace DM_OHD.FRM
             view.RefreshData();
         }
 
-        private void ViewMaster_RowStyle(object sender, RowStyleEventArgs e)
+        private void ViewMaster_RowCellStyle(object sender, RowCellStyleEventArgs e)
         {
-            if (e.RowHandle < 0) return;
-            int dataIndex = viewMaster.GetDataSourceRowIndex(e.RowHandle);
-            if (dataIndex < 0) return;
+            if (e.RowHandle < 0 || e.Column == null) return;
+            GridColumn qtyTypeCol = viewMaster.Columns["QTY_TYPE"];
+            if (qtyTypeCol == null) return;
 
-            int groupIndex = dataIndex / 3;
-            if (groupIndex % 2 == 1)
+            if (e.Column.VisibleIndex < qtyTypeCol.VisibleIndex) return;
+
+            string qtyType = Convert.ToString(viewMaster.GetRowCellValue(e.RowHandle, "QTY_TYPE")).ToLowerInvariant();
+            if (qtyType.Contains("fy"))
             {
                 e.Appearance.BackColor = Color.FromArgb(220, 242, 245);
+                e.HighPriority = true;
+                return;
+            }
+
+            if (qtyType.Contains("cộng đồn") || qtyType.Contains("cộng dồn"))
+            {
+                e.Appearance.BackColor = Color.FromArgb(255, 248, 220);
+                e.HighPriority = true;
+                return;
+            }
+
+            if (qtyType.Contains("ohd"))
+            {
+                e.Appearance.BackColor = Color.White;
+                string field = e.Column.FieldName ?? string.Empty;
+                if (field.StartsWith("M") && decimal.TryParse(Convert.ToString(viewMaster.GetRowCellValue(e.RowHandle, e.Column)), out decimal ohdValue) && ohdValue > 0)
+                {
+                    e.Appearance.BackColor = Color.FromArgb(255, 230, 153);
+                }
                 e.HighPriority = true;
             }
         }
