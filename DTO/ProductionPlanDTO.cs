@@ -295,6 +295,7 @@ namespace DM_OHD.DTO
             wide.Columns.Add("DIE_NAME", typeof(string));
             wide.Columns.Add("CAVITY_DETAIL", typeof(string));
             wide.Columns.Add("TOTAL_CAVITY", typeof(int));
+            wide.Columns.Add("LATEST_SHOT", typeof(decimal));
             wide.Columns.Add("QTY_TYPE", typeof(string));
             wide.Columns.Add("QTY_ORDER", typeof(int));
 
@@ -328,6 +329,14 @@ namespace DM_OHD.DTO
             row["TOTAL_CAVITY"] = group.Key.TotalCavity;
             row["QTY_TYPE"] = qtyType;
             row["QTY_ORDER"] = qtyOrder;
+
+            int currentYm = DateTime.Today.Year * 100 + DateTime.Today.Month;
+            DataRow latest = group
+                .Where(r => ToInt(r["PLAN_YEAR"]) * 100 + ToInt(r["PLAN_MONTH"]) <= currentYm)
+                .OrderByDescending(r => ToInt(r["PLAN_YEAR"]) * 100 + ToInt(r["PLAN_MONTH"]))
+                .FirstOrDefault()
+                ?? group.OrderByDescending(r => ToInt(r["PLAN_YEAR"]) * 100 + ToInt(r["PLAN_MONTH"])).FirstOrDefault();
+            row["LATEST_SHOT"] = latest == null ? 0m : ToDecimal(latest[valueField]);
 
             foreach (DataRow src in group)
             {

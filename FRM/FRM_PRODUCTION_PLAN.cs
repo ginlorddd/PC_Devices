@@ -613,6 +613,7 @@ namespace DM_OHD.FRM
             SetGridCaption(viewMaster, "DIE_NAME", "Tên khuôn");
             SetGridCaption(viewMaster, "DIE_NO", "Số khuôn");
             SetGridCaption(viewMaster, "TOTAL_CAVITY", "Tổng số cavity");
+            SetGridCaption(viewMaster, "LATEST_SHOT", "Cập nhật số shot mới nhất");
             if (viewMaster.Columns["CAVITY_DETAIL"] != null) viewMaster.Columns["CAVITY_DETAIL"].Visible = false;
             if (viewMaster.Columns["QTY_ORDER"] != null) viewMaster.Columns["QTY_ORDER"].Visible = false;
             SetGridCaption(viewMaster, "QTY_TYPE", "Loại dữ liệu");
@@ -654,6 +655,13 @@ namespace DM_OHD.FRM
             if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].Width = 110;
             if (view.Columns["CAVITY"] != null) view.Columns["CAVITY"].Width = 100;
             if (view.Columns["TOTAL_CAVITY"] != null) view.Columns["TOTAL_CAVITY"].Width = 110;
+            if (view.Columns["LATEST_SHOT"] != null)
+            {
+                view.Columns["LATEST_SHOT"].Width = 170;
+                view.Columns["LATEST_SHOT"].DisplayFormat.FormatType = FormatType.Numeric;
+                view.Columns["LATEST_SHOT"].DisplayFormat.FormatString = "N0";
+                view.Columns["LATEST_SHOT"].OptionsColumn.AllowEdit = false;
+            }
             if (view.Columns["QTY_TYPE"] != null) view.Columns["QTY_TYPE"].Width = 230;
         }
 
@@ -698,6 +706,8 @@ namespace DM_OHD.FRM
                 view.Columns["CAVITY"].Fixed = FixedStyle.Left;
             if (includeQtyType && view.Columns["TOTAL_CAVITY"] != null)
                 view.Columns["TOTAL_CAVITY"].Fixed = FixedStyle.Left;
+            if (includeQtyType && view.Columns["LATEST_SHOT"] != null)
+                view.Columns["LATEST_SHOT"].Fixed = FixedStyle.Left;
             if (includeQtyType && view.Columns["QTY_TYPE"] != null)
                 view.Columns["QTY_TYPE"].Fixed = FixedStyle.Left;
         }
@@ -745,11 +755,17 @@ namespace DM_OHD.FRM
             if (e.Value == null || e.Value == DBNull.Value) return;
             string field = e.Column?.FieldName ?? string.Empty;
             bool isMonthValue = field.StartsWith("M") && field.Length == 7;
-            if (!isMonthValue) return;
+            bool isLatestShot = sender == viewMaster && field == "LATEST_SHOT";
+            if (!isMonthValue && !isLatestShot) return;
 
             if (!decimal.TryParse(Convert.ToString(e.Value), out decimal number)) return;
             if (sender == viewMaster)
             {
+                if (isLatestShot)
+                {
+                    e.DisplayText = number.ToString("N0", CultureInfo.InvariantCulture).Replace(",", ".");
+                    return;
+                }
                 int rowHandle = e.ListSourceRowIndex >= 0 ? viewMaster.GetRowHandle(e.ListSourceRowIndex) : viewMaster.FocusedRowHandle;
                 string qtyType = Convert.ToString(viewMaster.GetRowCellValue(rowHandle, "QTY_TYPE"));
                 bool isOhdRow = !string.IsNullOrWhiteSpace(qtyType) && qtyType.ToLowerInvariant().Contains("ohd");
