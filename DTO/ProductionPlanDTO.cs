@@ -78,11 +78,12 @@ namespace DM_OHD.DTO
             string cavityCol = hasCavityDetail ? "CAVITY_DETAIL" : "CAVITY";
             string totalInsertCol = hasTotalCavity ? ",TOTAL_CAVITY" : string.Empty;
             string totalSelectCol = hasTotalCavity ? ",TOTAL_CAVITY" : string.Empty;
+            string oldCavityField = hasCavityDetail ? "CAVITY_DETAIL" : "CAVITY";
 
             string sql = $@"
                 IF OBJECT_ID('tempdb..#OLD_REQUIRED') IS NOT NULL DROP TABLE #OLD_REQUIRED;
                 SELECT LTRIM(RTRIM(DIE_NO)) AS DIE_NO,
-                       LTRIM(RTRIM(ISNULL(CAVITY_DETAIL,''))) AS CAVITY,
+                       LTRIM(RTRIM(ISNULL({oldCavityField},''))) AS CAVITY,
                        PLAN_YEAR,
                        PLAN_MONTH,
                        ISNULL(REQUIRED_QTY,0) AS REQUIRED_QTY
