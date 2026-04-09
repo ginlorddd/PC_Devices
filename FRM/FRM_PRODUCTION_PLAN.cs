@@ -783,14 +783,12 @@ namespace DM_OHD.FRM
             if (qtyType.Contains("fy"))
             {
                 e.Appearance.BackColor = Color.FromArgb(220, 242, 245);
-                e.HighPriority = true;
                 return;
             }
 
             if (qtyType.Contains("cộng đồn") || qtyType.Contains("cộng dồn"))
             {
                 e.Appearance.BackColor = Color.FromArgb(255, 248, 220);
-                e.HighPriority = true;
                 return;
             }
 
@@ -802,7 +800,6 @@ namespace DM_OHD.FRM
                 {
                     e.Appearance.BackColor = Color.FromArgb(255, 230, 153);
                 }
-                e.HighPriority = true;
             }
         }
 
