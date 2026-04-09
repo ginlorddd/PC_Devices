@@ -84,7 +84,7 @@ namespace DM_OHD.DTO
 
                 ;WITH src AS (
                     SELECT o.DIE_NO,
-                           ISNULL(o.DIE_NAME,'') AS DIE_NAME,
+                           ISNULL(dm.DIE_NAME, ISNULL(o.DIE_NAME,'')) AS DIE_NAME,
                            ISNULL(o.CAVITY,'') AS CAVITY,
                            o.PLAN_YEAR,
                            o.PLAN_MONTH,
@@ -111,6 +111,24 @@ namespace DM_OHD.DTO
                            SUM(SHOT_PER_CAVITY) OVER(PARTITION BY DIE_NO, CAVITY ORDER BY PLAN_YEAR, PLAN_MONTH ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS SHOT_CUMULATIVE
                     FROM src
                 )
+                ,moc_raw AS (
+                    SELECT DIE_NO,
+                           DIE_NAME,
+                           CAVITY,
+                           PLAN_YEAR,
+                           PLAN_MONTH,
+                           MONTHLY_SHOTS,
+                           RUN_RATIO,
+                           TOTAL_CAVITY,
+                           SHOT_PER_CAVITY,
+                           SHOT_CUMULATIVE,
+                           CASE
+                               WHEN SHOT_CUMULATIVE < 30000000 THEN 0
+                               WHEN FLOOR(SHOT_CUMULATIVE / 30000000.0) * 30 > 240 THEN 240
+                               ELSE FLOOR(SHOT_CUMULATIVE / 30000000.0) * 30
+                           END AS RAW_OHD
+                    FROM agg
+                )
                 INSERT INTO OHD_PLAN_MASTER(DIE_NO,DIE_NAME,{cavityCol}{totalInsertCol},PLAN_YEAR,PLAN_MONTH,FY_SHOTS,RUN_RATIO,REQUIRED_QTY,OHD_MOC)
                 SELECT DIE_NO,
                        DIE_NAME,
@@ -121,12 +139,46 @@ namespace DM_OHD.DTO
                        RUN_RATIO,
                        SHOT_CUMULATIVE,
                        CASE
-                           WHEN SHOT_CUMULATIVE < 30000000 THEN 0
-                           WHEN FLOOR(SHOT_CUMULATIVE / 30000000.0) * 30 > 240 THEN 240
-                           ELSE FLOOR(SHOT_CUMULATIVE / 30000000.0) * 30
+                           WHEN RAW_OHD <= 0 THEN 0
+                           WHEN RAW_OHD <> ISNULL(LAG(RAW_OHD) OVER(PARTITION BY DIE_NO, CAVITY ORDER BY PLAN_YEAR, PLAN_MONTH), 0) THEN RAW_OHD
+                           ELSE 0
                        END AS OHD_MOC
-                FROM agg;";
+                FROM moc_raw;";
             DBUtils.Exec(sql);
+        }
+
+        public void SaveMaster(DataTable wideTable)
+        {
+            if (wideTable == null) return;
+            bool hasCavityDetail = HasColumn("OHD_PLAN_MASTER", "CAVITY_DETAIL");
+            string cavityField = hasCavityDetail ? "CAVITY_DETAIL" : "CAVITY";
+
+            foreach (DataRow row in wideTable.Rows)
+            {
+                if (row.RowState == DataRowState.Deleted) continue;
+                string dieNo = NormalizeKey(row["DIE_NO"]);
+                string cavity = wideTable.Columns.Contains("CAVITY_DETAIL") ? NormalizeKey(row["CAVITY_DETAIL"]) : string.Empty;
+                if (string.IsNullOrWhiteSpace(cavity) && wideTable.Columns.Contains("CAVITY")) cavity = NormalizeKey(row["CAVITY"]);
+                if (string.IsNullOrWhiteSpace(dieNo)) continue;
+
+                string targetCol = MapMasterValueColumn(Convert.ToString(row["QTY_TYPE"]));
+                if (string.IsNullOrWhiteSpace(targetCol)) continue;
+
+                foreach (var ym in YearMonths())
+                {
+                    string monthCol = BuildMonthColumnName(ym.year, ym.month);
+                    if (!wideTable.Columns.Contains(monthCol)) continue;
+                    decimal value = ToDecimal(row[monthCol]);
+                    DBUtils.Exec($@"UPDATE OHD_PLAN_MASTER
+                                    SET {targetCol}=@V
+                                    WHERE DIE_NO=@D AND {cavityField}=@C AND PLAN_YEAR=@Y AND PLAN_MONTH=@M",
+                        new SqlParameter("@V", value),
+                        new SqlParameter("@D", dieNo),
+                        new SqlParameter("@C", cavity),
+                        new SqlParameter("@Y", ym.year),
+                        new SqlParameter("@M", ym.month));
+                }
+            }
         }
 
         private DataTable BuildWideTable(DataTable raw, string valueColumn, bool includeProductNo = false)
@@ -317,6 +369,14 @@ namespace DM_OHD.DTO
 
         private string BuildMonthColumnName(int year, int month) => $"M{year}{month:00}";
         private string NormalizeKey(object value) => Convert.ToString(value ?? string.Empty).Trim();
+        private string MapMasterValueColumn(string qtyType)
+        {
+            string key = NormalizeKey(qtyType).ToLowerInvariant();
+            if (key.Contains("fy")) return "FY_SHOTS";
+            if (key.Contains("cộng đồn") || key.Contains("cộng dồn")) return "REQUIRED_QTY";
+            if (key.Contains("ohd")) return "OHD_MOC";
+            return string.Empty;
+        }
 
         private int ToInt(object value) => int.TryParse(Convert.ToString(value), out int x) ? x : 0;
         private decimal ToDecimal(object value) => decimal.TryParse(Convert.ToString(value), out decimal x) ? x : 0;

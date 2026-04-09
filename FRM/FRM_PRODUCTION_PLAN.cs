@@ -43,6 +43,7 @@ namespace DM_OHD.FRM
             btnSaveFY.Click += (s, e) => { _dto.SavePlanFY(gridFY.DataSource as DataTable); LoadData(); };
             btnSaveRatio.Click += (s, e) => { _dto.SaveMachineRatio(gridRatio.DataSource as DataTable); LoadData(); };
             btnSaveOutput.Click += (s, e) => { _dto.SaveDieOutput(gridOutput.DataSource as DataTable); LoadData(); };
+            btnSaveMaster.Click += (s, e) => { _dto.SaveMaster(gridMaster.DataSource as DataTable); LoadData(); };
             btnDeleteFY.Click += (s, e) => DeleteSelectedRows(viewFY);
             btnDeleteRatio.Click += (s, e) => DeleteSelectedRows(viewRatio);
             btnDeleteOutput.Click += (s, e) => DeleteSelectedRows(viewOutput);
@@ -91,6 +92,7 @@ namespace DM_OHD.FRM
             ApplyButtonColor(btnSaveFY, Color.MediumSeaGreen);
             ApplyButtonColor(btnSaveRatio, Color.MediumSeaGreen);
             ApplyButtonColor(btnSaveOutput, Color.MediumSeaGreen);
+            ApplyButtonColor(btnSaveMaster, Color.MediumSeaGreen);
             ApplyButtonColor(btnDeleteFY, Color.IndianRed);
             ApplyButtonColor(btnDeleteRatio, Color.IndianRed);
             ApplyButtonColor(btnDeleteOutput, Color.IndianRed);
@@ -404,10 +406,12 @@ namespace DM_OHD.FRM
             btnDeleteFY.Enabled = canEdit;
             btnDeleteRatio.Enabled = canEdit;
             btnDeleteOutput.Enabled = canEdit;
+            btnSaveMaster.Enabled = canEdit;
             btnGenerateMaster.Enabled = canEdit;
             viewFY.OptionsBehavior.Editable = canEdit;
             viewRatio.OptionsBehavior.Editable = canEdit;
             viewOutput.OptionsBehavior.Editable = canEdit;
+            viewMaster.OptionsBehavior.Editable = canEdit;
         }
 
         private void ConfigureGrid(GridView view, bool editable = true)
@@ -648,6 +652,17 @@ namespace DM_OHD.FRM
             if (!isMonthValue) return;
 
             if (!decimal.TryParse(Convert.ToString(e.Value), out decimal number)) return;
+            if (sender == viewMaster)
+            {
+                int rowHandle = e.ListSourceRowIndex >= 0 ? viewMaster.GetRowHandle(e.ListSourceRowIndex) : viewMaster.FocusedRowHandle;
+                string qtyType = Convert.ToString(viewMaster.GetRowCellValue(rowHandle, "QTY_TYPE"));
+                bool isOhdRow = !string.IsNullOrWhiteSpace(qtyType) && qtyType.ToLowerInvariant().Contains("ohd");
+                if (isOhdRow && number == 0m)
+                {
+                    e.DisplayText = string.Empty;
+                    return;
+                }
+            }
             bool isRatioView = sender == viewRatio;
             if (isRatioView)
             {

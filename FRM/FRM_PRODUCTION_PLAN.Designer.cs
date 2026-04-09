@@ -22,6 +22,7 @@
         private DevExpress.XtraEditors.SimpleButton btnSaveFY;
         private DevExpress.XtraEditors.SimpleButton btnSaveRatio;
         private DevExpress.XtraEditors.SimpleButton btnSaveOutput;
+        private DevExpress.XtraEditors.SimpleButton btnSaveMaster;
         private DevExpress.XtraEditors.SimpleButton btnGenerateMaster;
         private DevExpress.XtraEditors.SimpleButton btnExportFY;
         private DevExpress.XtraEditors.SimpleButton btnImportFY;
@@ -71,6 +72,7 @@
             this.btnSaveFY = new DevExpress.XtraEditors.SimpleButton();
             this.btnSaveRatio = new DevExpress.XtraEditors.SimpleButton();
             this.btnSaveOutput = new DevExpress.XtraEditors.SimpleButton();
+            this.btnSaveMaster = new DevExpress.XtraEditors.SimpleButton();
             this.btnGenerateMaster = new DevExpress.XtraEditors.SimpleButton();
             this.btnExportFY = new DevExpress.XtraEditors.SimpleButton();
             this.btnImportFY = new DevExpress.XtraEditors.SimpleButton();
@@ -226,9 +228,12 @@
             this.panelMasterActions.Height = 38;
             this.panelMasterActions.Padding = new System.Windows.Forms.Padding(6, 6, 6, 4);
             this.panelMasterActions.Controls.Add(this.btnGenerateMaster);
+            this.panelMasterActions.Controls.Add(this.btnSaveMaster);
             this.panelMasterActions.Controls.Add(this.btnExportMaster);
             this.btnGenerateMaster.Size = new System.Drawing.Size(220, 26);
             this.btnGenerateMaster.Text = "Tạo bảng kế hoạch OHD (master)";
+            this.btnSaveMaster.Size = new System.Drawing.Size(120, 26);
+            this.btnSaveMaster.Text = "Lưu OHD";
             this.btnExportMaster.Size = new System.Drawing.Size(90, 26);
             this.btnExportMaster.Text = "Export";
 
