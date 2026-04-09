@@ -204,7 +204,21 @@ namespace DM_OHD.FRM
             using (var dialog = new SaveFileDialog { Filter = "Excel file (*.xlsx)|*.xlsx" })
             {
                 if (dialog.ShowDialog() != DialogResult.OK) return;
-                view.ExportToXlsx(dialog.FileName);
+                GridColumn sttCol = view.Columns["STT"];
+                GridColumn selectCol = view.Columns[SelectFieldName];
+                bool sttVisible = sttCol != null && sttCol.Visible;
+                bool selectVisible = selectCol != null && selectCol.Visible;
+                try
+                {
+                    if (sttCol != null) sttCol.Visible = false;
+                    if (selectCol != null) selectCol.Visible = false;
+                    view.ExportToXlsx(dialog.FileName);
+                }
+                finally
+                {
+                    if (sttCol != null) sttCol.Visible = sttVisible;
+                    if (selectCol != null) selectCol.Visible = selectVisible;
+                }
                 XtraMessageBox.Show("Export thành công.", "Thông báo");
             }
         }
@@ -265,6 +279,12 @@ namespace DM_OHD.FRM
         {
             if (string.IsNullOrWhiteSpace(sourceHeader)) return null;
             string header = sourceHeader.Trim();
+            if (string.Equals(header, "STT", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(header, "Chọn", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(header, SelectFieldName, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
             if (dt.Columns.Contains(header)) return header;
 
             GridColumn byCaption = view.Columns
@@ -471,6 +491,10 @@ namespace DM_OHD.FRM
             if (viewMaster.Columns["QTY_ORDER"] != null) viewMaster.Columns["QTY_ORDER"].Visible = false;
             SetGridCaption(viewMaster, "QTY_TYPE", "Loại dữ liệu");
             ConfigureMonthColumns(viewMaster, "Bảng 1 - Kế hoạch OHD");
+            NormalizeLeadingColumns(viewFY, true);
+            NormalizeLeadingColumns(viewRatio, true);
+            NormalizeLeadingColumns(viewOutput, true);
+            NormalizeLeadingColumns(viewMaster, false);
 
             ApplyFixedColumns(viewFY, true, false);
             ApplyFixedColumns(viewRatio, false, false);
@@ -612,6 +636,21 @@ namespace DM_OHD.FRM
         private void SetGridCaption(GridView view, string field, string caption)
         {
             if (view.Columns[field] != null) view.Columns[field].Caption = caption;
+        }
+
+        private void NormalizeLeadingColumns(GridView view, bool hasSelect)
+        {
+            if (hasSelect && view.Columns[SelectFieldName] != null)
+            {
+                view.Columns[SelectFieldName].VisibleIndex = 0;
+                view.Columns[SelectFieldName].Fixed = FixedStyle.Left;
+            }
+
+            if (view.Columns["STT"] != null)
+            {
+                view.Columns["STT"].VisibleIndex = hasSelect ? 1 : 0;
+                view.Columns["STT"].Fixed = FixedStyle.Left;
+            }
         }
 
         private void EnsureSttColumn(GridView view)
