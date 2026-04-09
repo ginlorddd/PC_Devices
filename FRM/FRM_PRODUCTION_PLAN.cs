@@ -199,6 +199,22 @@ namespace DM_OHD.FRM
             return 0m;
         }
 
+        private decimal ParseDecimalRaw(string value)
+        {
+            string clean = (value ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(clean) || clean == "-") return 0m;
+
+            NumberStyles styles = NumberStyles.Number | NumberStyles.AllowExponent;
+            if (decimal.TryParse(clean, styles, CultureInfo.InvariantCulture, out decimal numInvariant))
+                return numInvariant;
+            if (decimal.TryParse(clean, styles, CultureInfo.GetCultureInfo("vi-VN"), out decimal numVi))
+                return numVi;
+            if (decimal.TryParse(clean, styles, CultureInfo.GetCultureInfo("en-US"), out decimal numEn))
+                return numEn;
+
+            return ParseNumber(clean);
+        }
+
         private void ExportGrid(GridView view)
         {
             using (var dialog = new SaveFileDialog { Filter = "Excel file (*.xlsx)|*.xlsx" })
@@ -245,8 +261,8 @@ namespace DM_OHD.FRM
                         string value = Convert.ToString(srcRow[sourceCol] ?? string.Empty).Trim();
                         if (dt.Columns[targetColumn].DataType == typeof(decimal))
                         {
-                            decimal number = ParseNumber(value);
                             bool isRatioMonth = view == viewRatio && targetColumn.StartsWith("M") && targetColumn.Length == 7;
+                            decimal number = isRatioMonth ? ParseDecimalRaw(value) : ParseNumber(value);
                             if (isRatioMonth && number >= 0m && number <= 1m) number *= 100m;
                             row[targetColumn] = number;
                         }
