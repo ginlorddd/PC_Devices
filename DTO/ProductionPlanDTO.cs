@@ -100,19 +100,28 @@ namespace DM_OHD.DTO
                            o.PLAN_MONTH,
                            ISNULL(o.OUTPUT_QTY,0) AS MONTHLY_SHOTS,
                            ISNULL(r.RUN_RATIO,0) AS RUN_RATIO,
-                           COALESCE(NULLIF(dm.TOTAL_CAVITY,0), NULLIF(cav.OUTPUT_CAVITY,0), NULLIF(TRY_CONVERT(int, o.CAVITY),0), 0) AS TOTAL_CAVITY
+                           COALESCE(NULLIF(dm.TOTAL_CAVITY,0), NULLIF(dmByName.TOTAL_CAVITY,0), NULLIF(cav.OUTPUT_CAVITY,0), NULLIF(TRY_CONVERT(int, o.CAVITY),0), 0) AS TOTAL_CAVITY
                     FROM OHD_DIE_OUTPUT o
                     LEFT JOIN OHD_MACHINE_RATIO r ON o.DIE_NO = r.DIE_NO AND o.CAVITY = r.CAVITY AND o.PLAN_YEAR = r.PLAN_YEAR AND o.PLAN_MONTH = r.PLAN_MONTH
                     OUTER APPLY (
                         SELECT TOP 1 DIE_NAME, TOTAL_CAVITY
                         FROM DIE_MST
-                        WHERE LTRIM(RTRIM(DIE_NO)) = LTRIM(RTRIM(o.DIE_NO))
+                        WHERE UPPER(REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(DIE_NO)),' ',''),'-',''),'_',''))
+                              = UPPER(REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(o.DIE_NO)),' ',''),'-',''),'_',''))
                         ORDER BY TOTAL_CAVITY DESC, ID DESC
                     ) dm
                     OUTER APPLY (
+                        SELECT TOP 1 TOTAL_CAVITY
+                        FROM DIE_MST
+                        WHERE LTRIM(RTRIM(ISNULL(DIE_NAME,''))) <> ''
+                          AND UPPER(LTRIM(RTRIM(DIE_NAME))) = UPPER(LTRIM(RTRIM(ISNULL(o.DIE_NAME,''))))
+                        ORDER BY TOTAL_CAVITY DESC, ID DESC
+                    ) dmByName
+                    OUTER APPLY (
                         SELECT TOP 1 TRY_CONVERT(int, NULLIF(LTRIM(RTRIM(od.CAVITY)),'')) AS OUTPUT_CAVITY
                         FROM OHD_DIE_OUTPUT od
-                        WHERE LTRIM(RTRIM(od.DIE_NO)) = LTRIM(RTRIM(o.DIE_NO))
+                        WHERE UPPER(REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(od.DIE_NO)),' ',''),'-',''),'_',''))
+                              = UPPER(REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(o.DIE_NO)),' ',''),'-',''),'_',''))
                           AND TRY_CONVERT(int, NULLIF(LTRIM(RTRIM(od.CAVITY)),'')) > 0
                         ORDER BY od.PLAN_YEAR DESC, od.PLAN_MONTH DESC
                     ) cav
