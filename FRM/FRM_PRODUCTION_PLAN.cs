@@ -209,7 +209,9 @@ namespace DM_OHD.FRM
             var view = sender as GridView;
             if (view?.FocusedColumn == null) return;
             string field = view.FocusedColumn.FieldName;
-            if (!field.StartsWith("M") || field.Length != 7) return;
+            bool isMonthField = field.StartsWith("M") && field.Length == 7;
+            bool isLatestShotField = view == viewMaster && field == "LATEST_SHOT";
+            if (!isMonthField && !isLatestShotField) return;
 
             if (decimal.TryParse(Convert.ToString(e.Value)?.Replace(".", "").Replace(",", ""), out decimal num))
             {
@@ -613,10 +615,10 @@ namespace DM_OHD.FRM
             SetGridCaption(viewMaster, "DIE_NAME", "Tên khuôn");
             SetGridCaption(viewMaster, "DIE_NO", "Số khuôn");
             SetGridCaption(viewMaster, "TOTAL_CAVITY", "Tổng số cavity");
-            SetGridCaption(viewMaster, "LATEST_SHOT", "Cập nhật số shot mới nhất");
             if (viewMaster.Columns["CAVITY_DETAIL"] != null) viewMaster.Columns["CAVITY_DETAIL"].Visible = false;
             if (viewMaster.Columns["QTY_ORDER"] != null) viewMaster.Columns["QTY_ORDER"].Visible = false;
             SetGridCaption(viewMaster, "QTY_TYPE", "Loại dữ liệu");
+            SetGridCaption(viewMaster, "LATEST_SHOT", "Cập nhật số shot mới nhất");
             ConfigureMonthColumns(viewMaster, "Bảng 1 - Kế hoạch OHD");
             NormalizeLeadingColumns(viewFY, true);
             NormalizeLeadingColumns(viewRatio, true);
@@ -660,7 +662,7 @@ namespace DM_OHD.FRM
                 view.Columns["LATEST_SHOT"].Width = 170;
                 view.Columns["LATEST_SHOT"].DisplayFormat.FormatType = FormatType.Numeric;
                 view.Columns["LATEST_SHOT"].DisplayFormat.FormatString = "N0";
-                view.Columns["LATEST_SHOT"].OptionsColumn.AllowEdit = false;
+                view.Columns["LATEST_SHOT"].OptionsColumn.AllowEdit = view.OptionsBehavior.Editable;
             }
             if (view.Columns["QTY_TYPE"] != null) view.Columns["QTY_TYPE"].Width = 230;
         }
@@ -803,6 +805,16 @@ namespace DM_OHD.FRM
             {
                 view.Columns["STT"].VisibleIndex = hasSelect ? 1 : 0;
                 view.Columns["STT"].Fixed = FixedStyle.Left;
+            }
+
+            if (!hasSelect && view == viewMaster)
+            {
+                int index = view.Columns["STT"] != null ? 1 : 0;
+                if (view.Columns["DIE_NAME"] != null) view.Columns["DIE_NAME"].VisibleIndex = index++;
+                if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].VisibleIndex = index++;
+                if (view.Columns["TOTAL_CAVITY"] != null) view.Columns["TOTAL_CAVITY"].VisibleIndex = index++;
+                if (view.Columns["QTY_TYPE"] != null) view.Columns["QTY_TYPE"].VisibleIndex = index++;
+                if (view.Columns["LATEST_SHOT"] != null) view.Columns["LATEST_SHOT"].VisibleIndex = index;
             }
         }
 

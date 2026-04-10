@@ -214,6 +214,8 @@ namespace DM_OHD.DTO
             if (wideTable == null) return;
             bool hasCavityDetail = HasColumn("OHD_PLAN_MASTER", "CAVITY_DETAIL");
             string cavityField = hasCavityDetail ? "CAVITY_DETAIL" : "CAVITY";
+            int currentYear = DateTime.Today.Year;
+            int currentMonth = DateTime.Today.Month;
 
             foreach (DataRow row in wideTable.Rows)
             {
@@ -225,11 +227,27 @@ namespace DM_OHD.DTO
 
                 string targetCol = MapMasterValueColumn(Convert.ToString(row["QTY_TYPE"]));
                 if (string.IsNullOrWhiteSpace(targetCol)) continue;
+                bool hasLatestShot = wideTable.Columns.Contains("LATEST_SHOT");
+                bool latestApplied = false;
+                if (hasLatestShot)
+                {
+                    decimal latestValue = ToDecimal(row["LATEST_SHOT"]);
+                    DBUtils.Exec($@"UPDATE OHD_PLAN_MASTER
+                                    SET {targetCol}=@V
+                                    WHERE DIE_NO=@D AND {cavityField}=@C AND PLAN_YEAR=@Y AND PLAN_MONTH=@M",
+                        new SqlParameter("@V", latestValue),
+                        new SqlParameter("@D", dieNo),
+                        new SqlParameter("@C", cavity),
+                        new SqlParameter("@Y", currentYear),
+                        new SqlParameter("@M", currentMonth));
+                    latestApplied = true;
+                }
 
                 foreach (var ym in YearMonths())
                 {
                     string monthCol = BuildMonthColumnName(ym.year, ym.month);
                     if (!wideTable.Columns.Contains(monthCol)) continue;
+                    if (latestApplied && ym.year == currentYear && ym.month == currentMonth) continue;
                     decimal value = ToDecimal(row[monthCol]);
                     DBUtils.Exec($@"UPDATE OHD_PLAN_MASTER
                                     SET {targetCol}=@V
@@ -295,8 +313,8 @@ namespace DM_OHD.DTO
             wide.Columns.Add("DIE_NAME", typeof(string));
             wide.Columns.Add("CAVITY_DETAIL", typeof(string));
             wide.Columns.Add("TOTAL_CAVITY", typeof(int));
-            wide.Columns.Add("LATEST_SHOT", typeof(decimal));
             wide.Columns.Add("QTY_TYPE", typeof(string));
+            wide.Columns.Add("LATEST_SHOT", typeof(decimal));
             wide.Columns.Add("QTY_ORDER", typeof(int));
 
             foreach (var ym in YearMonths())
