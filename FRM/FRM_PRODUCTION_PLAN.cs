@@ -15,6 +15,7 @@ using System.Xml;
 using System.IO.Compression;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using DevExpress.XtraGrid;
 
 namespace DM_OHD.FRM
 {
@@ -63,6 +64,7 @@ namespace DM_OHD.FRM
             viewRatio.MouseDown += View_MouseDownSelectHeader;
             viewOutput.MouseDown += View_MouseDownSelectHeader;
             viewMaster.RowCellStyle += ViewMaster_RowCellStyle;
+            AddImportTemplateButtons();
             StyleButtons();
 
             ApplyPermissions();
@@ -96,6 +98,67 @@ namespace DM_OHD.FRM
             ApplyButtonColor(btnDeleteFY, Color.IndianRed);
             ApplyButtonColor(btnDeleteRatio, Color.IndianRed);
             ApplyButtonColor(btnDeleteOutput, Color.IndianRed);
+        }
+
+        private void AddImportTemplateButtons()
+        {
+            AddImportTemplateButton(panelFYActions, viewFY, 3);
+            AddImportTemplateButton(panelRatioActions, viewRatio, 3);
+            AddImportTemplateButton(panelOutputActions, viewOutput, 3);
+            AddImportTemplateButton(panelMasterActions, viewMaster, 2);
+        }
+
+        private void AddImportTemplateButton(FlowLayoutPanel panel, GridView view, int insertIndex)
+        {
+            if (panel == null || view == null) return;
+            SimpleButton button = new SimpleButton
+            {
+                Text = "Lưu form import",
+                Size = new Size(120, 26),
+                Margin = new Padding(3, 0, 3, 0)
+            };
+            button.Click += (s, e) => SaveImportTemplate(view);
+            ApplyButtonColor(button, Color.Teal);
+            panel.Controls.Add(button);
+            if (insertIndex >= 0 && insertIndex < panel.Controls.Count)
+                panel.Controls.SetChildIndex(button, insertIndex);
+        }
+
+        private void SaveImportTemplate(GridView sourceView)
+        {
+            DataTable source = sourceView?.GridControl?.DataSource as DataTable;
+            if (source == null) return;
+
+            DataTable template = source.Clone();
+            foreach (string helperCol in new[] { "STT", SelectFieldName, "QTY_ORDER", "CAVITY_DETAIL" })
+            {
+                if (template.Columns.Contains(helperCol)) template.Columns.Remove(helperCol);
+            }
+            template.Rows.Add(template.NewRow());
+
+            using (SaveFileDialog dialog = new SaveFileDialog { Filter = "Excel file (*.xlsx)|*.xlsx", FileName = "import_template.xlsx" })
+            {
+                if (dialog.ShowDialog() != DialogResult.OK) return;
+
+                using (GridControl tempGrid = new GridControl())
+                using (GridView tempView = new GridView(tempGrid))
+                {
+                    tempGrid.MainView = tempView;
+                    tempGrid.ViewCollection.Add(tempView);
+                    tempGrid.DataSource = template;
+                    tempView.PopulateColumns();
+
+                    foreach (GridColumn col in tempView.Columns)
+                    {
+                        GridColumn sourceCol = sourceView.Columns[col.FieldName];
+                        if (sourceCol != null) col.Caption = sourceCol.Caption;
+                    }
+
+                    tempView.ExportToXlsx(dialog.FileName);
+                }
+            }
+
+            NotifyAction("Đã lưu form import mẫu.");
         }
 
         private void ApplyButtonColor(SimpleButton button, Color color)
