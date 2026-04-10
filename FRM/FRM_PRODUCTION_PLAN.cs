@@ -675,19 +675,40 @@ namespace DM_OHD.FRM
                 view.ClearSorting();
                 int i = 0;
                 if (includeProductNo && view.Columns["PRODUCT_NO"] != null)
+                {
+                    view.Columns["PRODUCT_NO"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["PRODUCT_NO"].SortIndex = i++;
+                }
                 if (view.Columns["DIE_NAME"] != null)
+                {
+                    view.Columns["DIE_NAME"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["DIE_NAME"].SortIndex = i++;
+                }
                 if (view.Columns["DIE_NO"] != null)
+                {
+                    view.Columns["DIE_NO"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["DIE_NO"].SortIndex = i++;
+                }
                 if (view.Columns["CAVITY"] != null)
+                {
+                    view.Columns["CAVITY"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["CAVITY"].SortIndex = i++;
+                }
                 if (includeQtyType && view.Columns["TOTAL_CAVITY"] != null)
+                {
+                    view.Columns["TOTAL_CAVITY"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["TOTAL_CAVITY"].SortIndex = i++;
+                }
                 if (includeQtyType && view.Columns["QTY_ORDER"] != null)
+                {
+                    view.Columns["QTY_ORDER"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["QTY_ORDER"].SortIndex = i++;
+                }
                 if (includeQtyType && view.Columns["QTY_TYPE"] != null)
+                {
+                    view.Columns["QTY_TYPE"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["QTY_TYPE"].SortIndex = i;
+                }
             }
             finally
             {

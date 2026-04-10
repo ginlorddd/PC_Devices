@@ -86,7 +86,8 @@ namespace DM_OHD.DTO
                        LTRIM(RTRIM(ISNULL({oldCavityField},''))) AS CAVITY,
                        PLAN_YEAR,
                        PLAN_MONTH,
-                       ISNULL(REQUIRED_QTY,0) AS REQUIRED_QTY
+                       ISNULL(REQUIRED_QTY,0) AS REQUIRED_QTY,
+                       ISNULL(OHD_MOC,0) AS OHD_MOC
                 INTO #OLD_REQUIRED
                 FROM OHD_PLAN_MASTER;
 
@@ -156,7 +157,15 @@ namespace DM_OHD.DTO
                                  AND om.CAVITY = LTRIM(RTRIM(f.CAVITY))
                                  AND (om.PLAN_YEAR * 100 + om.PLAN_MONTH) < f.FIRST_YM
                                ORDER BY om.PLAN_YEAR DESC, om.PLAN_MONTH DESC
-                           ), 0) AS PREV_REQUIRED
+                           ), 0) AS PREV_REQUIRED,
+                           ISNULL((
+                               SELECT TOP 1 om.OHD_MOC
+                               FROM #OLD_REQUIRED om
+                               WHERE om.DIE_NO = LTRIM(RTRIM(f.DIE_NO))
+                                 AND om.CAVITY = LTRIM(RTRIM(f.CAVITY))
+                                 AND (om.PLAN_YEAR * 100 + om.PLAN_MONTH) < f.FIRST_YM
+                               ORDER BY om.PLAN_YEAR DESC, om.PLAN_MONTH DESC
+                           ), 0) AS PREV_OHD
                     FROM first_month f
                 ), agg AS (
                     SELECT s.DIE_NO,
@@ -168,6 +177,8 @@ namespace DM_OHD.DTO
                            s.RUN_RATIO,
                            s.TOTAL_CAVITY,
                            s.SHOT_PER_CAVITY,
+                           ISNULL(c.PREV_REQUIRED,0) AS PREV_REQUIRED,
+                           ISNULL(c.PREV_OHD,0) AS PREV_OHD,
                            ISNULL(c.PREV_REQUIRED,0) + SUM(s.SHOT_PER_CAVITY) OVER(PARTITION BY s.DIE_NO, s.CAVITY ORDER BY s.PLAN_YEAR, s.PLAN_MONTH ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS SHOT_CUMULATIVE
                     FROM src_shot s
                     LEFT JOIN carry c ON s.DIE_NO = c.DIE_NO AND s.CAVITY = c.CAVITY
@@ -182,10 +193,12 @@ namespace DM_OHD.DTO
                            RUN_RATIO,
                            TOTAL_CAVITY,
                            SHOT_PER_CAVITY,
+                           PREV_REQUIRED,
+                           PREV_OHD,
                            SHOT_CUMULATIVE,
                            CASE
-                               WHEN SHOT_CUMULATIVE < 30000000 THEN 0
-                               ELSE ((FLOOR(SHOT_CUMULATIVE / 30000000.0) - 1) % 8 + 1) * 30
+                               WHEN SHOT_CUMULATIVE <= PREV_REQUIRED THEN PREV_OHD
+                               ELSE PREV_OHD + FLOOR((SHOT_CUMULATIVE - PREV_REQUIRED) / 30000000.0) * 30
                            END AS RAW_OHD
                     FROM agg
                 )
