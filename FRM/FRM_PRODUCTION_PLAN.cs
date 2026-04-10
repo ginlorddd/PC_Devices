@@ -134,27 +134,36 @@ namespace DM_OHD.FRM
             {
                 if (template.Columns.Contains(helperCol)) template.Columns.Remove(helperCol);
             }
-            template.Rows.Add(template.NewRow());
+            var captionMap = sourceView.Columns
+                .Cast<GridColumn>()
+                .ToDictionary(c => c.FieldName, c => c.Caption);
 
             using (SaveFileDialog dialog = new SaveFileDialog { Filter = "Excel file (*.xlsx)|*.xlsx", FileName = "import_template.xlsx" })
             {
                 if (dialog.ShowDialog() != DialogResult.OK) return;
 
-                using (GridControl tempGrid = new GridControl())
-                using (GridView tempView = new GridView(tempGrid))
+                object originalDataSource = sourceView.GridControl.DataSource;
+                try
                 {
-                    tempGrid.MainView = tempView;
-                    tempGrid.ViewCollection.Add(tempView);
-                    tempGrid.DataSource = template;
-                    tempView.PopulateColumns();
+                    sourceView.GridControl.DataSource = template;
+                    sourceView.PopulateColumns();
 
-                    foreach (GridColumn col in tempView.Columns)
+                    foreach (GridColumn col in sourceView.Columns)
                     {
-                        GridColumn sourceCol = sourceView.Columns[col.FieldName];
-                        if (sourceCol != null) col.Caption = sourceCol.Caption;
+                        if (captionMap.TryGetValue(col.FieldName, out string caption))
+                            col.Caption = caption;
                     }
-
-                    tempView.ExportToXlsx(dialog.FileName);
+                    sourceView.ExportToXlsx(dialog.FileName);
+                }
+                finally
+                {
+                    sourceView.GridControl.DataSource = originalDataSource;
+                    if (sourceView == viewFY) RebuildViewColumns(viewFY, true);
+                    else if (sourceView == viewRatio) RebuildViewColumns(viewRatio, true);
+                    else if (sourceView == viewOutput) RebuildViewColumns(viewOutput, true);
+                    else if (sourceView == viewMaster) RebuildViewColumns(viewMaster, false);
+                    SetCaptions();
+                    ApplyMonthFilterToAllViews();
                 }
             }
 
