@@ -227,8 +227,9 @@ namespace DM_OHD.DTO
             if (wideTable == null) return;
             bool hasCavityDetail = HasColumn("OHD_PLAN_MASTER", "CAVITY_DETAIL");
             string cavityField = hasCavityDetail ? "CAVITY_DETAIL" : "CAVITY";
-            int currentYear = DateTime.Today.Year;
-            int currentMonth = DateTime.Today.Month;
+            DateTime baselineMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddMonths(-1);
+            int baselineYear = baselineMonth.Year;
+            int baselineMonthValue = baselineMonth.Month;
 
             foreach (DataRow row in wideTable.Rows)
             {
@@ -251,8 +252,8 @@ namespace DM_OHD.DTO
                         new SqlParameter("@V", latestValue),
                         new SqlParameter("@D", dieNo),
                         new SqlParameter("@C", cavity),
-                        new SqlParameter("@Y", currentYear),
-                        new SqlParameter("@M", currentMonth));
+                        new SqlParameter("@Y", baselineYear),
+                        new SqlParameter("@M", baselineMonthValue));
                     latestApplied = true;
                 }
 
@@ -260,7 +261,7 @@ namespace DM_OHD.DTO
                 {
                     string monthCol = BuildMonthColumnName(ym.year, ym.month);
                     if (!wideTable.Columns.Contains(monthCol)) continue;
-                    if (latestApplied && ym.year == currentYear && ym.month == currentMonth) continue;
+                    if (latestApplied && ym.year == baselineYear && ym.month == baselineMonthValue) continue;
                     decimal value = ToDecimal(row[monthCol]);
                     DBUtils.Exec($@"UPDATE OHD_PLAN_MASTER
                                     SET {targetCol}=@V
