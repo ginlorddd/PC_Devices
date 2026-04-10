@@ -35,17 +35,20 @@ namespace DM_OHD.DTO
             bool hasCavityDetail = HasColumn("OHD_PLAN_MASTER", "CAVITY_DETAIL");
             bool hasTotalCavity = HasColumn("OHD_PLAN_MASTER", "TOTAL_CAVITY");
             bool hasLatestShot = HasColumn("OHD_PLAN_MASTER", "LATEST_SHOT");
+            bool hasLatestOhd = HasColumn("OHD_PLAN_MASTER", "LATEST_OHD");
 
             string cavitySelect = hasCavityDetail ? "p.CAVITY_DETAIL" : "p.CAVITY";
             string orderCavity = hasCavityDetail ? "p.CAVITY_DETAIL" : "p.CAVITY";
             string totalSelect = hasTotalCavity ? "ISNULL(p.TOTAL_CAVITY,0)" : "0";
             string latestSelect = hasLatestShot ? "ISNULL(p.LATEST_SHOT,0)" : "0";
+            string latestOhdSelect = hasLatestOhd ? "ISNULL(p.LATEST_OHD,0)" : "0";
 
             string sql = $@"SELECT p.DIE_NO,
                                    ISNULL(p.DIE_NAME,'') AS DIE_NAME,
                                    {cavitySelect} AS CAVITY_DETAIL,
                                    {totalSelect} AS TOTAL_CAVITY,
                                    {latestSelect} AS LATEST_SHOT,
+                                   {latestOhdSelect} AS LATEST_OHD,
                                    p.PLAN_YEAR,
                                    p.PLAN_MONTH,
                                    p.FY_SHOTS,
@@ -78,14 +81,18 @@ namespace DM_OHD.DTO
             bool hasCavityDetail = HasColumn("OHD_PLAN_MASTER", "CAVITY_DETAIL");
             bool hasTotalCavity = HasColumn("OHD_PLAN_MASTER", "TOTAL_CAVITY");
             bool hasLatestShot = HasColumn("OHD_PLAN_MASTER", "LATEST_SHOT");
+            bool hasLatestOhd = HasColumn("OHD_PLAN_MASTER", "LATEST_OHD");
 
             string cavityCol = hasCavityDetail ? "CAVITY_DETAIL" : "CAVITY";
             string totalInsertCol = hasTotalCavity ? ",TOTAL_CAVITY" : string.Empty;
             string totalSelectCol = hasTotalCavity ? ",TOTAL_CAVITY" : string.Empty;
             string latestInsertCol = hasLatestShot ? ",LATEST_SHOT" : string.Empty;
             string latestSelectCol = hasLatestShot ? ",BASE_REQUIRED AS LATEST_SHOT" : string.Empty;
+            string latestOhdInsertCol = hasLatestOhd ? ",LATEST_OHD" : string.Empty;
+            string latestOhdSelectCol = hasLatestOhd ? ",BASE_OHD AS LATEST_OHD" : string.Empty;
             string oldCavityField = hasCavityDetail ? "CAVITY_DETAIL" : "CAVITY";
             string oldLatestSelect = hasLatestShot ? "ISNULL(LATEST_SHOT,0)" : "0";
+            string oldLatestOhdSelect = hasLatestOhd ? "ISNULL(LATEST_OHD,0)" : "0";
 
             string sql = $@"
                 IF OBJECT_ID('tempdb..#OLD_REQUIRED') IS NOT NULL DROP TABLE #OLD_REQUIRED;
@@ -95,7 +102,8 @@ namespace DM_OHD.DTO
                        PLAN_MONTH,
                        ISNULL(REQUIRED_QTY,0) AS REQUIRED_QTY,
                        ISNULL(OHD_MOC,0) AS OHD_MOC,
-                       {oldLatestSelect} AS LATEST_SHOT
+                       {oldLatestSelect} AS LATEST_SHOT,
+                       {oldLatestOhdSelect} AS LATEST_OHD
                 INTO #OLD_REQUIRED
                 FROM OHD_PLAN_MASTER;
 
@@ -180,7 +188,14 @@ namespace DM_OHD.DTO
                                WHERE om.DIE_NO = LTRIM(RTRIM(f.DIE_NO))
                                  AND om.CAVITY = LTRIM(RTRIM(f.CAVITY))
                                ORDER BY om.PLAN_YEAR DESC, om.PLAN_MONTH DESC
-                           ), 0) AS PREV_LATEST
+                           ), 0) AS PREV_LATEST,
+                           ISNULL((
+                               SELECT TOP 1 om.LATEST_OHD
+                               FROM #OLD_REQUIRED om
+                               WHERE om.DIE_NO = LTRIM(RTRIM(f.DIE_NO))
+                                 AND om.CAVITY = LTRIM(RTRIM(f.CAVITY))
+                               ORDER BY om.PLAN_YEAR DESC, om.PLAN_MONTH DESC
+                           ), 0) AS PREV_LATEST_OHD
                     FROM first_month f
                 ), agg AS (
                     SELECT s.DIE_NO,
@@ -193,7 +208,7 @@ namespace DM_OHD.DTO
                            s.TOTAL_CAVITY,
                            s.SHOT_PER_CAVITY,
                            CASE WHEN ISNULL(c.PREV_LATEST,0) > 0 THEN ISNULL(c.PREV_LATEST,0) ELSE ISNULL(c.PREV_REQUIRED,0) END AS BASE_REQUIRED,
-                           ISNULL(c.PREV_OHD,0) AS PREV_OHD,
+                           CASE WHEN ISNULL(c.PREV_LATEST_OHD,0) > 0 THEN ISNULL(c.PREV_LATEST_OHD,0) ELSE ISNULL(c.PREV_OHD,0) END AS BASE_OHD,
                            (CASE WHEN ISNULL(c.PREV_LATEST,0) > 0 THEN ISNULL(c.PREV_LATEST,0) ELSE ISNULL(c.PREV_REQUIRED,0) END)
                            + SUM(s.SHOT_PER_CAVITY) OVER(PARTITION BY s.DIE_NO, s.CAVITY ORDER BY s.PLAN_YEAR, s.PLAN_MONTH ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS SHOT_CUMULATIVE
                     FROM src_shot s
@@ -210,22 +225,22 @@ namespace DM_OHD.DTO
                            TOTAL_CAVITY,
                            SHOT_PER_CAVITY,
                            BASE_REQUIRED,
-                           PREV_OHD,
+                           BASE_OHD,
                            SHOT_CUMULATIVE,
                            CASE
-                               WHEN SHOT_CUMULATIVE <= BASE_REQUIRED THEN PREV_OHD
-                               ELSE PREV_OHD + FLOOR((SHOT_CUMULATIVE - BASE_REQUIRED) / 30000000.0) * 30
+                               WHEN SHOT_CUMULATIVE <= BASE_REQUIRED THEN BASE_OHD
+                               ELSE BASE_OHD + FLOOR((SHOT_CUMULATIVE - BASE_REQUIRED) / 30000000.0) * 30
                            END AS RAW_OHD
                     FROM agg
                 )
-                INSERT INTO OHD_PLAN_MASTER(DIE_NO,DIE_NAME,{cavityCol}{totalInsertCol},PLAN_YEAR,PLAN_MONTH,FY_SHOTS,RUN_RATIO{latestInsertCol},REQUIRED_QTY,OHD_MOC)
+                INSERT INTO OHD_PLAN_MASTER(DIE_NO,DIE_NAME,{cavityCol}{totalInsertCol},PLAN_YEAR,PLAN_MONTH,FY_SHOTS,RUN_RATIO{latestInsertCol}{latestOhdInsertCol},REQUIRED_QTY,OHD_MOC)
                 SELECT DIE_NO,
                        DIE_NAME,
                        CAVITY{totalSelectCol},
                        PLAN_YEAR,
                        PLAN_MONTH,
                        SHOT_PER_CAVITY,
-                       RUN_RATIO{latestSelectCol},
+                       RUN_RATIO{latestSelectCol}{latestOhdSelectCol},
                        SHOT_CUMULATIVE,
                        CASE
                            WHEN RAW_OHD <= 0 THEN 0
@@ -243,6 +258,7 @@ namespace DM_OHD.DTO
             if (wideTable == null) return;
             bool hasCavityDetail = HasColumn("OHD_PLAN_MASTER", "CAVITY_DETAIL");
             bool hasLatestShotCol = HasColumn("OHD_PLAN_MASTER", "LATEST_SHOT");
+            bool hasLatestOhdCol = HasColumn("OHD_PLAN_MASTER", "LATEST_OHD");
             string cavityField = hasCavityDetail ? "CAVITY_DETAIL" : "CAVITY";
 
             foreach (DataRow row in wideTable.Rows)
@@ -263,6 +279,16 @@ namespace DM_OHD.DTO
                                     SET LATEST_SHOT=@V
                                     WHERE DIE_NO=@D AND {cavityField}=@C",
                         new SqlParameter("@V", latestValue),
+                        new SqlParameter("@D", dieNo),
+                        new SqlParameter("@C", cavity));
+                }
+                if (hasLatestShot && hasLatestOhdCol && targetCol == "OHD_MOC")
+                {
+                    int latestOhd = ToInt(row["LATEST_SHOT"]);
+                    DBUtils.Exec($@"UPDATE OHD_PLAN_MASTER
+                                    SET LATEST_OHD=@V
+                                    WHERE DIE_NO=@D AND {cavityField}=@C",
+                        new SqlParameter("@V", latestOhd),
                         new SqlParameter("@D", dieNo),
                         new SqlParameter("@C", cavity));
                 }
@@ -376,6 +402,10 @@ namespace DM_OHD.DTO
                 .OrderByDescending(r => ToInt(r["PLAN_YEAR"]) * 100 + ToInt(r["PLAN_MONTH"]))
                 .Select(r => ToDecimal(r["LATEST_SHOT"]))
                 .FirstOrDefault();
+            decimal ohdLatest = group
+                .OrderByDescending(r => ToInt(r["PLAN_YEAR"]) * 100 + ToInt(r["PLAN_MONTH"]))
+                .Select(r => ToDecimal(r["LATEST_OHD"]))
+                .FirstOrDefault();
             DataRow latest = group
                 .Where(r => ToInt(r["PLAN_YEAR"]) * 100 + ToInt(r["PLAN_MONTH"]) <= currentYm)
                 .OrderByDescending(r => ToInt(r["PLAN_YEAR"]) * 100 + ToInt(r["PLAN_MONTH"]))
@@ -383,7 +413,9 @@ namespace DM_OHD.DTO
                 ?? group.OrderByDescending(r => ToInt(r["PLAN_YEAR"]) * 100 + ToInt(r["PLAN_MONTH"])).FirstOrDefault();
             row["LATEST_SHOT"] = valueField == "REQUIRED_QTY"
                 ? requiredLatest
-                : (latest == null ? 0m : ToDecimal(latest[valueField]));
+                : (valueField == "OHD_MOC"
+                    ? ohdLatest
+                    : (latest == null ? 0m : ToDecimal(latest[valueField])));
 
             foreach (DataRow src in group)
             {
