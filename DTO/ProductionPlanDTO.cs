@@ -228,8 +228,8 @@ namespace DM_OHD.DTO
                            BASE_OHD,
                            SHOT_CUMULATIVE,
                            CASE
-                               WHEN SHOT_CUMULATIVE <= BASE_REQUIRED THEN BASE_OHD
-                               ELSE BASE_OHD + FLOOR((SHOT_CUMULATIVE - BASE_REQUIRED) / 30000000.0) * 30
+                               WHEN SHOT_CUMULATIVE < 30000000 THEN BASE_OHD
+                               ELSE BASE_OHD + FLOOR(SHOT_CUMULATIVE / 30000000.0) * 30
                            END AS RAW_OHD
                     FROM agg
                 )
