@@ -1,0 +1,54 @@
+HƯỚNG DẪN THAO TÁC PC_Devices
+(Phần: Đăng ký thiết bị mới & Phê duyệt thiết bị mới)
+
+4. Đăng ký thiết bị mới
+1) Click vào phần đăng ký thiết bị trên thanh công cụ (1) Hình 5.
+
+Hình 5
+
+2) Nhập thông tin thiết bị mới (Hình 6).
+- Click vào nút “Add” (1), nhập đầy đủ thông tin của thiết bị mới.
+- Tại phần xác định nhu cầu sử dụng, click “Thêm mục đích”, sau đó nhập chi tiết mục đích sử dụng, thông số thiết bị và nhu cầu sử dụng.
+- Sau khi nhập đầy đủ thông tin, click vào nút “Register” (2).
+
+Hình 6
+
+- Màn hình hiển thị đăng ký thành công.
+- Sau khi đăng ký thành công, thông tin thiết bị sẽ được chuyển tới danh sách thiết bị mới chờ duyệt.
+
+5. Phê duyệt thiết bị mới
+1) Danh sách thiết bị mới chờ duyệt
+- Click vào phần “Thiết bị mới chờ duyệt” trên thanh công cụ (1) Hình 8.
+
+Hình 8
+
+- Danh sách các thiết bị đăng ký mới sẽ được hiển thị tại đây.
+- Thiết bị đăng ký mới sẽ hiển thị trạng thái “Trưởng bộ phận chưa phê duyệt”.
+- Trưởng bộ phận vào danh sách này để phê duyệt đăng ký thiết bị mới của bộ phận mình (1) Hình 9.
+
+Hình 9
+
+2) Trưởng bộ phận phê duyệt thiết bị
+- Sau khi click vào nút “MGR Approved”, chi tiết thông tin thiết bị sẽ được hiển thị.
+- Người phê duyệt chọn kết quả xác nhận (1), sau đó click “Approved” để phê duyệt thiết bị (2) Hình 10.
+
+Hình 10
+
+- Màn hình hiển thị phê duyệt thành công.
+- Sau khi phê duyệt thành công, thông tin thiết bị sẽ được cập nhật vào danh sách lịch sử đăng ký và danh sách thiết bị.
+
+Hình 11
+
+3) QA phê duyệt
+- Sau khi Trưởng bộ phận phê duyệt thiết bị mới, bộ phận QA sẽ thực hiện phê duyệt.
+- Bộ phận QA chọn thông tin thiết bị cần phê duyệt, sau đó click “QA Approved” (2).
+
+Hình 12
+
+- Thông tin chi tiết được hiển thị (Hình 13).
+- Người duyệt nhập kết quả xác nhận (1), sau đó click “Approved” (2) để phê duyệt thiết bị mới.
+
+Hình 13
+
+Ghi chú sử dụng:
+- Bạn có thể mở file .txt này bằng Notepad hoặc copy toàn bộ nội dung sang Microsoft Word để lưu thành file .docx theo mẫu biểu của công ty.
