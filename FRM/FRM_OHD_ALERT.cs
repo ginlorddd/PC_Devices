@@ -120,6 +120,8 @@ namespace DM_OHD.FRM
             SetCaption("NEXT_OHD_MOC", "Mốc OHD sắp tới");
             SetCaption("TRACK_START_DATE", "Ngày bắt đầu theo dõi");
             SetCaption("ALERT_CONTENT", "Nội dung cảnh báo");
+            if (view.Columns["ALERT_BG_COLOR"] != null) view.Columns["ALERT_BG_COLOR"].Visible = false;
+            if (view.Columns["ALERT_FG_COLOR"] != null) view.Columns["ALERT_FG_COLOR"].Visible = false;
             SetCaption("REVIEW_NOTE", "Đánh giá");
             SetCaption("OWNER_USER_ID", "Người phụ trách");
             SetCaption("COMPLETED_AT", "Ngày hoàn thành");

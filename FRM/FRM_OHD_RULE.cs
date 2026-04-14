@@ -32,6 +32,8 @@ namespace DM_OHD.FRM
             if (view.Columns["ALERT_CONTENT"] != null) view.Columns["ALERT_CONTENT"].Caption = "Nội dung cảnh báo";
             SetCaption("ALERT_BG_COLOR", "Màu nền cảnh báo");
             SetCaption("ALERT_FG_COLOR", "Màu chữ cảnh báo");
+            if (view.Columns["ALERT_BG_COLOR"] != null) view.Columns["ALERT_BG_COLOR"].ColumnEdit = colorBgEdit;
+            if (view.Columns["ALERT_FG_COLOR"] != null) view.Columns["ALERT_FG_COLOR"].ColumnEdit = colorFgEdit;
             SetCaption("DUE_DAYS_30", "30");
             SetCaption("DUE_DAYS_60", "60");
             SetCaption("DUE_DAYS_90", "90");
