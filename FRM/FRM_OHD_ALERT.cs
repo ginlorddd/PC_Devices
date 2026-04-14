@@ -18,11 +18,27 @@ namespace DM_OHD.FRM
             btnRefresh.Click += (s, e) => LoadData();
             btnUpdate.Click += BtnUpdate_Click;
             btnApprove.Click += BtnApprove_Click;
-            btnConfigMail.Click += (s, e) => new FRM_MAIL_CONFIG { MdiParent = this.MdiParent }.Show();
-            btnRule.Click += (s, e) => new FRM_OHD_RULE { MdiParent = this.MdiParent }.Show();
+            btnConfigMail.Click += BtnConfigMail_Click;
+            btnRule.Click += BtnRule_Click;
             deFrom.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             deTo.EditValue = DateTime.Today.AddMonths(3);
             Load += (s, e) => LoadData();
+        }
+
+        private void BtnConfigMail_Click(object sender, EventArgs e)
+        {
+            using (var frm = new FRM_MAIL_CONFIG())
+            {
+                frm.ShowDialog(this);
+            }
+        }
+
+        private void BtnRule_Click(object sender, EventArgs e)
+        {
+            using (var frm = new FRM_OHD_RULE())
+            {
+                frm.ShowDialog(this);
+            }
         }
 
         private void BtnUpdate_Click(object sender, EventArgs e)

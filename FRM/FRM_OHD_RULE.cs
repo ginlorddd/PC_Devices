@@ -20,9 +20,9 @@ namespace DM_OHD.FRM
         private void LoadData()
         {
             grid.DataSource = _dto.GetRules();
-            cboOwner.Properties.DataSource = _dto.GetUsers();
-            cboOwner.Properties.DisplayMember = "USER_ID";
-            cboOwner.Properties.ValueMember = "USER_ID";
+            cboOwner.DataSource = _dto.GetUsers();
+            cboOwner.DisplayMember = "USER_ID";
+            cboOwner.ValueMember = "USER_ID";
             if (view.Columns["ID"] != null) view.Columns["ID"].Caption = "Stt";
             if (view.Columns["OWNER_USER_ID"] != null)
             {
