@@ -16,6 +16,8 @@ namespace DM_OHD.DTO
                                            NEXT_OHD_MOC,
                                            TRACK_START_DATE,
                                            ALERT_CONTENT,
+                                           ALERT_BG_COLOR,
+                                           ALERT_FG_COLOR,
                                            REVIEW_NOTE,
                                            OWNER_USER_ID,
                                            COMPLETED_AT,
@@ -33,6 +35,8 @@ namespace DM_OHD.DTO
             return DBUtils.GetData(@"SELECT ID,
                                            OWNER_USER_ID,
                                            ALERT_CONTENT,
+                                           ALERT_BG_COLOR,
+                                           ALERT_FG_COLOR,
                                            DUE_DAYS_30,
                                            DUE_DAYS_60,
                                            DUE_DAYS_90,
@@ -71,6 +75,8 @@ namespace DM_OHD.DTO
                                    DUE_DAYS_180=@D180,
                                    DUE_DAYS_210=@D210,
                                    DUE_DAYS_240=@D240,
+                                   ALERT_BG_COLOR=@BG,
+                                   ALERT_FG_COLOR=@FG,
                                    USE_MONTH_FIRST_DAY=@M1,
                                    EXACT_DAY_IN_MONTH=@EX
                                WHERE ID=@ID",
@@ -84,6 +90,8 @@ namespace DM_OHD.DTO
                     new SqlParameter("@D180", ToInt(row["DUE_DAYS_180"])),
                     new SqlParameter("@D210", ToInt(row["DUE_DAYS_210"])),
                     new SqlParameter("@D240", ToInt(row["DUE_DAYS_240"])),
+                    new SqlParameter("@BG", Convert.ToString(row["ALERT_BG_COLOR"] ?? "#FFF3CD")),
+                    new SqlParameter("@FG", Convert.ToString(row["ALERT_FG_COLOR"] ?? "#7A4E00")),
                     new SqlParameter("@M1", ToBool(row["USE_MONTH_FIRST_DAY"])),
                     new SqlParameter("@EX", ToNullableInt(row["EXACT_DAY_IN_MONTH"])),
                     new SqlParameter("@ID", id));
@@ -124,6 +132,31 @@ namespace DM_OHD.DTO
                 new SqlParameter("@ID", id));
         }
 
+        public void SaveProgress(DataTable dt)
+        {
+            if (dt == null) return;
+            foreach (DataRow row in dt.Rows)
+            {
+                if (row.RowState == DataRowState.Deleted) continue;
+                int id = ToInt(row["ID"]);
+                if (id <= 0) continue;
+                bool approved = ToBool(row["APPROVED"]);
+                DateTime? completed = row["COMPLETED_AT"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(row["COMPLETED_AT"]);
+                DBUtils.Exec(@"UPDATE OHD_ALERT_PROGRESS
+                               SET REVIEW_NOTE=@N,
+                                   OWNER_USER_ID=@U,
+                                   APPROVED=@A,
+                                   APPROVED_AT=CASE WHEN @A=1 THEN ISNULL(APPROVED_AT,GETDATE()) ELSE NULL END,
+                                   COMPLETED_AT=@C
+                               WHERE ID=@ID",
+                    new SqlParameter("@N", Convert.ToString(row["REVIEW_NOTE"] ?? string.Empty)),
+                    new SqlParameter("@U", Convert.ToString(row["OWNER_USER_ID"] ?? string.Empty)),
+                    new SqlParameter("@A", approved),
+                    new SqlParameter("@C", (object)completed ?? DBNull.Value),
+                    new SqlParameter("@ID", id));
+            }
+        }
+
         public int RefreshProgressFromPlan()
         {
             return DBUtils.Exec(@";WITH src AS (
@@ -135,18 +168,21 @@ namespace DM_OHD.DTO
                                     FROM OHD_PLAN_MASTER p
                                     WHERE p.OHD_MOC > 0
                                   )
-                                  INSERT INTO OHD_ALERT_PROGRESS(DIE_NO,DIE_NAME,TOTAL_CAVITY,NEXT_OHD_MOC,TRACK_START_DATE,ALERT_CONTENT,OWNER_USER_ID,APPROVED)
+                                  INSERT INTO OHD_ALERT_PROGRESS(DIE_NO,DIE_NAME,TOTAL_CAVITY,NEXT_OHD_MOC,TRACK_START_DATE,ALERT_CONTENT,ALERT_BG_COLOR,ALERT_FG_COLOR,REVIEW_NOTE,OWNER_USER_ID,APPROVED)
                                   SELECT s.DIE_NO,
                                          s.DIE_NAME,
                                          s.TOTAL_CAVITY,
                                          s.OHD_MOC,
                                          s.TRACK_DATE,
                                          ISNULL(r.ALERT_CONTENT,N'Theo dõi mốc OHD'),
+                                         ISNULL(r.ALERT_BG_COLOR,'#FFF3CD'),
+                                         ISNULL(r.ALERT_FG_COLOR,'#7A4E00'),
+                                         N'Chưa hoàn thành',
                                          ISNULL(r.OWNER_USER_ID,'admin'),
                                          0
                                   FROM src s
                                   OUTER APPLY (
-                                      SELECT TOP 1 OWNER_USER_ID, ALERT_CONTENT
+                                      SELECT TOP 1 OWNER_USER_ID, ALERT_CONTENT, ALERT_BG_COLOR, ALERT_FG_COLOR
                                       FROM OHD_ALERT_RULE
                                       ORDER BY ID
                                   ) r

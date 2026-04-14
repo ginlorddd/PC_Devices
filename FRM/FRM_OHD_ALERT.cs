@@ -2,6 +2,7 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraGrid.Views.Grid;
 using DM_OHD.DTO;
 using System;
+using System.Drawing;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
@@ -18,11 +19,24 @@ namespace DM_OHD.FRM
             btnRefresh.Click += (s, e) => LoadData();
             btnUpdate.Click += BtnUpdate_Click;
             btnApprove.Click += BtnApprove_Click;
+            btnSave.Click += BtnSave_Click;
             btnConfigMail.Click += BtnConfigMail_Click;
             btnRule.Click += BtnRule_Click;
+            ConfigureMonthEditor(deFrom);
+            ConfigureMonthEditor(deTo);
             deFrom.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-            deTo.EditValue = DateTime.Today.AddMonths(3);
+            deTo.EditValue = new DateTime(DateTime.Today.Year + 1, 12, 1);
             Load += (s, e) => LoadData();
+        }
+
+        private void ConfigureMonthEditor(DateEdit editor)
+        {
+            editor.Properties.Mask.EditMask = "MM/yyyy";
+            editor.Properties.Mask.UseMaskAsDisplayFormat = true;
+            editor.Properties.CalendarView = DevExpress.XtraEditors.Repository.CalendarView.Vista;
+            editor.Properties.VistaCalendarInitialViewStyle = DevExpress.XtraEditors.VistaCalendarInitialViewStyle.YearView;
+            editor.Properties.VistaCalendarViewStyle = DevExpress.XtraEditors.VistaCalendarViewStyle.YearView;
+            editor.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
         }
 
         private void BtnConfigMail_Click(object sender, EventArgs e)
@@ -59,13 +73,18 @@ namespace DM_OHD.FRM
 
             foreach (int rowHandle in selected.Where(x => x >= 0))
             {
-                int id = ToInt(view.GetRowCellValue(rowHandle, "ID"));
-                if (id <= 0) continue;
-                string review = Convert.ToString(view.GetRowCellValue(rowHandle, "REVIEW_NOTE"));
-                _dto.ApproveProgress(id, review);
+                view.SetRowCellValue(rowHandle, "APPROVED", true);
+                view.SetRowCellValue(rowHandle, "COMPLETED_AT", DateTime.Now);
+                view.SetRowCellValue(rowHandle, "REVIEW_NOTE", "Đã hoàn thành");
             }
 
-            XtraMessageBox.Show("Đã duyệt hoàn thành. Các nội dung đã duyệt sẽ dừng nhắc mail.");
+            XtraMessageBox.Show("Đã đánh dấu duyệt hoàn thành. Vui lòng bấm Lưu để cập nhật.");
+        }
+
+        private void BtnSave_Click(object sender, EventArgs e)
+        {
+            _dto.SaveProgress(grid.DataSource as DataTable);
+            XtraMessageBox.Show("Đã lưu cảnh báo tiến độ.");
             LoadData();
         }
 
@@ -78,7 +97,22 @@ namespace DM_OHD.FRM
                 DateTime tmp = from; from = to; to = tmp;
             }
 
-            grid.DataSource = _dto.GetProgress(from.Date, to.Date);
+            DataTable dt = _dto.GetProgress(from.Date, to.Date);
+            foreach (DataRow row in dt.Rows)
+            {
+                bool approved = row["APPROVED"] != DBNull.Value && Convert.ToBoolean(row["APPROVED"]);
+                DateTime? completed = row["COMPLETED_AT"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(row["COMPLETED_AT"]);
+                DateTime trackDate = row["TRACK_START_DATE"] == DBNull.Value ? DateTime.Today : Convert.ToDateTime(row["TRACK_START_DATE"]);
+                if (approved || completed.HasValue)
+                {
+                    row["REVIEW_NOTE"] = "Đã hoàn thành";
+                    continue;
+                }
+
+                int lateDays = (DateTime.Today.Date - trackDate.Date).Days;
+                row["REVIEW_NOTE"] = lateDays > 0 ? $"{lateDays} ngày chậm kế hoạch" : "Chưa hoàn thành";
+            }
+            grid.DataSource = dt;
             if (view.Columns["ID"] != null) view.Columns["ID"].Visible = false;
             SetCaption("DIE_NO", "Số khuôn");
             SetCaption("DIE_NAME", "Tên khuôn");
@@ -89,12 +123,50 @@ namespace DM_OHD.FRM
             SetCaption("REVIEW_NOTE", "Đánh giá");
             SetCaption("OWNER_USER_ID", "Người phụ trách");
             SetCaption("COMPLETED_AT", "Ngày hoàn thành");
-            SetCaption("APPROVED", "Đã duyệt");
+            SetCaption("APPROVED", "Duyệt hoàn thành");
             view.OptionsSelection.MultiSelect = true;
             view.OptionsSelection.MultiSelectMode = GridMultiSelectMode.CheckBoxRowSelect;
             view.OptionsView.ShowAutoFilterRow = true;
             view.OptionsView.ShowGroupPanel = false;
+            view.Appearance.HeaderPanel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            view.Appearance.HeaderPanel.Options.UseFont = true;
+            view.RowCellStyle -= View_RowCellStyle;
+            view.RowCellStyle += View_RowCellStyle;
             view.BestFitColumns();
+        }
+
+        private void View_RowCellStyle(object sender, RowCellStyleEventArgs e)
+        {
+            if (e.RowHandle < 0) return;
+            string field = e.Column?.FieldName ?? string.Empty;
+            if (field == "REVIEW_NOTE")
+            {
+                string review = Convert.ToString(view.GetRowCellValue(e.RowHandle, "REVIEW_NOTE"));
+                DateTime? completed = view.GetRowCellValue(e.RowHandle, "COMPLETED_AT") == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(view.GetRowCellValue(e.RowHandle, "COMPLETED_AT"));
+                if (completed.HasValue || review == "Đã hoàn thành")
+                {
+                    e.Appearance.BackColor = Color.FromArgb(198, 239, 206);
+                    return;
+                }
+                if (review != null && review.Contains("chậm"))
+                {
+                    e.Appearance.BackColor = Color.FromArgb(255, 199, 206);
+                    return;
+                }
+                e.Appearance.BackColor = Color.FromArgb(255, 235, 156);
+            }
+
+            if (field == "ALERT_CONTENT")
+            {
+                string bg = Convert.ToString(view.GetRowCellValue(e.RowHandle, "ALERT_BG_COLOR"));
+                string fg = Convert.ToString(view.GetRowCellValue(e.RowHandle, "ALERT_FG_COLOR"));
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(bg)) e.Appearance.BackColor = ColorTranslator.FromHtml(bg);
+                    if (!string.IsNullOrWhiteSpace(fg)) e.Appearance.ForeColor = ColorTranslator.FromHtml(fg);
+                }
+                catch { }
+            }
         }
 
         private void SetCaption(string field, string caption)

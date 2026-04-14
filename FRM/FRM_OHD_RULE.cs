@@ -30,6 +30,8 @@ namespace DM_OHD.FRM
                 view.Columns["OWNER_USER_ID"].ColumnEdit = cboOwner;
             }
             if (view.Columns["ALERT_CONTENT"] != null) view.Columns["ALERT_CONTENT"].Caption = "Nội dung cảnh báo";
+            SetCaption("ALERT_BG_COLOR", "Màu nền cảnh báo");
+            SetCaption("ALERT_FG_COLOR", "Màu chữ cảnh báo");
             SetCaption("DUE_DAYS_30", "30");
             SetCaption("DUE_DAYS_60", "60");
             SetCaption("DUE_DAYS_90", "90");

@@ -13,6 +13,7 @@ namespace DM_OHD.FRM
         private DevExpress.XtraEditors.SimpleButton btnRefresh;
         private DevExpress.XtraEditors.SimpleButton btnRule;
         private DevExpress.XtraEditors.SimpleButton btnApprove;
+        private DevExpress.XtraEditors.SimpleButton btnSave;
         private DevExpress.XtraGrid.GridControl grid;
         private DevExpress.XtraGrid.Views.Grid.GridView view;
 
@@ -34,6 +35,7 @@ namespace DM_OHD.FRM
             this.btnRefresh = new DevExpress.XtraEditors.SimpleButton();
             this.btnRule = new DevExpress.XtraEditors.SimpleButton();
             this.btnApprove = new DevExpress.XtraEditors.SimpleButton();
+            this.btnSave = new DevExpress.XtraEditors.SimpleButton();
             this.grid = new DevExpress.XtraGrid.GridControl();
             this.view = new DevExpress.XtraGrid.Views.Grid.GridView();
             ((System.ComponentModel.ISupportInitialize)(this.panelTop)).BeginInit();
@@ -56,6 +58,7 @@ namespace DM_OHD.FRM
             this.panelTop.Controls.Add(this.btnRule);
             this.panelTop.Controls.Add(this.btnRefresh);
             this.panelTop.Controls.Add(this.btnApprove);
+            this.panelTop.Controls.Add(this.btnSave);
             this.lblFrom.Location = new System.Drawing.Point(12, 18);
             this.lblFrom.Text = "Từ";
             this.deFrom.Location = new System.Drawing.Point(30, 15);
@@ -79,6 +82,9 @@ namespace DM_OHD.FRM
             this.btnApprove.Location = new System.Drawing.Point(815, 13);
             this.btnApprove.Size = new System.Drawing.Size(95, 26);
             this.btnApprove.Text = "Duyệt";
+            this.btnSave.Location = new System.Drawing.Point(915, 13);
+            this.btnSave.Size = new System.Drawing.Size(95, 26);
+            this.btnSave.Text = "Lưu";
             this.grid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grid.Location = new System.Drawing.Point(0, 52);
             this.grid.MainView = this.view;
