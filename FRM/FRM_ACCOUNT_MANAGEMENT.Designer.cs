@@ -6,9 +6,11 @@
         private DevExpress.XtraEditors.PanelControl panel;
         private DevExpress.XtraEditors.LabelControl lblUser;
         private DevExpress.XtraEditors.LabelControl lblName;
+        private DevExpress.XtraEditors.LabelControl lblEmail;
         private DevExpress.XtraEditors.LabelControl lblPassword;
         private DevExpress.XtraEditors.TextEdit txtUser;
         private DevExpress.XtraEditors.TextEdit txtName;
+        private DevExpress.XtraEditors.TextEdit txtEmail;
         private DevExpress.XtraEditors.TextEdit txtPassword;
         private DevExpress.XtraEditors.CheckEdit chkActive;
         private DevExpress.XtraEditors.CheckedListBoxControl chkRoles;
@@ -30,9 +32,11 @@
             this.panel = new DevExpress.XtraEditors.PanelControl();
             this.lblUser = new DevExpress.XtraEditors.LabelControl();
             this.lblName = new DevExpress.XtraEditors.LabelControl();
+            this.lblEmail = new DevExpress.XtraEditors.LabelControl();
             this.lblPassword = new DevExpress.XtraEditors.LabelControl();
             this.txtUser = new DevExpress.XtraEditors.TextEdit();
             this.txtName = new DevExpress.XtraEditors.TextEdit();
+            this.txtEmail = new DevExpress.XtraEditors.TextEdit();
             this.txtPassword = new DevExpress.XtraEditors.TextEdit();
             this.chkActive = new DevExpress.XtraEditors.CheckEdit();
             this.chkRoles = new DevExpress.XtraEditors.CheckedListBoxControl();
@@ -43,6 +47,7 @@
             this.panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtUser.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtName.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtEmail.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtPassword.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkActive.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkRoles)).BeginInit();
@@ -52,9 +57,11 @@
             // panel
             this.panel.Controls.Add(this.lblUser);
             this.panel.Controls.Add(this.lblName);
+            this.panel.Controls.Add(this.lblEmail);
             this.panel.Controls.Add(this.lblPassword);
             this.panel.Controls.Add(this.txtUser);
             this.panel.Controls.Add(this.txtName);
+            this.panel.Controls.Add(this.txtEmail);
             this.panel.Controls.Add(this.txtPassword);
             this.panel.Controls.Add(this.chkActive);
             this.panel.Controls.Add(this.chkRoles);
@@ -69,16 +76,20 @@
             this.lblUser.Text = "User ID";
             this.lblName.Location = new System.Drawing.Point(15, 55);
             this.lblName.Text = "Họ tên";
-            this.lblPassword.Location = new System.Drawing.Point(15, 90);
+            this.lblEmail.Location = new System.Drawing.Point(15, 90);
+            this.lblEmail.Text = "Email";
+            this.lblPassword.Location = new System.Drawing.Point(15, 125);
             this.lblPassword.Text = "Mật khẩu";
             this.txtUser.Location = new System.Drawing.Point(90, 15);
             this.txtUser.Size = new System.Drawing.Size(180, 22);
             this.txtName.Location = new System.Drawing.Point(90, 50);
             this.txtName.Size = new System.Drawing.Size(250, 22);
-            this.txtPassword.Location = new System.Drawing.Point(90, 85);
+            this.txtEmail.Location = new System.Drawing.Point(90, 85);
+            this.txtEmail.Size = new System.Drawing.Size(250, 22);
+            this.txtPassword.Location = new System.Drawing.Point(90, 120);
             this.txtPassword.Properties.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(180, 22);
-            this.chkActive.Location = new System.Drawing.Point(90, 120);
+            this.chkActive.Location = new System.Drawing.Point(90, 150);
             this.chkActive.Properties.Caption = "Active";
             this.chkRoles.Location = new System.Drawing.Point(370, 15);
             this.chkRoles.Size = new System.Drawing.Size(280, 130);
@@ -108,6 +119,7 @@
             this.panel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtUser.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtName.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtEmail.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtPassword.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkActive.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkRoles)).EndInit();
