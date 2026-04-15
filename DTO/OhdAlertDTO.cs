@@ -139,23 +139,66 @@ namespace DM_OHD.DTO
 
         public int ApplyRulesToAllProgress()
         {
+            if (HasFullDueRuleColumns())
+            {
+                return DBUtils.Exec(@";WITH map_rule AS (
+                                        SELECT p.ID,
+                                               r.OWNER_USER_ID,
+                                               r.ALERT_CONTENT,
+                                               r.ALERT_BG_COLOR,
+                                               r.ALERT_FG_COLOR,
+                                               CASE
+                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_30 THEN r.DUE_DAYS_30
+                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_60 THEN r.DUE_DAYS_60
+                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_90 THEN r.DUE_DAYS_90
+                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_120 THEN r.DUE_DAYS_120
+                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_150 THEN r.DUE_DAYS_150
+                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_180 THEN r.DUE_DAYS_180
+                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_210 THEN r.DUE_DAYS_210
+                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_240 THEN r.DUE_DAYS_240
+                                                   ELSE NULL
+                                               END AS DUE_DAYS
+                                        FROM OHD_ALERT_PROGRESS p
+                                        OUTER APPLY (
+                                            SELECT TOP 1 rr.OWNER_USER_ID,
+                                                         rr.ALERT_CONTENT,
+                                                         rr.ALERT_BG_COLOR,
+                                                         rr.ALERT_FG_COLOR,
+                                                         rr.DUE_DAYS_30,
+                                                         rr.DUE_DAYS_60,
+                                                         rr.DUE_DAYS_90,
+                                                         rr.DUE_DAYS_120,
+                                                         rr.DUE_DAYS_150,
+                                                         rr.DUE_DAYS_180,
+                                                         rr.DUE_DAYS_210,
+                                                         rr.DUE_DAYS_240
+                                            FROM OHD_ALERT_RULE rr
+                                            WHERE p.NEXT_OHD_MOC IN (rr.DUE_DAYS_30, rr.DUE_DAYS_60, rr.DUE_DAYS_90, rr.DUE_DAYS_120, rr.DUE_DAYS_150, rr.DUE_DAYS_180, rr.DUE_DAYS_210, rr.DUE_DAYS_240)
+                                            ORDER BY rr.ID
+                                        ) r
+                                        WHERE r.ALERT_CONTENT IS NOT NULL
+                                      )
+                                      UPDATE p
+                                      SET p.OWNER_USER_ID = m.OWNER_USER_ID,
+                                          p.ALERT_CONTENT = m.ALERT_CONTENT,
+                                          p.ALERT_BG_COLOR = m.ALERT_BG_COLOR,
+                                          p.ALERT_FG_COLOR = m.ALERT_FG_COLOR,
+                                          p.DUE_DATE = CASE WHEN m.DUE_DAYS IS NULL THEN NULL ELSE DATEADD(day, -m.DUE_DAYS, CAST(p.TRACK_START_DATE AS date)) END
+                                      FROM OHD_ALERT_PROGRESS p
+                                      INNER JOIN map_rule m ON p.ID = m.ID
+                                      WHERE ISNULL(p.OWNER_USER_ID,'') <> ISNULL(m.OWNER_USER_ID,'')
+                                         OR ISNULL(p.ALERT_CONTENT,'') <> ISNULL(m.ALERT_CONTENT,'')
+                                         OR ISNULL(p.ALERT_BG_COLOR,'') <> ISNULL(m.ALERT_BG_COLOR,'')
+                                         OR ISNULL(p.ALERT_FG_COLOR,'') <> ISNULL(m.ALERT_FG_COLOR,'')
+                                         OR ISNULL(CONVERT(varchar(10), p.DUE_DATE, 23),'') <> ISNULL(CONVERT(varchar(10), CASE WHEN m.DUE_DAYS IS NULL THEN NULL ELSE DATEADD(day, -m.DUE_DAYS, CAST(p.TRACK_START_DATE AS date)) END, 23),'');");
+            }
+
             return DBUtils.Exec(@";WITH map_rule AS (
                                     SELECT p.ID,
                                            r.OWNER_USER_ID,
                                            r.ALERT_CONTENT,
                                            r.ALERT_BG_COLOR,
-                                           r.ALERT_FG_COLOR,
-                                           CASE
-                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_30 THEN r.DUE_DAYS_30
-                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_60 THEN r.DUE_DAYS_60
-                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_90 THEN r.DUE_DAYS_90
-                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_120 THEN r.DUE_DAYS_120
-                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_150 THEN r.DUE_DAYS_150
-                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_180 THEN r.DUE_DAYS_180
-                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_210 THEN r.DUE_DAYS_210
-                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_240 THEN r.DUE_DAYS_240
-                                               ELSE NULL
-                                           END AS DUE_DAYS
+                                           r.ALERT_FG_COLOR
                                     FROM OHD_ALERT_PROGRESS p
                                     OUTER APPLY (
                                         SELECT TOP 1 rr.OWNER_USER_ID,
@@ -163,7 +206,6 @@ namespace DM_OHD.DTO
                                                      rr.ALERT_BG_COLOR,
                                                      rr.ALERT_FG_COLOR
                                         FROM OHD_ALERT_RULE rr
-                                        WHERE p.NEXT_OHD_MOC IN (rr.DUE_DAYS_30, rr.DUE_DAYS_60, rr.DUE_DAYS_90, rr.DUE_DAYS_120, rr.DUE_DAYS_150, rr.DUE_DAYS_180, rr.DUE_DAYS_210, rr.DUE_DAYS_240)
                                         ORDER BY rr.ID
                                     ) r
                                     WHERE r.ALERT_CONTENT IS NOT NULL
@@ -173,14 +215,23 @@ namespace DM_OHD.DTO
                                       p.ALERT_CONTENT = m.ALERT_CONTENT,
                                       p.ALERT_BG_COLOR = m.ALERT_BG_COLOR,
                                       p.ALERT_FG_COLOR = m.ALERT_FG_COLOR,
-                                      p.DUE_DATE = CASE WHEN m.DUE_DAYS IS NULL THEN NULL ELSE DATEADD(day, -m.DUE_DAYS, CAST(p.TRACK_START_DATE AS date)) END
+                                      p.DUE_DATE = NULL
                                   FROM OHD_ALERT_PROGRESS p
                                   INNER JOIN map_rule m ON p.ID = m.ID
                                   WHERE ISNULL(p.OWNER_USER_ID,'') <> ISNULL(m.OWNER_USER_ID,'')
                                      OR ISNULL(p.ALERT_CONTENT,'') <> ISNULL(m.ALERT_CONTENT,'')
                                      OR ISNULL(p.ALERT_BG_COLOR,'') <> ISNULL(m.ALERT_BG_COLOR,'')
                                      OR ISNULL(p.ALERT_FG_COLOR,'') <> ISNULL(m.ALERT_FG_COLOR,'')
-                                     OR ISNULL(CONVERT(varchar(10), p.DUE_DATE, 23),'') <> ISNULL(CONVERT(varchar(10), CASE WHEN m.DUE_DAYS IS NULL THEN NULL ELSE DATEADD(day, -m.DUE_DAYS, CAST(p.TRACK_START_DATE AS date)) END, 23),'');");
+                                     OR p.DUE_DATE IS NOT NULL;");
+        }
+
+        private bool HasFullDueRuleColumns()
+        {
+            object count = DBUtils.ExecScalar(@"SELECT COUNT(1)
+                                                FROM sys.columns
+                                                WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE')
+                                                  AND name IN ('DUE_DAYS_30','DUE_DAYS_60','DUE_DAYS_90','DUE_DAYS_120','DUE_DAYS_150','DUE_DAYS_180','DUE_DAYS_210','DUE_DAYS_240')");
+            return Convert.ToInt32(count) == 8;
         }
 
         public DataTable GetMailConfig()
