@@ -195,6 +195,80 @@ namespace DM_OHD.DTO
                                   );");
         }
 
+        public DataTable ValidateAndFixProgressByRules()
+        {
+            DataTable dt = DBUtils.GetData(@"SELECT p.ID,
+                                                    p.NEXT_OHD_MOC,
+                                                    p.ALERT_CONTENT,
+                                                    p.OWNER_USER_ID,
+                                                    p.ALERT_BG_COLOR,
+                                                    p.ALERT_FG_COLOR,
+                                                    r.OWNER_USER_ID AS RULE_OWNER_USER_ID,
+                                                    r.ALERT_CONTENT AS RULE_ALERT_CONTENT,
+                                                    r.ALERT_BG_COLOR AS RULE_ALERT_BG_COLOR,
+                                                    r.ALERT_FG_COLOR AS RULE_ALERT_FG_COLOR
+                                             FROM OHD_ALERT_PROGRESS p
+                                             OUTER APPLY (
+                                                SELECT TOP 1 *
+                                                FROM OHD_ALERT_RULE r
+                                                WHERE p.NEXT_OHD_MOC IN (r.DUE_DAYS_30, r.DUE_DAYS_60, r.DUE_DAYS_90, r.DUE_DAYS_120, r.DUE_DAYS_150, r.DUE_DAYS_180, r.DUE_DAYS_210, r.DUE_DAYS_240)
+                                                ORDER BY r.ID
+                                             ) r
+                                             WHERE ISNULL(p.APPROVED,0)=0");
+
+            DataTable result = new DataTable();
+            result.Columns.Add("FIXED_OWNER", typeof(int));
+            result.Columns.Add("FIXED_COLOR", typeof(int));
+            result.Columns.Add("FIXED_CONTENT", typeof(int));
+            DataRow summary = result.NewRow();
+            summary["FIXED_OWNER"] = 0;
+            summary["FIXED_COLOR"] = 0;
+            summary["FIXED_CONTENT"] = 0;
+
+            foreach (DataRow row in dt.Rows)
+            {
+                int id = ToInt(row["ID"]);
+                if (id <= 0) continue;
+
+                string expectedOwner = Convert.ToString(row["RULE_OWNER_USER_ID"] ?? string.Empty);
+                string expectedContent = Convert.ToString(row["RULE_ALERT_CONTENT"] ?? string.Empty);
+                string expectedBg = Convert.ToString(row["RULE_ALERT_BG_COLOR"] ?? string.Empty);
+                string expectedFg = Convert.ToString(row["RULE_ALERT_FG_COLOR"] ?? string.Empty);
+                if (string.IsNullOrWhiteSpace(expectedContent)) continue;
+
+                string currentOwner = Convert.ToString(row["OWNER_USER_ID"] ?? string.Empty);
+                string currentContent = Convert.ToString(row["ALERT_CONTENT"] ?? string.Empty);
+                string currentBg = Convert.ToString(row["ALERT_BG_COLOR"] ?? string.Empty);
+                string currentFg = Convert.ToString(row["ALERT_FG_COLOR"] ?? string.Empty);
+
+                bool ownerChanged = !string.Equals(currentOwner, expectedOwner, StringComparison.OrdinalIgnoreCase);
+                bool contentChanged = !string.Equals(currentContent, expectedContent, StringComparison.Ordinal);
+                bool colorChanged = !string.Equals(currentBg, expectedBg, StringComparison.OrdinalIgnoreCase)
+                                    || !string.Equals(currentFg, expectedFg, StringComparison.OrdinalIgnoreCase);
+
+                if (!ownerChanged && !contentChanged && !colorChanged) continue;
+
+                DBUtils.Exec(@"UPDATE OHD_ALERT_PROGRESS
+                               SET OWNER_USER_ID=@U,
+                                   ALERT_CONTENT=@C,
+                                   ALERT_BG_COLOR=@BG,
+                                   ALERT_FG_COLOR=@FG
+                               WHERE ID=@ID",
+                    new SqlParameter("@U", expectedOwner),
+                    new SqlParameter("@C", expectedContent),
+                    new SqlParameter("@BG", expectedBg),
+                    new SqlParameter("@FG", expectedFg),
+                    new SqlParameter("@ID", id));
+
+                if (ownerChanged) summary["FIXED_OWNER"] = ToInt(summary["FIXED_OWNER"]) + 1;
+                if (contentChanged) summary["FIXED_CONTENT"] = ToInt(summary["FIXED_CONTENT"]) + 1;
+                if (colorChanged) summary["FIXED_COLOR"] = ToInt(summary["FIXED_COLOR"]) + 1;
+            }
+
+            result.Rows.Add(summary);
+            return result;
+        }
+
         private int ToInt(object value) => int.TryParse(Convert.ToString(value), out int x) ? x : 0;
         private object ToNullableInt(object value)
         {

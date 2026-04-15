@@ -1,5 +1,6 @@
 using DevExpress.XtraEditors;
 using DevExpress.XtraGrid.Views.Grid;
+using DM_OHD.DB;
 using DM_OHD.DTO;
 using System;
 using System.Drawing;
@@ -26,7 +27,7 @@ namespace DM_OHD.FRM
             ConfigureMonthEditor(deTo);
             deFrom.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             deTo.EditValue = new DateTime(DateTime.Today.Year + 1, 12, 1);
-            Load += (s, e) => LoadData();
+            Load += FRM_OHD_ALERT_Load;
         }
 
         private void ConfigureMonthEditor(DateEdit editor)
@@ -37,6 +38,18 @@ namespace DM_OHD.FRM
             editor.Properties.VistaCalendarInitialViewStyle = DevExpress.XtraEditors.VistaCalendarInitialViewStyle.YearView;
             editor.Properties.VistaCalendarViewStyle = DevExpress.XtraEditors.VistaCalendarViewStyle.YearView;
             editor.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+        }
+
+        private void FRM_OHD_ALERT_Load(object sender, EventArgs e)
+        {
+            bool isAdmin = Constaint.IsAdmin();
+            btnConfigMail.Visible = isAdmin;
+            btnConfigMail.Enabled = isAdmin;
+            if (!isAdmin)
+            {
+                btnConfigMail.ToolTip = "Chỉ tài khoản ADMIN mới được cấu hình mail.";
+            }
+            LoadData();
         }
 
         private void BtnConfigMail_Click(object sender, EventArgs e)
@@ -58,7 +71,22 @@ namespace DM_OHD.FRM
         private void BtnUpdate_Click(object sender, EventArgs e)
         {
             int inserted = _dto.RefreshProgressFromPlan();
-            XtraMessageBox.Show($"Đã cập nhật khuôn vào bảng cảnh báo: {Math.Max(0, inserted)} dòng.");
+            DataTable fixedResult = _dto.ValidateAndFixProgressByRules();
+            int fixedOwner = 0;
+            int fixedColor = 0;
+            int fixedContent = 0;
+            if (fixedResult != null && fixedResult.Rows.Count > 0)
+            {
+                DataRow row = fixedResult.Rows[0];
+                fixedOwner = ToInt(row["FIXED_OWNER"]);
+                fixedColor = ToInt(row["FIXED_COLOR"]);
+                fixedContent = ToInt(row["FIXED_CONTENT"]);
+            }
+
+            XtraMessageBox.Show(
+                $"Đã cập nhật khuôn vào bảng cảnh báo: {Math.Max(0, inserted)} dòng."
+                + Environment.NewLine
+                + $"Đã chuẩn hóa theo quy tắc: Người phụ trách {fixedOwner} dòng, Nội dung cảnh báo {fixedContent} dòng, Màu cảnh báo {fixedColor} dòng.");
             LoadData();
         }
 
