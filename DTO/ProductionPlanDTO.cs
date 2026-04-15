@@ -232,6 +232,23 @@ namespace DM_OHD.DTO
                                ELSE BASE_OHD + FLOOR(SHOT_CUMULATIVE / 30000000.0) * 30
                            END AS RAW_OHD
                     FROM agg
+                ), moc_cycle AS (
+                    SELECT DIE_NO,
+                           DIE_NAME,
+                           CAVITY,
+                           PLAN_YEAR,
+                           PLAN_MONTH,
+                           SHOT_PER_CAVITY,
+                           RUN_RATIO,
+                           BASE_REQUIRED,
+                           BASE_OHD,
+                           SHOT_CUMULATIVE,
+                           { (hasTotalCavity ? "TOTAL_CAVITY," : string.Empty) }
+                           CASE
+                               WHEN RAW_OHD <= 0 THEN 0
+                               ELSE (((CONVERT(int, RAW_OHD) - 1) % 240) + 1)
+                           END AS CYCLE_OHD
+                    FROM moc_raw
                 )
                 INSERT INTO OHD_PLAN_MASTER(DIE_NO,DIE_NAME,{cavityCol}{totalInsertCol},PLAN_YEAR,PLAN_MONTH,FY_SHOTS,RUN_RATIO{latestInsertCol}{latestOhdInsertCol},REQUIRED_QTY,OHD_MOC)
                 SELECT DIE_NO,
@@ -243,11 +260,11 @@ namespace DM_OHD.DTO
                        RUN_RATIO{latestSelectCol}{latestOhdSelectCol},
                        SHOT_CUMULATIVE,
                        CASE
-                           WHEN RAW_OHD <= 0 THEN 0
-                           WHEN RAW_OHD <> ISNULL(LAG(RAW_OHD) OVER(PARTITION BY DIE_NO, CAVITY ORDER BY PLAN_YEAR, PLAN_MONTH), 0) THEN RAW_OHD
+                           WHEN CYCLE_OHD <= 0 THEN 0
+                           WHEN CYCLE_OHD <> ISNULL(LAG(CYCLE_OHD) OVER(PARTITION BY DIE_NO, CAVITY ORDER BY PLAN_YEAR, PLAN_MONTH), 0) THEN CYCLE_OHD
                            ELSE 0
                        END AS OHD_MOC
-                FROM moc_raw;
+                FROM moc_cycle;
 
                 DROP TABLE #OLD_REQUIRED;";
             DBUtils.Exec(sql);
