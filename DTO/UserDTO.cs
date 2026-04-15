@@ -40,7 +40,7 @@ namespace DM_OHD.DTO
 
         public DataTable GetUsers()
         {
-            return DBUtils.GetData(@"SELECT u.USER_ID, u.FULL_NAME, u.IS_ACTIVE,
+            return DBUtils.GetData(@"SELECT u.USER_ID, u.FULL_NAME, ISNULL(u.EMAIL,'') AS EMAIL, u.IS_ACTIVE,
                                     STUFF((SELECT ',' + ur.ROLE_CODE FROM APP_USER_ROLE ur WHERE ur.USER_ID=u.USER_ID FOR XML PATH('')),1,1,'') AS ROLES
                                     FROM APP_USER u ORDER BY u.USER_ID");
         }
@@ -50,28 +50,30 @@ namespace DM_OHD.DTO
             return DBUtils.GetData("SELECT ROLE_CODE, ROLE_NAME FROM APP_ROLE ORDER BY ROLE_CODE");
         }
 
-        public void SaveUser(string userId, string fullName, string password, bool isActive, List<string> roles)
+        public void SaveUser(string userId, string fullName, string email, string password, bool isActive, List<string> roles)
         {
             object exists = DBUtils.ExecScalar("SELECT COUNT(1) FROM APP_USER WHERE USER_ID=@USER_ID", new SqlParameter("@USER_ID", userId));
             if (Convert.ToInt32(exists) == 0)
             {
-                DBUtils.Exec("INSERT INTO APP_USER(USER_ID,FULL_NAME,PASSWORD_MD5,IS_ACTIVE) VALUES(@USER_ID,@FULL_NAME,@PWD,@ACTIVE)",
+                DBUtils.Exec("INSERT INTO APP_USER(USER_ID,FULL_NAME,EMAIL,PASSWORD_MD5,IS_ACTIVE) VALUES(@USER_ID,@FULL_NAME,@EMAIL,@PWD,@ACTIVE)",
                     new SqlParameter("@USER_ID", userId),
                     new SqlParameter("@FULL_NAME", fullName),
+                    new SqlParameter("@EMAIL", email ?? string.Empty),
                     new SqlParameter("@PWD", Constaint.ToMd5(password)),
                     new SqlParameter("@ACTIVE", isActive));
             }
             else
             {
                 string update = string.IsNullOrWhiteSpace(password)
-                    ? "UPDATE APP_USER SET FULL_NAME=@FULL_NAME, IS_ACTIVE=@ACTIVE WHERE USER_ID=@USER_ID"
-                    : "UPDATE APP_USER SET FULL_NAME=@FULL_NAME, PASSWORD_MD5=@PWD, IS_ACTIVE=@ACTIVE WHERE USER_ID=@USER_ID";
+                    ? "UPDATE APP_USER SET FULL_NAME=@FULL_NAME, EMAIL=@EMAIL, IS_ACTIVE=@ACTIVE WHERE USER_ID=@USER_ID"
+                    : "UPDATE APP_USER SET FULL_NAME=@FULL_NAME, EMAIL=@EMAIL, PASSWORD_MD5=@PWD, IS_ACTIVE=@ACTIVE WHERE USER_ID=@USER_ID";
 
                 if (string.IsNullOrWhiteSpace(password))
                 {
                     DBUtils.Exec(update,
                         new SqlParameter("@USER_ID", userId),
                         new SqlParameter("@FULL_NAME", fullName),
+                        new SqlParameter("@EMAIL", email ?? string.Empty),
                         new SqlParameter("@ACTIVE", isActive));
                 }
                 else
@@ -79,6 +81,7 @@ namespace DM_OHD.DTO
                     DBUtils.Exec(update,
                         new SqlParameter("@USER_ID", userId),
                         new SqlParameter("@FULL_NAME", fullName),
+                        new SqlParameter("@EMAIL", email ?? string.Empty),
                         new SqlParameter("@PWD", Constaint.ToMd5(password)),
                         new SqlParameter("@ACTIVE", isActive));
                 }
