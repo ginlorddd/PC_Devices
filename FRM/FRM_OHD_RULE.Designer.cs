@@ -51,8 +51,10 @@ namespace DM_OHD.FRM
             this.cboOwner.Name = "cboOwner";
             this.colorBgEdit.AutoHeight = false;
             this.colorBgEdit.Name = "colorBgEdit";
+            this.colorBgEdit.StoreColorAsInteger = false;
             this.colorFgEdit.AutoHeight = false;
             this.colorFgEdit.Name = "colorFgEdit";
+            this.colorFgEdit.StoreColorAsInteger = false;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1100, 620);

@@ -1,8 +1,10 @@
 using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Controls;
 using DM_OHD.DB;
 using DM_OHD.DTO;
 using System;
 using System.Data;
+using System.Drawing;
 
 namespace DM_OHD.FRM
 {
@@ -13,6 +15,10 @@ namespace DM_OHD.FRM
         public FRM_OHD_RULE()
         {
             InitializeComponent();
+            colorBgEdit.ParseEditValue += ColorEdit_ParseEditValue;
+            colorFgEdit.ParseEditValue += ColorEdit_ParseEditValue;
+            colorBgEdit.CustomDisplayText += ColorEdit_CustomDisplayText;
+            colorFgEdit.CustomDisplayText += ColorEdit_CustomDisplayText;
             btnSave.Click += BtnSave_Click;
             Load += (s, e) => LoadData();
         }
@@ -47,6 +53,43 @@ namespace DM_OHD.FRM
             view.OptionsView.ShowAutoFilterRow = true;
             view.OptionsView.ShowGroupPanel = false;
             view.BestFitColumns();
+        }
+
+        private void ColorEdit_ParseEditValue(object sender, ConvertEditValueEventArgs e)
+        {
+            if (e.Value is Color color)
+            {
+                e.Value = ColorTranslator.ToHtml(color);
+                e.Handled = true;
+                return;
+            }
+
+            string text = Convert.ToString(e.Value);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                e.Value = "#FFF3CD";
+                e.Handled = true;
+            }
+        }
+
+        private void ColorEdit_CustomDisplayText(object sender, CustomDisplayTextEventArgs e)
+        {
+            string text = Convert.ToString(e.Value);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                e.DisplayText = string.Empty;
+                return;
+            }
+
+            try
+            {
+                Color color = ColorTranslator.FromHtml(text);
+                e.DisplayText = $"{color.R}, {color.G}, {color.B}";
+            }
+            catch
+            {
+                e.DisplayText = text;
+            }
         }
 
         private void BtnSave_Click(object sender, EventArgs e)
