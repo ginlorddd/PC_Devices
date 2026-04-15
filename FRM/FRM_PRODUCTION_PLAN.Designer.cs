@@ -40,6 +40,10 @@
         private DevExpress.XtraEditors.DateEdit deFrom;
         private DevExpress.XtraEditors.DateEdit deTo;
         private DevExpress.XtraEditors.SimpleButton btnApplyFilter;
+        private DevExpress.XtraEditors.SimpleButton btnTemplateFY;
+        private DevExpress.XtraEditors.SimpleButton btnTemplateRatio;
+        private DevExpress.XtraEditors.SimpleButton btnTemplateOutput;
+        private DevExpress.XtraEditors.SimpleButton btnTemplateMaster;
         private System.Windows.Forms.FlowLayoutPanel panelFYActions;
         private System.Windows.Forms.FlowLayoutPanel panelRatioActions;
         private System.Windows.Forms.FlowLayoutPanel panelOutputActions;
@@ -90,6 +94,10 @@
             this.deFrom = new DevExpress.XtraEditors.DateEdit();
             this.deTo = new DevExpress.XtraEditors.DateEdit();
             this.btnApplyFilter = new DevExpress.XtraEditors.SimpleButton();
+            this.btnTemplateFY = new DevExpress.XtraEditors.SimpleButton();
+            this.btnTemplateRatio = new DevExpress.XtraEditors.SimpleButton();
+            this.btnTemplateOutput = new DevExpress.XtraEditors.SimpleButton();
+            this.btnTemplateMaster = new DevExpress.XtraEditors.SimpleButton();
             this.panelFYActions = new System.Windows.Forms.FlowLayoutPanel();
             this.panelRatioActions = new System.Windows.Forms.FlowLayoutPanel();
             this.panelOutputActions = new System.Windows.Forms.FlowLayoutPanel();
@@ -143,6 +151,7 @@
             this.panelFYActions.Padding = new System.Windows.Forms.Padding(6, 6, 6, 4);
             this.panelFYActions.Controls.Add(this.btnSaveFY);
             this.panelFYActions.Controls.Add(this.btnDeleteFY);
+            this.panelFYActions.Controls.Add(this.btnTemplateFY);
             this.panelFYActions.Controls.Add(this.btnImportFY);
             this.panelFYActions.Controls.Add(this.btnExportFY);
             this.btnSaveFY.Size = new System.Drawing.Size(170, 26);
@@ -153,6 +162,8 @@
             this.btnImportFY.Text = "Import Excel";
             this.btnExportFY.Size = new System.Drawing.Size(90, 26);
             this.btnExportFY.Text = "Export";
+            this.btnTemplateFY.Size = new System.Drawing.Size(120, 26);
+            this.btnTemplateFY.Text = "Lưu form import";
 
             // tab Ratio
             this.tabRatio.Controls.Add(this.gridRatio);
@@ -174,6 +185,7 @@
             this.panelRatioActions.Padding = new System.Windows.Forms.Padding(6, 6, 6, 4);
             this.panelRatioActions.Controls.Add(this.btnSaveRatio);
             this.panelRatioActions.Controls.Add(this.btnDeleteRatio);
+            this.panelRatioActions.Controls.Add(this.btnTemplateRatio);
             this.panelRatioActions.Controls.Add(this.btnImportRatio);
             this.panelRatioActions.Controls.Add(this.btnExportRatio);
             this.btnSaveRatio.Size = new System.Drawing.Size(170, 26);
@@ -184,6 +196,8 @@
             this.btnImportRatio.Text = "Import Excel";
             this.btnExportRatio.Size = new System.Drawing.Size(90, 26);
             this.btnExportRatio.Text = "Export";
+            this.btnTemplateRatio.Size = new System.Drawing.Size(120, 26);
+            this.btnTemplateRatio.Text = "Lưu form import";
 
             // tab Output
             this.tabOutput.Controls.Add(this.gridOutput);
@@ -205,6 +219,7 @@
             this.panelOutputActions.Padding = new System.Windows.Forms.Padding(6, 6, 6, 4);
             this.panelOutputActions.Controls.Add(this.btnSaveOutput);
             this.panelOutputActions.Controls.Add(this.btnDeleteOutput);
+            this.panelOutputActions.Controls.Add(this.btnTemplateOutput);
             this.panelOutputActions.Controls.Add(this.btnImportOutput);
             this.panelOutputActions.Controls.Add(this.btnExportOutput);
             this.btnSaveOutput.Size = new System.Drawing.Size(180, 26);
@@ -215,6 +230,8 @@
             this.btnImportOutput.Text = "Import Excel";
             this.btnExportOutput.Size = new System.Drawing.Size(90, 26);
             this.btnExportOutput.Text = "Export";
+            this.btnTemplateOutput.Size = new System.Drawing.Size(120, 26);
+            this.btnTemplateOutput.Text = "Lưu form import";
 
             // tab Master
             this.tabMaster.Controls.Add(this.gridMaster);
@@ -229,6 +246,7 @@
             this.panelMasterActions.Padding = new System.Windows.Forms.Padding(6, 6, 6, 4);
             this.panelMasterActions.Controls.Add(this.btnGenerateMaster);
             this.panelMasterActions.Controls.Add(this.btnSaveMaster);
+            this.panelMasterActions.Controls.Add(this.btnTemplateMaster);
             this.panelMasterActions.Controls.Add(this.btnExportMaster);
             this.btnGenerateMaster.Size = new System.Drawing.Size(220, 26);
             this.btnGenerateMaster.Text = "Tạo bảng kế hoạch OHD (master)";
@@ -236,6 +254,8 @@
             this.btnSaveMaster.Text = "Lưu OHD";
             this.btnExportMaster.Size = new System.Drawing.Size(90, 26);
             this.btnExportMaster.Text = "Export";
+            this.btnTemplateMaster.Size = new System.Drawing.Size(120, 26);
+            this.btnTemplateMaster.Text = "Lưu form import";
 
             // panelFilter
             this.panelFilter.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;

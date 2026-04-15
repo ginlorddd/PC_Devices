@@ -55,6 +55,10 @@ namespace DM_OHD.FRM
             btnExportOutput.Click += BtnExportOutput_Click;
             btnImportOutput.Click += BtnImportOutput_Click;
             btnExportMaster.Click += BtnExportMaster_Click;
+            btnTemplateFY.Click += (s, e) => SaveImportTemplate(viewFY);
+            btnTemplateRatio.Click += (s, e) => SaveImportTemplate(viewRatio);
+            btnTemplateOutput.Click += (s, e) => SaveImportTemplate(viewOutput);
+            btnTemplateMaster.Click += (s, e) => SaveImportTemplate(viewMaster);
 
             SetupGridEditingBehavior(viewFY);
             SetupGridEditingBehavior(viewRatio);
@@ -64,7 +68,6 @@ namespace DM_OHD.FRM
             viewRatio.MouseDown += View_MouseDownSelectHeader;
             viewOutput.MouseDown += View_MouseDownSelectHeader;
             viewMaster.RowCellStyle += ViewMaster_RowCellStyle;
-            AddImportTemplateButtons();
             StyleButtons();
 
             ApplyPermissions();
@@ -91,6 +94,10 @@ namespace DM_OHD.FRM
             ApplyButtonColor(btnImportFY, importColor);
             ApplyButtonColor(btnImportRatio, importColor);
             ApplyButtonColor(btnImportOutput, importColor);
+            ApplyButtonColor(btnTemplateFY, Color.Teal);
+            ApplyButtonColor(btnTemplateRatio, Color.Teal);
+            ApplyButtonColor(btnTemplateOutput, Color.Teal);
+            ApplyButtonColor(btnTemplateMaster, Color.Teal);
             ApplyButtonColor(btnSaveFY, Color.MediumSeaGreen);
             ApplyButtonColor(btnSaveRatio, Color.MediumSeaGreen);
             ApplyButtonColor(btnSaveOutput, Color.MediumSeaGreen);
@@ -98,30 +105,6 @@ namespace DM_OHD.FRM
             ApplyButtonColor(btnDeleteFY, Color.IndianRed);
             ApplyButtonColor(btnDeleteRatio, Color.IndianRed);
             ApplyButtonColor(btnDeleteOutput, Color.IndianRed);
-        }
-
-        private void AddImportTemplateButtons()
-        {
-            AddImportTemplateButton(panelFYActions, viewFY, 3);
-            AddImportTemplateButton(panelRatioActions, viewRatio, 3);
-            AddImportTemplateButton(panelOutputActions, viewOutput, 3);
-            AddImportTemplateButton(panelMasterActions, viewMaster, 2);
-        }
-
-        private void AddImportTemplateButton(FlowLayoutPanel panel, GridView view, int insertIndex)
-        {
-            if (panel == null || view == null) return;
-            SimpleButton button = new SimpleButton
-            {
-                Text = "Lưu form import",
-                Size = new Size(120, 26),
-                Margin = new Padding(3, 0, 3, 0)
-            };
-            button.Click += (s, e) => SaveImportTemplate(view);
-            ApplyButtonColor(button, Color.Teal);
-            panel.Controls.Add(button);
-            if (insertIndex >= 0 && insertIndex < panel.Controls.Count)
-                panel.Controls.SetChildIndex(button, insertIndex);
         }
 
         private void SaveImportTemplate(GridView sourceView)
