@@ -15,6 +15,7 @@ namespace DM_OHD.DTO
                                            TOTAL_CAVITY,
                                            NEXT_OHD_MOC,
                                            TRACK_START_DATE,
+                                           DUE_DATE,
                                            ALERT_CONTENT,
                                            ALERT_BG_COLOR,
                                            ALERT_FG_COLOR,
@@ -28,6 +29,44 @@ namespace DM_OHD.DTO
                                     ORDER BY APPROVED ASC, TRACK_START_DATE, DIE_NO",
                 new SqlParameter("@F", from.Date),
                 new SqlParameter("@T", to.Date));
+        }
+
+        public DataTable GetObsoleteProgressRows()
+        {
+            return DBUtils.GetData(@";WITH src AS (
+                                        SELECT p.DIE_NO,
+                                               p.OHD_MOC,
+                                               CAST(DATEFROMPARTS(p.PLAN_YEAR, p.PLAN_MONTH, 1) AS date) AS TRACK_DATE
+                                        FROM OHD_PLAN_MASTER p
+                                        WHERE p.OHD_MOC > 0
+                                     )
+                                     SELECT pr.ID,
+                                            pr.DIE_NO,
+                                            pr.DIE_NAME,
+                                            pr.NEXT_OHD_MOC,
+                                            pr.TRACK_START_DATE
+                                     FROM OHD_ALERT_PROGRESS pr
+                                     WHERE NOT EXISTS (
+                                        SELECT 1
+                                        FROM src s
+                                        WHERE s.DIE_NO = pr.DIE_NO
+                                          AND s.OHD_MOC = pr.NEXT_OHD_MOC
+                                          AND s.TRACK_DATE = CAST(pr.TRACK_START_DATE AS date)
+                                     )
+                                     ORDER BY pr.DIE_NO, pr.TRACK_START_DATE, pr.NEXT_OHD_MOC");
+        }
+
+        public int DeleteProgressByIds(DataTable ids)
+        {
+            if (ids == null || ids.Rows.Count == 0) return 0;
+            int affected = 0;
+            foreach (DataRow row in ids.Rows)
+            {
+                int id = ToInt(row["ID"]);
+                if (id <= 0) continue;
+                affected += DBUtils.Exec("DELETE FROM OHD_ALERT_PROGRESS WHERE ID=@ID", new SqlParameter("@ID", id));
+            }
+            return affected;
         }
 
         public DataTable GetRules()
@@ -105,7 +144,18 @@ namespace DM_OHD.DTO
                                            r.OWNER_USER_ID,
                                            r.ALERT_CONTENT,
                                            r.ALERT_BG_COLOR,
-                                           r.ALERT_FG_COLOR
+                                           r.ALERT_FG_COLOR,
+                                           CASE
+                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_30 THEN r.DUE_DAYS_30
+                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_60 THEN r.DUE_DAYS_60
+                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_90 THEN r.DUE_DAYS_90
+                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_120 THEN r.DUE_DAYS_120
+                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_150 THEN r.DUE_DAYS_150
+                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_180 THEN r.DUE_DAYS_180
+                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_210 THEN r.DUE_DAYS_210
+                                               WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_240 THEN r.DUE_DAYS_240
+                                               ELSE NULL
+                                           END AS DUE_DAYS
                                     FROM OHD_ALERT_PROGRESS p
                                     OUTER APPLY (
                                         SELECT TOP 1 rr.OWNER_USER_ID,
@@ -122,13 +172,15 @@ namespace DM_OHD.DTO
                                   SET p.OWNER_USER_ID = m.OWNER_USER_ID,
                                       p.ALERT_CONTENT = m.ALERT_CONTENT,
                                       p.ALERT_BG_COLOR = m.ALERT_BG_COLOR,
-                                      p.ALERT_FG_COLOR = m.ALERT_FG_COLOR
+                                      p.ALERT_FG_COLOR = m.ALERT_FG_COLOR,
+                                      p.DUE_DATE = CASE WHEN m.DUE_DAYS IS NULL THEN NULL ELSE DATEADD(day, -m.DUE_DAYS, CAST(p.TRACK_START_DATE AS date)) END
                                   FROM OHD_ALERT_PROGRESS p
                                   INNER JOIN map_rule m ON p.ID = m.ID
                                   WHERE ISNULL(p.OWNER_USER_ID,'') <> ISNULL(m.OWNER_USER_ID,'')
                                      OR ISNULL(p.ALERT_CONTENT,'') <> ISNULL(m.ALERT_CONTENT,'')
                                      OR ISNULL(p.ALERT_BG_COLOR,'') <> ISNULL(m.ALERT_BG_COLOR,'')
-                                     OR ISNULL(p.ALERT_FG_COLOR,'') <> ISNULL(m.ALERT_FG_COLOR,'');");
+                                     OR ISNULL(p.ALERT_FG_COLOR,'') <> ISNULL(m.ALERT_FG_COLOR,'')
+                                     OR ISNULL(CONVERT(varchar(10), p.DUE_DATE, 23),'') <> ISNULL(CONVERT(varchar(10), CASE WHEN m.DUE_DAYS IS NULL THEN NULL ELSE DATEADD(day, -m.DUE_DAYS, CAST(p.TRACK_START_DATE AS date)) END, 23),'');");
         }
 
         public DataTable GetMailConfig()

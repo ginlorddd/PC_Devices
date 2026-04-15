@@ -6,6 +6,7 @@ using System;
 using System.Drawing;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace DM_OHD.FRM
@@ -70,23 +71,45 @@ namespace DM_OHD.FRM
 
         private void BtnUpdate_Click(object sender, EventArgs e)
         {
-            int inserted = _dto.RefreshProgressFromPlan();
-            DataTable fixedResult = _dto.ValidateAndFixProgressByRules();
-            int fixedOwner = 0;
-            int fixedColor = 0;
-            int fixedContent = 0;
-            if (fixedResult != null && fixedResult.Rows.Count > 0)
+            DataTable obsolete = _dto.GetObsoleteProgressRows();
+            int deleted = 0;
+            if (obsolete != null && obsolete.Rows.Count > 0)
             {
-                DataRow row = fixedResult.Rows[0];
-                fixedOwner = ToInt(row["FIXED_OWNER"]);
-                fixedColor = ToInt(row["FIXED_COLOR"]);
-                fixedContent = ToInt(row["FIXED_CONTENT"]);
+                StringBuilder detail = new StringBuilder();
+                int preview = Math.Min(20, obsolete.Rows.Count);
+                for (int i = 0; i < preview; i++)
+                {
+                    DataRow r = obsolete.Rows[i];
+                    detail.AppendLine($"- {Convert.ToString(r["DIE_NO"])} | {Convert.ToString(r["DIE_NAME"])} | Mốc {Convert.ToString(r["NEXT_OHD_MOC"])} | Bắt đầu {Convert.ToDateTime(r["TRACK_START_DATE"]):yyyy-MM-dd}");
+                }
+                if (obsolete.Rows.Count > preview)
+                {
+                    detail.AppendLine($"... và {obsolete.Rows.Count - preview} dòng khác");
+                }
+
+                DialogResult confirm = XtraMessageBox.Show(
+                    "Phát hiện các dòng cảnh báo không còn khớp kế hoạch OHD hiện tại." + Environment.NewLine
+                    + "Bạn có muốn xóa các dòng sau không?" + Environment.NewLine + Environment.NewLine
+                    + detail,
+                    "Xác nhận xóa cảnh báo cũ",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (confirm == DialogResult.Yes)
+                {
+                    deleted = _dto.DeleteProgressByIds(obsolete);
+                }
             }
+
+            int inserted = _dto.RefreshProgressFromPlan();
+            int affected = _dto.ApplyRulesToAllProgress();
 
             XtraMessageBox.Show(
                 $"Đã cập nhật khuôn vào bảng cảnh báo: {Math.Max(0, inserted)} dòng."
                 + Environment.NewLine
-                + $"Đã chuẩn hóa theo quy tắc: Người phụ trách {fixedOwner} dòng, Nội dung cảnh báo {fixedContent} dòng, Màu cảnh báo {fixedColor} dòng.");
+                + $"Đã xóa dòng cảnh báo cũ: {Math.Max(0, deleted)} dòng."
+                + Environment.NewLine
+                + $"Đã áp dụng lại quy tắc (bao gồm Due Date): {Math.Max(0, affected)} dòng.");
             LoadData();
         }
 
@@ -130,15 +153,30 @@ namespace DM_OHD.FRM
             {
                 bool approved = row["APPROVED"] != DBNull.Value && Convert.ToBoolean(row["APPROVED"]);
                 DateTime? completed = row["COMPLETED_AT"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(row["COMPLETED_AT"]);
-                DateTime trackDate = row["TRACK_START_DATE"] == DBNull.Value ? DateTime.Today : Convert.ToDateTime(row["TRACK_START_DATE"]);
+                DateTime? dueDate = row["DUE_DATE"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(row["DUE_DATE"]);
                 if (approved || completed.HasValue)
                 {
-                    row["REVIEW_NOTE"] = "Đã hoàn thành";
+                    if (dueDate.HasValue && completed.HasValue)
+                    {
+                        int diff = (completed.Value.Date - dueDate.Value.Date).Days;
+                        row["REVIEW_NOTE"] = diff <= 0 ? $"Hoàn thành nhanh {Math.Abs(diff)} ngày" : $"Hoàn thành chậm {diff} ngày";
+                    }
+                    else
+                    {
+                        row["REVIEW_NOTE"] = "Đã hoàn thành";
+                    }
                     continue;
                 }
 
-                int lateDays = (DateTime.Today.Date - trackDate.Date).Days;
-                row["REVIEW_NOTE"] = lateDays > 0 ? $"{lateDays} ngày chậm kế hoạch" : "Chưa hoàn thành";
+                if (dueDate.HasValue)
+                {
+                    int lateDays = (DateTime.Today.Date - dueDate.Value.Date).Days;
+                    row["REVIEW_NOTE"] = lateDays > 0 ? $"Chậm {lateDays} ngày" : $"Sớm {Math.Abs(lateDays)} ngày";
+                }
+                else
+                {
+                    row["REVIEW_NOTE"] = "Chưa hoàn thành";
+                }
             }
             grid.DataSource = dt;
             if (view.Columns["ID"] != null) view.Columns["ID"].Visible = false;
@@ -147,6 +185,7 @@ namespace DM_OHD.FRM
             SetCaption("TOTAL_CAVITY", "Số cavity");
             SetCaption("NEXT_OHD_MOC", "Mốc OHD sắp tới");
             SetCaption("TRACK_START_DATE", "Ngày bắt đầu theo dõi");
+            SetCaption("DUE_DATE", "Hạn xử lý");
             SetCaption("ALERT_CONTENT", "Nội dung cảnh báo");
             if (view.Columns["ALERT_BG_COLOR"] != null) view.Columns["ALERT_BG_COLOR"].Visible = false;
             if (view.Columns["ALERT_FG_COLOR"] != null) view.Columns["ALERT_FG_COLOR"].Visible = false;
