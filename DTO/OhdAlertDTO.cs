@@ -148,14 +148,14 @@ namespace DM_OHD.DTO
                                                r.ALERT_BG_COLOR,
                                                r.ALERT_FG_COLOR,
                                                CASE
-                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_30 THEN r.DUE_DAYS_30
-                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_60 THEN r.DUE_DAYS_60
-                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_90 THEN r.DUE_DAYS_90
-                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_120 THEN r.DUE_DAYS_120
-                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_150 THEN r.DUE_DAYS_150
-                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_180 THEN r.DUE_DAYS_180
-                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_210 THEN r.DUE_DAYS_210
-                                                   WHEN p.NEXT_OHD_MOC = r.DUE_DAYS_240 THEN r.DUE_DAYS_240
+                                                   WHEN p.NEXT_OHD_MOC = 30 THEN r.DUE_DAYS_30
+                                                   WHEN p.NEXT_OHD_MOC = 60 THEN r.DUE_DAYS_60
+                                                   WHEN p.NEXT_OHD_MOC = 90 THEN r.DUE_DAYS_90
+                                                   WHEN p.NEXT_OHD_MOC = 120 THEN r.DUE_DAYS_120
+                                                   WHEN p.NEXT_OHD_MOC = 150 THEN r.DUE_DAYS_150
+                                                   WHEN p.NEXT_OHD_MOC = 180 THEN r.DUE_DAYS_180
+                                                   WHEN p.NEXT_OHD_MOC = 210 THEN r.DUE_DAYS_210
+                                                   WHEN p.NEXT_OHD_MOC = 240 THEN r.DUE_DAYS_240
                                                    ELSE NULL
                                                END AS DUE_DAYS
                                         FROM OHD_ALERT_PROGRESS p
@@ -173,8 +173,7 @@ namespace DM_OHD.DTO
                                                          rr.DUE_DAYS_210,
                                                          rr.DUE_DAYS_240
                                             FROM OHD_ALERT_RULE rr
-                                            WHERE p.NEXT_OHD_MOC IN (rr.DUE_DAYS_30, rr.DUE_DAYS_60, rr.DUE_DAYS_90, rr.DUE_DAYS_120, rr.DUE_DAYS_150, rr.DUE_DAYS_180, rr.DUE_DAYS_210, rr.DUE_DAYS_240)
-                                            ORDER BY rr.ID
+                                            ORDER BY CASE WHEN ISNULL(rr.ALERT_CONTENT,'') = ISNULL(p.ALERT_CONTENT,'') THEN 0 ELSE 1 END, rr.ID
                                         ) r
                                         WHERE r.ALERT_CONTENT IS NOT NULL
                                       )
