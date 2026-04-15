@@ -98,6 +98,39 @@ namespace DM_OHD.DTO
             }
         }
 
+        public int ApplyRulesToAllProgress()
+        {
+            return DBUtils.Exec(@";WITH map_rule AS (
+                                    SELECT p.ID,
+                                           r.OWNER_USER_ID,
+                                           r.ALERT_CONTENT,
+                                           r.ALERT_BG_COLOR,
+                                           r.ALERT_FG_COLOR
+                                    FROM OHD_ALERT_PROGRESS p
+                                    OUTER APPLY (
+                                        SELECT TOP 1 rr.OWNER_USER_ID,
+                                                     rr.ALERT_CONTENT,
+                                                     rr.ALERT_BG_COLOR,
+                                                     rr.ALERT_FG_COLOR
+                                        FROM OHD_ALERT_RULE rr
+                                        WHERE p.NEXT_OHD_MOC IN (rr.DUE_DAYS_30, rr.DUE_DAYS_60, rr.DUE_DAYS_90, rr.DUE_DAYS_120, rr.DUE_DAYS_150, rr.DUE_DAYS_180, rr.DUE_DAYS_210, rr.DUE_DAYS_240)
+                                        ORDER BY rr.ID
+                                    ) r
+                                    WHERE r.ALERT_CONTENT IS NOT NULL
+                                  )
+                                  UPDATE p
+                                  SET p.OWNER_USER_ID = m.OWNER_USER_ID,
+                                      p.ALERT_CONTENT = m.ALERT_CONTENT,
+                                      p.ALERT_BG_COLOR = m.ALERT_BG_COLOR,
+                                      p.ALERT_FG_COLOR = m.ALERT_FG_COLOR
+                                  FROM OHD_ALERT_PROGRESS p
+                                  INNER JOIN map_rule m ON p.ID = m.ID
+                                  WHERE ISNULL(p.OWNER_USER_ID,'') <> ISNULL(m.OWNER_USER_ID,'')
+                                     OR ISNULL(p.ALERT_CONTENT,'') <> ISNULL(m.ALERT_CONTENT,'')
+                                     OR ISNULL(p.ALERT_BG_COLOR,'') <> ISNULL(m.ALERT_BG_COLOR,'')
+                                     OR ISNULL(p.ALERT_FG_COLOR,'') <> ISNULL(m.ALERT_FG_COLOR,'');");
+        }
+
         public DataTable GetMailConfig()
         {
             return DBUtils.GetData("SELECT TOP 1 ID, MAIL_TO, MAIL_CC, SUBJECT_TEMPLATE, BODY_TEMPLATE, SEND_FREQUENCY_DAYS, ENABLED FROM OHD_MAIL_CONFIG ORDER BY ID");

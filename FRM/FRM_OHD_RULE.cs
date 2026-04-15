@@ -95,7 +95,8 @@ namespace DM_OHD.FRM
         private void BtnSave_Click(object sender, EventArgs e)
         {
             _dto.SaveRules(grid.DataSource as DataTable);
-            XtraMessageBox.Show("Đã lưu điều chỉnh quy tắc.");
+            int affected = _dto.ApplyRulesToAllProgress();
+            XtraMessageBox.Show($"Đã lưu điều chỉnh quy tắc.{Environment.NewLine}Đã áp dụng lại quy tắc cho bảng PROGRESS: {Math.Max(0, affected)} dòng.");
             LoadData();
         }
 
