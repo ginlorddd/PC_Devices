@@ -303,34 +303,75 @@ namespace DM_OHD.DTO
                                            ISNULL(p.DIE_NAME,'') AS DIE_NAME,
                                            ISNULL(p.TOTAL_CAVITY,0) AS TOTAL_CAVITY,
                                            p.OHD_MOC,
-                                           DATEFROMPARTS(p.PLAN_YEAR, p.PLAN_MONTH, 1) AS TRACK_DATE
+                                           DATEFROMPARTS(p.PLAN_YEAR, p.PLAN_MONTH, 1) AS TRACK_DATE,
+                                           CASE
+                                               WHEN p.OHD_MOC IS NULL OR p.OHD_MOC <= 0 THEN NULL
+                                               ELSE (((p.OHD_MOC - 1) % 240) + 1)
+                                           END AS CYCLE_MOC
                                     FROM OHD_PLAN_MASTER p
                                     WHERE p.OHD_MOC > 0
+                                  ), rule_src AS (
+                                    SELECT r.ID,
+                                           ISNULL(r.OWNER_USER_ID,'admin') AS OWNER_USER_ID,
+                                           ISNULL(r.ALERT_CONTENT,N'Theo dõi mốc OHD') AS ALERT_CONTENT,
+                                           ISNULL(r.ALERT_BG_COLOR,'#FFF3CD') AS ALERT_BG_COLOR,
+                                           ISNULL(r.ALERT_FG_COLOR,'#7A4E00') AS ALERT_FG_COLOR,
+                                           r.DUE_DAYS_30,
+                                           r.DUE_DAYS_60,
+                                           r.DUE_DAYS_90,
+                                           r.DUE_DAYS_120,
+                                           r.DUE_DAYS_150,
+                                           r.DUE_DAYS_180,
+                                           r.DUE_DAYS_210,
+                                           r.DUE_DAYS_240
+                                    FROM OHD_ALERT_RULE r
+                                    UNION ALL
+                                    SELECT 0 AS ID,
+                                           'admin' AS OWNER_USER_ID,
+                                           N'Theo dõi mốc OHD' AS ALERT_CONTENT,
+                                           '#FFF3CD' AS ALERT_BG_COLOR,
+                                           '#7A4E00' AS ALERT_FG_COLOR,
+                                           NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+                                    WHERE NOT EXISTS (SELECT 1 FROM OHD_ALERT_RULE)
                                   )
-                                  INSERT INTO OHD_ALERT_PROGRESS(DIE_NO,DIE_NAME,TOTAL_CAVITY,NEXT_OHD_MOC,TRACK_START_DATE,ALERT_CONTENT,ALERT_BG_COLOR,ALERT_FG_COLOR,REVIEW_NOTE,OWNER_USER_ID,APPROVED)
+                                  INSERT INTO OHD_ALERT_PROGRESS(DIE_NO,DIE_NAME,TOTAL_CAVITY,NEXT_OHD_MOC,TRACK_START_DATE,DUE_DATE,ALERT_CONTENT,ALERT_BG_COLOR,ALERT_FG_COLOR,REVIEW_NOTE,OWNER_USER_ID,APPROVED)
                                   SELECT s.DIE_NO,
                                          s.DIE_NAME,
                                          s.TOTAL_CAVITY,
                                          s.OHD_MOC,
                                          s.TRACK_DATE,
-                                         ISNULL(r.ALERT_CONTENT,N'Theo dõi mốc OHD'),
-                                         ISNULL(r.ALERT_BG_COLOR,'#FFF3CD'),
-                                         ISNULL(r.ALERT_FG_COLOR,'#7A4E00'),
+                                         CASE
+                                            WHEN due_info.DUE_DAYS IS NULL THEN NULL
+                                            ELSE DATEADD(day, -due_info.DUE_DAYS, CAST(s.TRACK_DATE AS date))
+                                         END AS DUE_DATE,
+                                         r.ALERT_CONTENT,
+                                         r.ALERT_BG_COLOR,
+                                         r.ALERT_FG_COLOR,
                                          N'Chưa hoàn thành',
-                                         ISNULL(r.OWNER_USER_ID,'admin'),
+                                         r.OWNER_USER_ID,
                                          0
                                   FROM src s
+                                  INNER JOIN rule_src r ON 1 = 1
                                   OUTER APPLY (
-                                      SELECT TOP 1 OWNER_USER_ID, ALERT_CONTENT, ALERT_BG_COLOR, ALERT_FG_COLOR
-                                      FROM OHD_ALERT_RULE
-                                      ORDER BY ID
-                                  ) r
+                                      SELECT CASE
+                                          WHEN s.CYCLE_MOC BETWEEN 1 AND 30 THEN r.DUE_DAYS_30
+                                          WHEN s.CYCLE_MOC BETWEEN 31 AND 60 THEN r.DUE_DAYS_60
+                                          WHEN s.CYCLE_MOC BETWEEN 61 AND 90 THEN r.DUE_DAYS_90
+                                          WHEN s.CYCLE_MOC BETWEEN 91 AND 120 THEN r.DUE_DAYS_120
+                                          WHEN s.CYCLE_MOC BETWEEN 121 AND 150 THEN r.DUE_DAYS_150
+                                          WHEN s.CYCLE_MOC BETWEEN 151 AND 180 THEN r.DUE_DAYS_180
+                                          WHEN s.CYCLE_MOC BETWEEN 181 AND 210 THEN r.DUE_DAYS_210
+                                          WHEN s.CYCLE_MOC BETWEEN 211 AND 240 THEN r.DUE_DAYS_240
+                                          ELSE NULL
+                                      END AS DUE_DAYS
+                                  ) due_info
                                   WHERE NOT EXISTS (
                                       SELECT 1
                                       FROM OHD_ALERT_PROGRESS p
                                       WHERE p.DIE_NO = s.DIE_NO
                                         AND p.NEXT_OHD_MOC = s.OHD_MOC
                                         AND CAST(p.TRACK_START_DATE AS date) = CAST(s.TRACK_DATE AS date)
+                                        AND ISNULL(p.ALERT_CONTENT,'') = ISNULL(r.ALERT_CONTENT,'')
                                   );");
         }
 
