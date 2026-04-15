@@ -148,14 +148,18 @@ namespace DM_OHD.DTO
                                                r.ALERT_BG_COLOR,
                                                r.ALERT_FG_COLOR,
                                                CASE
-                                                   WHEN p.NEXT_OHD_MOC = 30 THEN r.DUE_DAYS_30
-                                                   WHEN p.NEXT_OHD_MOC = 60 THEN r.DUE_DAYS_60
-                                                   WHEN p.NEXT_OHD_MOC = 90 THEN r.DUE_DAYS_90
-                                                   WHEN p.NEXT_OHD_MOC = 120 THEN r.DUE_DAYS_120
-                                                   WHEN p.NEXT_OHD_MOC = 150 THEN r.DUE_DAYS_150
-                                                   WHEN p.NEXT_OHD_MOC = 180 THEN r.DUE_DAYS_180
-                                                   WHEN p.NEXT_OHD_MOC = 210 THEN r.DUE_DAYS_210
-                                                   WHEN p.NEXT_OHD_MOC = 240 THEN r.DUE_DAYS_240
+                                                   WHEN p.NEXT_OHD_MOC IS NULL OR p.NEXT_OHD_MOC <= 0 THEN NULL
+                                                   ELSE (((p.NEXT_OHD_MOC - 1) % 240) + 1)
+                                               END AS NORMALIZED_MOC,
+                                               CASE
+                                                   WHEN (((p.NEXT_OHD_MOC - 1) % 240) + 1) BETWEEN 1 AND 30 THEN r.DUE_DAYS_30
+                                                   WHEN (((p.NEXT_OHD_MOC - 1) % 240) + 1) BETWEEN 31 AND 60 THEN r.DUE_DAYS_60
+                                                   WHEN (((p.NEXT_OHD_MOC - 1) % 240) + 1) BETWEEN 61 AND 90 THEN r.DUE_DAYS_90
+                                                   WHEN (((p.NEXT_OHD_MOC - 1) % 240) + 1) BETWEEN 91 AND 120 THEN r.DUE_DAYS_120
+                                                   WHEN (((p.NEXT_OHD_MOC - 1) % 240) + 1) BETWEEN 121 AND 150 THEN r.DUE_DAYS_150
+                                                   WHEN (((p.NEXT_OHD_MOC - 1) % 240) + 1) BETWEEN 151 AND 180 THEN r.DUE_DAYS_180
+                                                   WHEN (((p.NEXT_OHD_MOC - 1) % 240) + 1) BETWEEN 181 AND 210 THEN r.DUE_DAYS_210
+                                                   WHEN (((p.NEXT_OHD_MOC - 1) % 240) + 1) BETWEEN 211 AND 240 THEN r.DUE_DAYS_240
                                                    ELSE NULL
                                                END AS DUE_DAYS
                                         FROM OHD_ALERT_PROGRESS p
