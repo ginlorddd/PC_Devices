@@ -7,14 +7,14 @@ namespace JigFlow.Data
     {
         public DataTable GetUsers()
         {
-            const string sql = @"SELECT UserId, Username, FullName, RoleCode, Email, IsActive, CreatedAt, UpdatedAt
+            const string SQL_QUERY = @"SELECT UserId, Username, FullName, RoleCode, Email, IsActive, CreatedAt, UpdatedAt
                                  FROM dbo.Users ORDER BY Username";
-            return DbUtils.GetData(sql);
+            return DbUtils.GetData(SQL_QUERY);
         }
 
         public int SaveUser(string username, string fullName, string roleCode, string email, bool isActive, string rawPassword)
         {
-            const string sql = @"
+            const string SQL_QUERY = @"
 IF EXISTS (SELECT 1 FROM dbo.Users WHERE Username = @Username)
 BEGIN
     UPDATE dbo.Users
@@ -31,7 +31,7 @@ BEGIN
     VALUES(@Username, @FullName, @PasswordHash, @RoleCode, @Email, @IsActive, GETDATE())
 END";
 
-            return DbUtils.Execute(sql,
+            return DbUtils.Execute(SQL_QUERY,
                 new SqlParameter("@Username", username),
                 new SqlParameter("@FullName", fullName),
                 new SqlParameter("@PasswordHash", AppSession.Md5(rawPassword)),

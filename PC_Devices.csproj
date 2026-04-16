@@ -54,22 +54,22 @@
     <Compile Include="Data\DbUtils.cs" />
     <Compile Include="Data\UserManagementService.cs" />
     <Compile Include="DTO\UserDto.cs" />
-    <Compile Include="Forms\FrmMain.cs"><SubType>Form</SubType></Compile>
-    <Compile Include="Forms\FrmMain.Designer.cs"><DependentUpon>FrmMain.cs</DependentUpon></Compile>
-    <Compile Include="Forms\FrmLogin.cs"><SubType>Form</SubType></Compile>
-    <Compile Include="Forms\FrmLogin.Designer.cs"><DependentUpon>FrmLogin.cs</DependentUpon></Compile>
-    <Compile Include="Forms\FrmChangePassword.cs"><SubType>Form</SubType></Compile>
-    <Compile Include="Forms\FrmChangePassword.Designer.cs"><DependentUpon>FrmChangePassword.cs</DependentUpon></Compile>
-    <Compile Include="Forms\FrmUserManagement.cs"><SubType>Form</SubType></Compile>
-    <Compile Include="Forms\FrmUserManagement.Designer.cs"><DependentUpon>FrmUserManagement.cs</DependentUpon></Compile>
-    <Compile Include="Forms\FrmJigTypeList.cs"><SubType>Form</SubType></Compile>
-    <Compile Include="Forms\FrmJigTypeList.Designer.cs"><DependentUpon>FrmJigTypeList.cs</DependentUpon></Compile>
+    <Compile Include="Forms\FRM_MAIN.cs"><SubType>Form</SubType></Compile>
+    <Compile Include="Forms\FRM_MAIN.Designer.cs"><DependentUpon>FRM_MAIN.cs</DependentUpon></Compile>
+    <Compile Include="Forms\FRM_LOGIN.cs"><SubType>Form</SubType></Compile>
+    <Compile Include="Forms\FRM_LOGIN.Designer.cs"><DependentUpon>FRM_LOGIN.cs</DependentUpon></Compile>
+    <Compile Include="Forms\FRM_USER_CHANGE_PASSWORD.cs"><SubType>Form</SubType></Compile>
+    <Compile Include="Forms\FRM_USER_CHANGE_PASSWORD.Designer.cs"><DependentUpon>FRM_USER_CHANGE_PASSWORD.cs</DependentUpon></Compile>
+    <Compile Include="Forms\FRM_ACCOUNT_MANAGEMENT.cs"><SubType>Form</SubType></Compile>
+    <Compile Include="Forms\FRM_ACCOUNT_MANAGEMENT.Designer.cs"><DependentUpon>FRM_ACCOUNT_MANAGEMENT.cs</DependentUpon></Compile>
+    <Compile Include="Forms\FRM_JIG_FUNCTION_LIST.cs"><SubType>Form</SubType></Compile>
+    <Compile Include="Forms\FRM_JIG_FUNCTION_LIST.Designer.cs"><DependentUpon>FRM_JIG_FUNCTION_LIST.cs</DependentUpon></Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Forms\FrmMain.resx"><DependentUpon>FrmMain.cs</DependentUpon></EmbeddedResource>
-    <EmbeddedResource Include="Forms\FrmLogin.resx"><DependentUpon>FrmLogin.cs</DependentUpon></EmbeddedResource>
-    <EmbeddedResource Include="Forms\FrmChangePassword.resx"><DependentUpon>FrmChangePassword.cs</DependentUpon></EmbeddedResource>
-    <EmbeddedResource Include="Forms\FrmUserManagement.resx"><DependentUpon>FrmUserManagement.cs</DependentUpon></EmbeddedResource>
-    <EmbeddedResource Include="Forms\FrmJigTypeList.resx"><DependentUpon>FrmJigTypeList.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="Forms\FRM_MAIN.resx"><DependentUpon>FRM_MAIN.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="Forms\FRM_LOGIN.resx"><DependentUpon>FRM_LOGIN.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="Forms\FRM_USER_CHANGE_PASSWORD.resx"><DependentUpon>FRM_USER_CHANGE_PASSWORD.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="Forms\FRM_ACCOUNT_MANAGEMENT.resx"><DependentUpon>FRM_ACCOUNT_MANAGEMENT.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Include="Forms\FRM_JIG_FUNCTION_LIST.resx"><DependentUpon>FRM_JIG_FUNCTION_LIST.cs</DependentUpon></EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

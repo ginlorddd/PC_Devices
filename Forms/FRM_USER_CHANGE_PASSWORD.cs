@@ -4,11 +4,11 @@ using System.Windows.Forms;
 
 namespace JigFlow.Forms
 {
-    public partial class FrmChangePassword : DevExpress.XtraEditors.XtraForm
+    public partial class FRM_USER_CHANGE_PASSWORD : DevExpress.XtraEditors.XtraForm
     {
         private readonly AuthService _authService = new AuthService();
 
-        public FrmChangePassword()
+        public FRM_USER_CHANGE_PASSWORD()
         {
             InitializeComponent();
         }

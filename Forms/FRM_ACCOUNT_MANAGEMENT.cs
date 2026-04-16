@@ -4,16 +4,16 @@ using System.Windows.Forms;
 
 namespace JigFlow.Forms
 {
-    public partial class FrmUserManagement : DevExpress.XtraEditors.XtraForm
+    public partial class FRM_ACCOUNT_MANAGEMENT : DevExpress.XtraEditors.XtraForm
     {
         private readonly UserManagementService _service = new UserManagementService();
 
-        public FrmUserManagement()
+        public FRM_ACCOUNT_MANAGEMENT()
         {
             InitializeComponent();
         }
 
-        private void FrmUserManagement_Load(object sender, EventArgs e)
+        private void FRM_ACCOUNT_MANAGEMENT_Load(object sender, EventArgs e)
         {
             ReloadData();
         }

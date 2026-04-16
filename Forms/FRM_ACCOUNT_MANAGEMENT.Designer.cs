@@ -1,6 +1,6 @@
 namespace JigFlow.Forms
 {
-    partial class FrmUserManagement
+    partial class FRM_ACCOUNT_MANAGEMENT
     {
         private System.ComponentModel.IContainer components = null;
         protected override void Dispose(bool disposing)
@@ -49,7 +49,7 @@ namespace JigFlow.Forms
             this.Controls.Add(this.panelTop);
             this.Text = "Quản lý tài khoản và phân quyền";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.Load += new System.EventHandler(this.FrmUserManagement_Load);
+            this.Load += new System.EventHandler(this.FRM_ACCOUNT_MANAGEMENT_Load);
             this.panelTop.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.chkIsActive.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboRole.Properties)).EndInit();

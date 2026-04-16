@@ -1,6 +1,6 @@
 namespace JigFlow.Forms
 {
-    partial class FrmLogin
+    partial class FRM_LOGIN
     {
         private System.ComponentModel.IContainer components = null;
         protected override void Dispose(bool disposing)
@@ -45,7 +45,7 @@ namespace JigFlow.Forms
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.btnClose);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Name = "FrmLogin";
+            this.Name = "FRM_LOGIN";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Đăng nhập";
             ((System.ComponentModel.ISupportInitialize)(this.txtUsername.Properties)).EndInit();

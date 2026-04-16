@@ -18,7 +18,7 @@ namespace JigFlow
             Application.SetCompatibleTextRenderingDefault(false);
 
             DbUtils.SetDataInit();
-            Application.Run(new FrmMain());
+            Application.Run(new FRM_MAIN());
         }
     }
 }

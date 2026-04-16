@@ -6,61 +6,62 @@ namespace JigFlow.Data
 {
     public class AuthService
     {
-        public UserDto Login(string username, string password)
+        public UserDto Login(string USERNAME, string PASSWORD)
         {
-            const string sql = @"SELECT TOP 1 UserId, Username, FullName, RoleCode, Email, IsActive, PasswordHash
+            const string SQL_QUERY = @"SELECT TOP 1 UserId, Username, FullName, RoleCode, Email, IsActive, PasswordHash
                                  FROM dbo.Users
                                  WHERE Username = @Username";
-            var dt = DbUtils.GetData(sql, new SqlParameter("@Username", username));
-            if (dt.Rows.Count == 0)
+
+            var DT_RESULT = DbUtils.GetData(SQL_QUERY, new SqlParameter("@Username", USERNAME));
+            if (DT_RESULT.Rows.Count == 0)
             {
                 return null;
             }
 
-            var row = dt.Rows[0];
-            if (!(bool)row["IsActive"]) return null;
+            var USER_ROW = DT_RESULT.Rows[0];
+            if (!(bool)USER_ROW["IsActive"]) return null;
 
-            var hash = Convert.ToString(row["PasswordHash"]);
-            if (!string.Equals(hash, AppSession.Md5(password), StringComparison.OrdinalIgnoreCase))
+            var HASH_PASSWORD = Convert.ToString(USER_ROW["PasswordHash"]);
+            if (!string.Equals(HASH_PASSWORD, AppSession.Md5(PASSWORD), StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
 
-            var user = new UserDto
+            var USER_DTO = new UserDto
             {
-                UserId = Convert.ToInt32(row["UserId"]),
-                Username = Convert.ToString(row["Username"]),
-                FullName = Convert.ToString(row["FullName"]),
-                RoleCode = Convert.ToString(row["RoleCode"]),
-                Email = Convert.ToString(row["Email"]),
-                IsActive = Convert.ToBoolean(row["IsActive"])
+                UserId = Convert.ToInt32(USER_ROW["UserId"]),
+                Username = Convert.ToString(USER_ROW["Username"]),
+                FullName = Convert.ToString(USER_ROW["FullName"]),
+                RoleCode = Convert.ToString(USER_ROW["RoleCode"]),
+                Email = Convert.ToString(USER_ROW["Email"]),
+                IsActive = Convert.ToBoolean(USER_ROW["IsActive"])
             };
 
-            AppSession.UserId = user.Username;
-            AppSession.FullName = user.FullName;
-            AppSession.RoleCode = user.RoleCode;
-            AppSession.PasswordHash = hash;
+            AppSession.UserId = USER_DTO.Username;
+            AppSession.FullName = USER_DTO.FullName;
+            AppSession.RoleCode = USER_DTO.RoleCode;
+            AppSession.PasswordHash = HASH_PASSWORD;
 
-            return user;
+            return USER_DTO;
         }
 
-        public bool ChangePassword(string username, string currentPassword, string newPassword)
+        public bool ChangePassword(string USERNAME, string CURRENT_PASSWORD, string NEW_PASSWORD)
         {
-            var currentHash = AppSession.Md5(currentPassword);
-            var newHash = AppSession.Md5(newPassword);
+            var CURRENT_HASH = AppSession.Md5(CURRENT_PASSWORD);
+            var NEW_HASH = AppSession.Md5(NEW_PASSWORD);
 
-            const string sql = @"UPDATE dbo.Users
+            const string SQL_QUERY = @"UPDATE dbo.Users
                                  SET PasswordHash = @NewHash, UpdatedAt = GETDATE()
                                  WHERE Username = @Username AND PasswordHash = @CurrentHash";
 
-            var affected = DbUtils.Execute(sql,
-                new SqlParameter("@NewHash", newHash),
-                new SqlParameter("@Username", username),
-                new SqlParameter("@CurrentHash", currentHash));
+            var AFFECTED_ROWS = DbUtils.Execute(SQL_QUERY,
+                new SqlParameter("@NewHash", NEW_HASH),
+                new SqlParameter("@Username", USERNAME),
+                new SqlParameter("@CurrentHash", CURRENT_HASH));
 
-            if (affected > 0)
+            if (AFFECTED_ROWS > 0)
             {
-                AppSession.PasswordHash = newHash;
+                AppSession.PasswordHash = NEW_HASH;
                 return true;
             }
 

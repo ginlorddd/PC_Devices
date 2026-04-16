@@ -1,6 +1,6 @@
 namespace JigFlow.Forms
 {
-    partial class FrmJigTypeList
+    partial class FRM_JIG_FUNCTION_LIST
     {
         private System.ComponentModel.IContainer components = null;
         protected override void Dispose(bool disposing)

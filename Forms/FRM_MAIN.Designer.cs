@@ -1,11 +1,15 @@
 namespace JigFlow.Forms
 {
-    partial class FrmMain
+    partial class FRM_MAIN
     {
         private System.ComponentModel.IContainer components = null;
+
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null)) components.Dispose();
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
             base.Dispose(disposing);
         }
 
@@ -15,13 +19,14 @@ namespace JigFlow.Forms
             this.ribbonControl1 = new DevExpress.XtraBars.Ribbon.RibbonControl();
             this.btnLogin = new DevExpress.XtraBars.BarButtonItem();
             this.btnLogout = new DevExpress.XtraBars.BarButtonItem();
-            this.btnChangePassword = new DevExpress.XtraBars.BarButtonItem();
-            this.btnUserManagement = new DevExpress.XtraBars.BarButtonItem();
-            this.btnJigTypeList = new DevExpress.XtraBars.BarButtonItem();
+            this.btnChangePass = new DevExpress.XtraBars.BarButtonItem();
+            this.btnAccountManagement = new DevExpress.XtraBars.BarButtonItem();
+            this.btnJigFunctionList = new DevExpress.XtraBars.BarButtonItem();
             this.bsiUser = new DevExpress.XtraBars.BarStaticItem();
             this.ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.rpgSystem = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.rpgMaster = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
+            this.ribbonStatusBar1 = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
             this.xtraTabbedMdiManager1 = new DevExpress.XtraTabbedMdi.XtraTabbedMdiManager(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabbedMdiManager1)).BeginInit();
@@ -34,9 +39,9 @@ namespace JigFlow.Forms
             this.ribbonControl1.ExpandCollapseItem,
             this.btnLogin,
             this.btnLogout,
-            this.btnChangePassword,
-            this.btnUserManagement,
-            this.btnJigTypeList,
+            this.btnChangePass,
+            this.btnAccountManagement,
+            this.btnJigFunctionList,
             this.bsiUser});
             this.ribbonControl1.Location = new System.Drawing.Point(0, 0);
             this.ribbonControl1.MaxItemId = 7;
@@ -61,26 +66,26 @@ namespace JigFlow.Forms
             this.btnLogout.Name = "btnLogout";
             this.btnLogout.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnLogout_ItemClick);
             // 
-            // btnChangePassword
+            // btnChangePass
             // 
-            this.btnChangePassword.Caption = "Đổi mật khẩu";
-            this.btnChangePassword.Id = 3;
-            this.btnChangePassword.Name = "btnChangePassword";
-            this.btnChangePassword.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnChangePassword_ItemClick);
+            this.btnChangePass.Caption = "Đổi mật khẩu";
+            this.btnChangePass.Id = 3;
+            this.btnChangePass.Name = "btnChangePass";
+            this.btnChangePass.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnChangePass_ItemClick);
             // 
-            // btnUserManagement
+            // btnAccountManagement
             // 
-            this.btnUserManagement.Caption = "Quản lý tài khoản";
-            this.btnUserManagement.Id = 4;
-            this.btnUserManagement.Name = "btnUserManagement";
-            this.btnUserManagement.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnUserManagement_ItemClick);
+            this.btnAccountManagement.Caption = "Quản lý tài khoản";
+            this.btnAccountManagement.Id = 4;
+            this.btnAccountManagement.Name = "btnAccountManagement";
+            this.btnAccountManagement.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnAccountManagement_ItemClick);
             // 
-            // btnJigTypeList
+            // btnJigFunctionList
             // 
-            this.btnJigTypeList.Caption = "Jig chức năng";
-            this.btnJigTypeList.Id = 5;
-            this.btnJigTypeList.Name = "btnJigTypeList";
-            this.btnJigTypeList.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnJigTypeList_ItemClick);
+            this.btnJigFunctionList.Caption = "Jig chức năng";
+            this.btnJigFunctionList.Id = 5;
+            this.btnJigFunctionList.Name = "btnJigFunctionList";
+            this.btnJigFunctionList.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnJigFunctionList_ItemClick);
             // 
             // bsiUser
             // 
@@ -100,22 +105,29 @@ namespace JigFlow.Forms
             // 
             this.rpgSystem.ItemLinks.Add(this.btnLogin);
             this.rpgSystem.ItemLinks.Add(this.btnLogout);
-            this.rpgSystem.ItemLinks.Add(this.btnChangePassword);
-            this.rpgSystem.ItemLinks.Add(this.btnUserManagement);
+            this.rpgSystem.ItemLinks.Add(this.btnChangePass);
+            this.rpgSystem.ItemLinks.Add(this.btnAccountManagement);
             this.rpgSystem.Name = "rpgSystem";
             this.rpgSystem.Text = "Hệ thống";
             // 
             // rpgMaster
             // 
-            this.rpgMaster.ItemLinks.Add(this.btnJigTypeList);
+            this.rpgMaster.ItemLinks.Add(this.btnJigFunctionList);
             this.rpgMaster.Name = "rpgMaster";
             this.rpgMaster.Text = "Master";
+            // 
+            // ribbonStatusBar1
+            // 
+            this.ribbonStatusBar1.Location = new System.Drawing.Point(0, 689);
+            this.ribbonStatusBar1.Name = "ribbonStatusBar1";
+            this.ribbonStatusBar1.Ribbon = this.ribbonControl1;
+            this.ribbonStatusBar1.Size = new System.Drawing.Size(1280, 31);
             // 
             // xtraTabbedMdiManager1
             // 
             this.xtraTabbedMdiManager1.MdiParent = this;
             // 
-            // FrmMain
+            // FRM_MAIN
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -123,12 +135,12 @@ namespace JigFlow.Forms
             this.Controls.Add(this.ribbonStatusBar1);
             this.Controls.Add(this.ribbonControl1);
             this.IsMdiContainer = true;
-            this.Name = "FrmMain";
+            this.Name = "FRM_MAIN";
             this.Ribbon = this.ribbonControl1;
             this.StatusBar = this.ribbonStatusBar1;
             this.Text = "JigFlow";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.Load += new System.EventHandler(this.FrmMain_Load);
+            this.Load += new System.EventHandler(this.FRM_MAIN_Load);
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabbedMdiManager1)).EndInit();
             this.ResumeLayout(false);
@@ -142,11 +154,11 @@ namespace JigFlow.Forms
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgMaster;
         private DevExpress.XtraBars.BarButtonItem btnLogin;
         private DevExpress.XtraBars.BarButtonItem btnLogout;
-        private DevExpress.XtraBars.BarButtonItem btnChangePassword;
-        private DevExpress.XtraBars.BarButtonItem btnUserManagement;
-        private DevExpress.XtraBars.BarButtonItem btnJigTypeList;
+        private DevExpress.XtraBars.BarButtonItem btnChangePass;
+        private DevExpress.XtraBars.BarButtonItem btnAccountManagement;
+        private DevExpress.XtraBars.BarButtonItem btnJigFunctionList;
         private DevExpress.XtraBars.BarStaticItem bsiUser;
+        private DevExpress.XtraBars.Ribbon.RibbonStatusBar ribbonStatusBar1;
         private DevExpress.XtraTabbedMdi.XtraTabbedMdiManager xtraTabbedMdiManager1;
-        private DevExpress.XtraBars.Ribbon.RibbonStatusBar ribbonStatusBar1 = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
     }
 }

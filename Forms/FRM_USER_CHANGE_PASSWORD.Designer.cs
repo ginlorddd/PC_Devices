@@ -1,6 +1,6 @@
 namespace JigFlow.Forms
 {
-    partial class FrmChangePassword
+    partial class FRM_USER_CHANGE_PASSWORD
     {
         private System.ComponentModel.IContainer components = null;
         protected override void Dispose(bool disposing)
