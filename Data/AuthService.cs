@@ -8,20 +8,23 @@ namespace JigFlow.Data
     {
         public UserDto Login(string USERNAME, string PASSWORD)
         {
-            const string SQL_QUERY = @"SELECT TOP 1 UserId, Username, FullName, RoleCode, Email, IsActive, PasswordHash
-                                 FROM dbo.Users
-                                 WHERE Username = @Username";
+            const string SQL_QUERY = @"SELECT TOP 1 USER_ID, USERNAME, FULL_NAME, ROLE_CODE, EMAIL, IS_ACTIVE, PASSWORD_HASH
+                                       FROM dbo.USERS
+                                       WHERE USERNAME = @USERNAME";
 
-            var DT_RESULT = DbUtils.GetData(SQL_QUERY, new SqlParameter("@Username", USERNAME));
+            var DT_RESULT = DbUtils.GetData(SQL_QUERY, new SqlParameter("@USERNAME", USERNAME));
             if (DT_RESULT.Rows.Count == 0)
             {
                 return null;
             }
 
             var USER_ROW = DT_RESULT.Rows[0];
-            if (!(bool)USER_ROW["IsActive"]) return null;
+            if (!Convert.ToBoolean(USER_ROW["IS_ACTIVE"]))
+            {
+                return null;
+            }
 
-            var HASH_PASSWORD = Convert.ToString(USER_ROW["PasswordHash"]);
+            var HASH_PASSWORD = Convert.ToString(USER_ROW["PASSWORD_HASH"]);
             if (!string.Equals(HASH_PASSWORD, AppSession.Md5(PASSWORD), StringComparison.OrdinalIgnoreCase))
             {
                 return null;
@@ -29,12 +32,12 @@ namespace JigFlow.Data
 
             var USER_DTO = new UserDto
             {
-                UserId = Convert.ToInt32(USER_ROW["UserId"]),
-                Username = Convert.ToString(USER_ROW["Username"]),
-                FullName = Convert.ToString(USER_ROW["FullName"]),
-                RoleCode = Convert.ToString(USER_ROW["RoleCode"]),
-                Email = Convert.ToString(USER_ROW["Email"]),
-                IsActive = Convert.ToBoolean(USER_ROW["IsActive"])
+                UserId = Convert.ToInt32(USER_ROW["USER_ID"]),
+                Username = Convert.ToString(USER_ROW["USERNAME"]),
+                FullName = Convert.ToString(USER_ROW["FULL_NAME"]),
+                RoleCode = Convert.ToString(USER_ROW["ROLE_CODE"]),
+                Email = Convert.ToString(USER_ROW["EMAIL"]),
+                IsActive = Convert.ToBoolean(USER_ROW["IS_ACTIVE"])
             };
 
             AppSession.UserId = USER_DTO.Username;
@@ -50,14 +53,16 @@ namespace JigFlow.Data
             var CURRENT_HASH = AppSession.Md5(CURRENT_PASSWORD);
             var NEW_HASH = AppSession.Md5(NEW_PASSWORD);
 
-            const string SQL_QUERY = @"UPDATE dbo.Users
-                                 SET PasswordHash = @NewHash, UpdatedAt = GETDATE()
-                                 WHERE Username = @Username AND PasswordHash = @CurrentHash";
+            const string SQL_QUERY = @"UPDATE dbo.USERS
+                                       SET PASSWORD_HASH = @NEW_HASH,
+                                           UPDATED_AT = GETDATE()
+                                       WHERE USERNAME = @USERNAME
+                                         AND PASSWORD_HASH = @CURRENT_HASH";
 
             var AFFECTED_ROWS = DbUtils.Execute(SQL_QUERY,
-                new SqlParameter("@NewHash", NEW_HASH),
-                new SqlParameter("@Username", USERNAME),
-                new SqlParameter("@CurrentHash", CURRENT_HASH));
+                new SqlParameter("@NEW_HASH", NEW_HASH),
+                new SqlParameter("@USERNAME", USERNAME),
+                new SqlParameter("@CURRENT_HASH", CURRENT_HASH));
 
             if (AFFECTED_ROWS > 0)
             {
