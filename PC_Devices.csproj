@@ -53,6 +53,7 @@
     <Compile Include="Data\AuthService.cs" />
     <Compile Include="Data\DbUtils.cs" />
     <Compile Include="Data\UserManagementService.cs" />
+    <Compile Include="Data\JigFunctionService.cs" />
     <Compile Include="DTO\UserDto.cs" />
     <Compile Include="Forms\FRM_MAIN.cs"><SubType>Form</SubType></Compile>
     <Compile Include="Forms\FRM_MAIN.Designer.cs"><DependentUpon>FRM_MAIN.cs</DependentUpon></Compile>

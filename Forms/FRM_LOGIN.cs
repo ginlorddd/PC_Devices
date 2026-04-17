@@ -11,6 +11,13 @@ namespace JigFlow.Forms
         public FRM_LOGIN()
         {
             InitializeComponent();
+            this.AcceptButton = btnLogin;
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            txtUsername.Focus();
         }
 
         private void btnLogin_Click(object sender, EventArgs e)

@@ -1,5 +1,7 @@
+using DevExpress.XtraGrid.Views.Grid;
 using JigFlow.Data;
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace JigFlow.Forms
@@ -15,7 +17,27 @@ namespace JigFlow.Forms
 
         private void FRM_ACCOUNT_MANAGEMENT_Load(object sender, EventArgs e)
         {
+            SetupGridFormat(gvUsers);
             ReloadData();
+        }
+
+        private void SetupGridFormat(GridView VIEW)
+        {
+            VIEW.OptionsView.ShowAutoFilterRow = true;
+            VIEW.Appearance.HeaderPanel.Font = new Font(VIEW.Appearance.HeaderPanel.Font, FontStyle.Bold);
+            VIEW.Appearance.HeaderPanel.Options.UseFont = true;
+            VIEW.OptionsView.ColumnAutoWidth = false;
+            if (VIEW.Columns.ColumnByFieldName("STT") == null)
+            {
+                var col = VIEW.Columns.AddVisible("STT", "STT");
+                col.VisibleIndex = 0;
+                col.Width = 60;
+                col.UnboundType = DevExpress.Data.UnboundColumnType.Integer;
+            }
+            VIEW.CustomUnboundColumnData += (s, e) =>
+            {
+                if (e.Column.FieldName == "STT" && e.IsGetData) e.Value = e.ListSourceRowIndex + 1;
+            };
         }
 
         private void ReloadData()

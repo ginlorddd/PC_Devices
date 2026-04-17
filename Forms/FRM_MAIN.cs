@@ -18,17 +18,17 @@ namespace JigFlow.Forms
             IsMdiContainer = true;
             xtraTabbedMdiManager1.MdiParent = this;
             AppSession.Clear();
-            SetLoginState(false);
+            UpdateAccountMenu(false);
             OpenOrActivate(typeof(FRM_JIG_FUNCTION_LIST));
         }
 
-        private void SetLoginState(bool LOGGED_IN)
+        private void UpdateAccountMenu(bool LOGGED_IN)
         {
-            btnLogin.Enabled = !LOGGED_IN;
-            btnLogout.Enabled = LOGGED_IN;
-            btnChangePass.Enabled = LOGGED_IN;
+            btnLoginMenu.Visibility = LOGGED_IN ? BarItemVisibility.Never : BarItemVisibility.Always;
+            btnChangePassMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
+            btnLogoutMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
             btnAccountManagement.Enabled = LOGGED_IN && AppSession.RoleCode == "ADMIN";
-            bsiUser.Caption = LOGGED_IN ? $"Xin chào: {AppSession.FullName}" : "Chưa đăng nhập";
+            subUser.Caption = LOGGED_IN ? AppSession.FullName : "Đăng nhập";
         }
 
         private void OpenOrActivate(Type FORM_TYPE)
@@ -45,29 +45,29 @@ namespace JigFlow.Forms
             FORM.Show();
         }
 
-        private void btnLogin_ItemClick(object sender, ItemClickEventArgs e)
+        private void btnLoginMenu_ItemClick(object sender, ItemClickEventArgs e)
         {
             using (var FORM_LOGIN = new FRM_LOGIN())
             {
                 if (FORM_LOGIN.ShowDialog() == DialogResult.OK)
                 {
-                    SetLoginState(true);
+                    UpdateAccountMenu(true);
                 }
             }
         }
 
-        private void btnLogout_ItemClick(object sender, ItemClickEventArgs e)
-        {
-            AppSession.Clear();
-            SetLoginState(false);
-        }
-
-        private void btnChangePass_ItemClick(object sender, ItemClickEventArgs e)
+        private void btnChangePassMenu_ItemClick(object sender, ItemClickEventArgs e)
         {
             using (var FORM_CHANGE_PASS = new FRM_USER_CHANGE_PASSWORD())
             {
                 FORM_CHANGE_PASS.ShowDialog();
             }
+        }
+
+        private void btnLogoutMenu_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            AppSession.Clear();
+            UpdateAccountMenu(false);
         }
 
         private void btnAccountManagement_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_ACCOUNT_MANAGEMENT));
