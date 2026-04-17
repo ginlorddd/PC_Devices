@@ -84,6 +84,7 @@ namespace JigFlow.Forms
             new DevExpress.XtraBars.LinkPersistInfo(this.btnChangePassMenu),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnLogoutMenu)});
             this.subUser.Name = "subUser";
+            this.subUser.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
             // 
             // btnLoginMenu
             // 

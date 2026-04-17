@@ -1,4 +1,6 @@
+using System;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace JigFlow.Data
 {
@@ -9,9 +11,11 @@ namespace JigFlow.Data
             const string SQL_QUERY = @"
 SELECT
     ROW_NUMBER() OVER (ORDER BY JM.JIG_ID) AS STT,
+    JM.JIG_ID,
     JM.CONTROL_NO,
     JM.JIG_NAME,
-    JM.JIG_TYPE,
+    COALESCE(JTM.JIG_TYPE_NAME, JM.JIG_TYPE) AS JIG_TYPE_NAME,
+    JM.JIG_TYPE_CODE,
     JM.JIG_SIZE,
     JM.USE_PRODUCT,
     JM.LOCATION_CODE,
@@ -22,9 +26,67 @@ SELECT
     JM.CHECK_RESULT,
     JM.CHECK_FREQUENCY
 FROM dbo.JIG_MASTER JM
+LEFT JOIN dbo.JIG_TYPE_MASTER JTM ON JM.JIG_TYPE_CODE = JTM.JIG_TYPE_CODE
 WHERE JM.IS_ACTIVE = 1
 ORDER BY JM.JIG_ID";
             return DbUtils.GetData(SQL_QUERY);
+        }
+
+        public void UpsertJig(
+            string CONTROL_NO,
+            string JIG_NAME,
+            string JIG_TYPE_CODE,
+            string JIG_SIZE,
+            string USE_PRODUCT,
+            string LOCATION_CODE,
+            string STATUS_USE,
+            string USE_SECTION,
+            DateTime? LAST_CHECK_DATE,
+            DateTime? NEXT_CHECK_PLAN_DATE,
+            string CHECK_RESULT,
+            string CHECK_FREQUENCY)
+        {
+            const string SQL_QUERY = @"
+IF EXISTS (SELECT 1 FROM dbo.JIG_MASTER WHERE CONTROL_NO = @CONTROL_NO)
+BEGIN
+    UPDATE dbo.JIG_MASTER
+    SET JIG_NAME = @JIG_NAME,
+        JIG_TYPE_CODE = @JIG_TYPE_CODE,
+        JIG_SIZE = @JIG_SIZE,
+        USE_PRODUCT = @USE_PRODUCT,
+        LOCATION_CODE = @LOCATION_CODE,
+        STATUS_USE = @STATUS_USE,
+        USE_SECTION = @USE_SECTION,
+        LAST_CHECK_DATE = @LAST_CHECK_DATE,
+        NEXT_CHECK_PLAN_DATE = @NEXT_CHECK_PLAN_DATE,
+        CHECK_RESULT = @CHECK_RESULT,
+        CHECK_FREQUENCY = @CHECK_FREQUENCY,
+        UPDATED_AT = GETDATE()
+    WHERE CONTROL_NO = @CONTROL_NO
+END
+ELSE
+BEGIN
+    INSERT INTO dbo.JIG_MASTER
+    (CONTROL_NO, JIG_NAME, JIG_TYPE_CODE, JIG_SIZE, USE_PRODUCT, LOCATION_CODE, STATUS_USE, USE_SECTION,
+     LAST_CHECK_DATE, NEXT_CHECK_PLAN_DATE, CHECK_RESULT, CHECK_FREQUENCY, IS_ACTIVE, CREATED_AT)
+    VALUES
+    (@CONTROL_NO, @JIG_NAME, @JIG_TYPE_CODE, @JIG_SIZE, @USE_PRODUCT, @LOCATION_CODE, @STATUS_USE, @USE_SECTION,
+     @LAST_CHECK_DATE, @NEXT_CHECK_PLAN_DATE, @CHECK_RESULT, @CHECK_FREQUENCY, 1, GETDATE())
+END";
+
+            DbUtils.Execute(SQL_QUERY,
+                new SqlParameter("@CONTROL_NO", (object)CONTROL_NO ?? DBNull.Value),
+                new SqlParameter("@JIG_NAME", (object)JIG_NAME ?? DBNull.Value),
+                new SqlParameter("@JIG_TYPE_CODE", (object)JIG_TYPE_CODE ?? DBNull.Value),
+                new SqlParameter("@JIG_SIZE", (object)JIG_SIZE ?? DBNull.Value),
+                new SqlParameter("@USE_PRODUCT", (object)USE_PRODUCT ?? DBNull.Value),
+                new SqlParameter("@LOCATION_CODE", (object)LOCATION_CODE ?? DBNull.Value),
+                new SqlParameter("@STATUS_USE", (object)STATUS_USE ?? DBNull.Value),
+                new SqlParameter("@USE_SECTION", (object)USE_SECTION ?? DBNull.Value),
+                new SqlParameter("@LAST_CHECK_DATE", (object)LAST_CHECK_DATE ?? DBNull.Value),
+                new SqlParameter("@NEXT_CHECK_PLAN_DATE", (object)NEXT_CHECK_PLAN_DATE ?? DBNull.Value),
+                new SqlParameter("@CHECK_RESULT", (object)CHECK_RESULT ?? DBNull.Value),
+                new SqlParameter("@CHECK_FREQUENCY", (object)CHECK_FREQUENCY ?? DBNull.Value));
         }
     }
 }

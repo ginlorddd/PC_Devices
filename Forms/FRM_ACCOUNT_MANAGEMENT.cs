@@ -24,6 +24,7 @@ namespace JigFlow.Forms
         private void SetupGridFormat(GridView VIEW)
         {
             VIEW.OptionsView.ShowAutoFilterRow = true;
+            VIEW.OptionsView.ShowGroupPanel = false;
             VIEW.Appearance.HeaderPanel.Font = new Font(VIEW.Appearance.HeaderPanel.Font, FontStyle.Bold);
             VIEW.Appearance.HeaderPanel.Options.UseFont = true;
             VIEW.OptionsView.ColumnAutoWidth = false;
@@ -43,6 +44,9 @@ namespace JigFlow.Forms
         private void ReloadData()
         {
             gcUsers.DataSource = _service.GetUsers();
+            gvUsers.PopulateColumns();
+            if (gvUsers.Columns["STT"] != null) gvUsers.Columns["STT"].VisibleIndex = 0;
+            gvUsers.BestFitColumns();
         }
 
         private void btnSave_Click(object sender, EventArgs e)
