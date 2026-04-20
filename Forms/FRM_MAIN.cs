@@ -25,10 +25,13 @@ namespace JigFlow.Forms
         private void UpdateAccountMenu(bool LOGGED_IN)
         {
             btnLoginMenu.Visibility = LOGGED_IN ? BarItemVisibility.Never : BarItemVisibility.Always;
+            btnUserInfoMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
             btnChangePassMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
             btnLogoutMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
+            btnExitMenu.Visibility = BarItemVisibility.Always;
             btnAccountManagement.Enabled = LOGGED_IN && AppSession.RoleCode == "ADMIN";
             subUser.Caption = LOGGED_IN ? AppSession.FullName : "Đăng nhập";
+            btnUserInfoMenu.Caption = LOGGED_IN ? AppSession.FullName : string.Empty;
         }
 
         private void OpenOrActivate(Type FORM_TYPE)
@@ -68,6 +71,11 @@ namespace JigFlow.Forms
         {
             AppSession.Clear();
             UpdateAccountMenu(false);
+        }
+
+        private void btnExitMenu_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            Close();
         }
 
         private void btnAccountManagement_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_ACCOUNT_MANAGEMENT));
