@@ -32,6 +32,35 @@ ORDER BY JM.JIG_ID";
             return DbUtils.GetData(SQL_QUERY);
         }
 
+
+
+        public DataTable GetJigVisualList()
+        {
+            const string SQL_QUERY = @"
+SELECT
+    ROW_NUMBER() OVER (ORDER BY JM.JIG_ID) AS STT,
+    JM.JIG_ID,
+    JM.CONTROL_NO,
+    JM.JIG_NAME,
+    COALESCE(JTM.JIG_TYPE_NAME, JM.JIG_TYPE) AS JIG_TYPE_NAME,
+    JM.JIG_TYPE_CODE,
+    JM.JIG_SIZE,
+    JM.USE_PRODUCT,
+    JM.LOCATION_CODE,
+    JM.STATUS_USE,
+    JM.USE_SECTION,
+    JM.LAST_CHECK_DATE,
+    JM.NEXT_CHECK_PLAN_DATE,
+    JM.CHECK_RESULT,
+    JM.CHECK_FREQUENCY
+FROM dbo.JIG_MASTER JM
+LEFT JOIN dbo.JIG_TYPE_MASTER JTM ON JM.JIG_TYPE_CODE = JTM.JIG_TYPE_CODE
+WHERE JM.IS_ACTIVE = 1
+  AND JM.JIG_TYPE_CODE IN ('JIG_SUPPORT', 'JIG_PRODUCT_DISTINGUISH', 'JIG_HLC')
+ORDER BY JM.JIG_ID";
+            return DbUtils.GetData(SQL_QUERY);
+        }
+
         public void UpsertJig(
             string CONTROL_NO,
             string JIG_NAME,
