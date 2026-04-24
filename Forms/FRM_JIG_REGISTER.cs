@@ -113,7 +113,7 @@ namespace JigFlow.Forms
             }
             else
             {
-                txtNameJig.Text = "QA-Jig";
+                txtNameJig.Text = "QA-JIG";
             }
 
             var YYMM = DateTime.Now.ToString("yyMM");
