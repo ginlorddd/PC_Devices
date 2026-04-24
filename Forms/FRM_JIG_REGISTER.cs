@@ -1,3 +1,4 @@
+using DevExpress.XtraEditors.Controls;
 using JigFlow.Data;
 using System;
 using System.Text.RegularExpressions;
@@ -5,23 +6,57 @@ using System.Windows.Forms;
 
 namespace JigFlow.Forms
 {
-    public partial class FRM_JIG_REGISTER_LIST : DevExpress.XtraEditors.XtraForm
+    public partial class FRM_JIG_REGISTER : DevExpress.XtraEditors.XtraForm
     {
         private readonly JigRegisterService _service = new JigRegisterService();
         private bool _allowEditManagementNo = false;
 
-        public FRM_JIG_REGISTER_LIST()
+        public FRM_JIG_REGISTER()
         {
             InitializeComponent();
         }
 
-        private void FRM_JIG_REGISTER_LIST_Load(object sender, EventArgs e)
+        private void FRM_JIG_REGISTER_Load(object sender, EventArgs e)
         {
+            ConfigureEditors();
             LoadCombos();
             txtManagementNo.Properties.ReadOnly = true;
             txtNameJig.Properties.ReadOnly = true;
             txtSize.Properties.ReadOnly = true;
             txtFirstCheckFile.Properties.ReadOnly = true;
+            txtReportFile.Properties.ReadOnly = true;
+        }
+
+        private void ConfigureEditors()
+        {
+            ConfigureComboBox(cboDepartment);
+            ConfigureComboBox(cboFactory);
+            ConfigureComboBox(cboFrequency);
+            ConfigureLookUp(cboJigType);
+            ConfigureLookUp(cboReportForm);
+            ConfigureLookUp(cboDrawing);
+
+            cboReportForm.Properties.NullText = "Chọn biểu mẫu";
+            cboDrawing.Properties.NullText = "Chọn bản vẽ";
+            cboFrequency.Properties.NullText = "Chọn tần suất";
+            cboFactory.Properties.NullText = "Chọn nhà máy";
+        }
+
+        private static void ConfigureComboBox(DevExpress.XtraEditors.ComboBoxEdit edit)
+        {
+            edit.Properties.TextEditStyle = TextEditStyles.DisableTextEditor;
+            edit.Properties.Buttons.Clear();
+            edit.Properties.Buttons.Add(new EditorButton(ButtonPredefines.Combo));
+        }
+
+        private static void ConfigureLookUp(DevExpress.XtraEditors.LookUpEdit edit)
+        {
+            edit.Properties.TextEditStyle = TextEditStyles.Standard;
+            edit.Properties.Buttons.Clear();
+            edit.Properties.Buttons.Add(new EditorButton(ButtonPredefines.Combo));
+            edit.Properties.ShowHeader = false;
+            edit.Properties.ShowFooter = false;
+            edit.Properties.PopupSizeable = false;
         }
 
         private void LoadCombos()
@@ -29,17 +64,14 @@ namespace JigFlow.Forms
             cboJigType.Properties.DataSource = _service.GetJigTypes();
             cboJigType.Properties.DisplayMember = "JIG_TYPE_NAME";
             cboJigType.Properties.ValueMember = "JIG_TYPE_CODE";
-            cboJigType.Properties.NullText = string.Empty;
 
             cboReportForm.Properties.DataSource = _service.GetFormMasters();
             cboReportForm.Properties.DisplayMember = "FORM_NAME";
             cboReportForm.Properties.ValueMember = "FORM_CODE";
-            cboReportForm.Properties.NullText = string.Empty;
 
             cboDrawing.Properties.DataSource = _service.GetDrawings();
             cboDrawing.Properties.DisplayMember = "DRAWING_NAME";
             cboDrawing.Properties.ValueMember = "DRAWING_CODE";
-            cboDrawing.Properties.NullText = string.Empty;
 
             cboDepartment.Properties.Items.Clear();
             cboDepartment.Properties.Items.AddRange(new object[] { "QA", "QC", "PE" });
@@ -51,15 +83,11 @@ namespace JigFlow.Forms
             cboFrequency.Properties.Items.AddRange(new object[] { "1 tháng", "3 tháng", "6 tháng", "1 năm", "2 năm" });
         }
 
-        private void cboJigType_EditValueChanged(object sender, EventArgs e)
-        {
-            AutoFillNameAndManagementNo();
-        }
+        private void cboJigType_EditValueChanged(object sender, EventArgs e) => AutoFillNameAndManagementNo();
 
         private void txtSize_EditValueChanged(object sender, EventArgs e)
         {
-            if (txtSize.Properties.ReadOnly) return;
-            AutoFillNameAndManagementNo();
+            if (!txtSize.Properties.ReadOnly) AutoFillNameAndManagementNo();
         }
 
         private void AutoFillNameAndManagementNo()
@@ -72,10 +100,7 @@ namespace JigFlow.Forms
             var IS_HLC = TYPE_CODE.ToUpper().Contains("HLC");
 
             txtSize.Properties.ReadOnly = !IS_BRACKET;
-            if (!IS_BRACKET)
-            {
-                txtSize.Text = string.Empty;
-            }
+            if (!IS_BRACKET) txtSize.Text = string.Empty;
 
             if (IS_HLC)
             {
@@ -130,7 +155,7 @@ namespace JigFlow.Forms
             {
                 if (DIALOG.ShowDialog() == DialogResult.OK)
                 {
-                    cboReportForm.ToolTip = DIALOG.FileName;
+                    txtReportFile.Text = DIALOG.FileName;
                 }
             }
         }
@@ -174,9 +199,6 @@ namespace JigFlow.Forms
             Close();
         }
 
-        private void btnClose_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
+        private void btnClose_Click(object sender, EventArgs e) => Close();
     }
 }

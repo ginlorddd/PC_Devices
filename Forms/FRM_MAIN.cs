@@ -83,7 +83,7 @@ namespace JigFlow.Forms
         private void btnJigVisualList_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_VISUAL_LIST));
         private void btnJigRegisterList_ItemClick(object sender, ItemClickEventArgs e)
         {
-            using (var FORM = new FRM_JIG_REGISTER_LIST())
+            using (var FORM = new FRM_JIG_REGISTER())
             {
                 FORM.ShowDialog(this);
             }

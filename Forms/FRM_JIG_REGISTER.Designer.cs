@@ -1,6 +1,6 @@
 namespace JigFlow.Forms
 {
-    partial class FRM_JIG_REGISTER_LIST
+    partial class FRM_JIG_REGISTER
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -22,6 +22,7 @@ namespace JigFlow.Forms
             this.txtSize = new DevExpress.XtraEditors.TextEdit();
             this.txtUseProduct = new DevExpress.XtraEditors.TextEdit();
             this.cboReportForm = new DevExpress.XtraEditors.LookUpEdit();
+            this.txtReportFile = new DevExpress.XtraEditors.TextEdit();
             this.btnBrowseReport = new DevExpress.XtraEditors.SimpleButton();
             this.txtLocation = new DevExpress.XtraEditors.TextEdit();
             this.txtManagementNo = new DevExpress.XtraEditors.TextEdit();
@@ -41,6 +42,7 @@ namespace JigFlow.Forms
             ((System.ComponentModel.ISupportInitialize)(this.txtSize.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtUseProduct.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboReportForm.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtReportFile.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtLocation.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtManagementNo.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtFirstCheckFile.Properties)).BeginInit();
@@ -49,85 +51,102 @@ namespace JigFlow.Forms
             // 
             // lblTitle
             // 
-            this.lblTitle.Appearance.Font = new System.Drawing.Font("Times New Roman", 24F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.Appearance.Font = new System.Drawing.Font("Segoe UI", 24F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.Appearance.ForeColor = System.Drawing.Color.FromArgb(15, 35, 95);
             this.lblTitle.Appearance.Options.UseFont = true;
-            this.lblTitle.Location = new System.Drawing.Point(20, 14);
+            this.lblTitle.Appearance.Options.UseForeColor = true;
+            this.lblTitle.Location = new System.Drawing.Point(28, 16);
             this.lblTitle.Text = "Đăng ký Jig mới";
             // 
             // groupInfo
             // 
+            this.groupInfo.AppearanceCaption.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.groupInfo.AppearanceCaption.Options.UseFont = true;
             this.groupInfo.Text = "Thông tin Jig";
-            this.groupInfo.Location = new System.Drawing.Point(20, 60);
-            this.groupInfo.Size = new System.Drawing.Size(1260, 410);
+            this.groupInfo.Location = new System.Drawing.Point(24, 64);
+            this.groupInfo.Size = new System.Drawing.Size(1260, 440);
 
-            int LEFT_LABEL_X = 20;
-            int LEFT_CTRL_X = 180;
-            int RIGHT_LABEL_X = 640;
-            int RIGHT_CTRL_X = 820;
-            int CTRL_W = 360;
+            int LEFT_LABEL_X = 24;
+            int LEFT_CTRL_X = 210;
+            int RIGHT_LABEL_X = 690;
+            int RIGHT_CTRL_X = 870;
+            int CTRL_W = 350;
+            int LEFT_W = 320;
             int ROW_H = 48;
-            int Y = 40;
+            int Y = 42;
 
-            AddLabel("Bộ phận", LEFT_LABEL_X, Y); SetCtrl(this.cboDepartment, LEFT_CTRL_X, Y - 4, 270);
+            AddLabel("Bộ phận", LEFT_LABEL_X, Y); SetCtrl(this.cboDepartment, LEFT_CTRL_X, Y - 4, LEFT_W);
             AddLabel("Nhà máy", RIGHT_LABEL_X, Y); SetCtrl(this.cboFactory, RIGHT_CTRL_X, Y - 4, 220);
 
             Y += ROW_H;
-            AddLabel("Tên Jig", LEFT_LABEL_X, Y); SetCtrl(this.txtNameJig, LEFT_CTRL_X, Y - 4, 270);
+            AddLabel("Tên Jig", LEFT_LABEL_X, Y); SetCtrl(this.txtNameJig, LEFT_CTRL_X, Y - 4, LEFT_W);
             AddLabel("Số quản lý", RIGHT_LABEL_X, Y); SetCtrl(this.txtManagementNo, RIGHT_CTRL_X, Y - 4, 250);
             this.groupInfo.Controls.Add(this.btnEditManagementNo);
-            this.btnEditManagementNo.Location = new System.Drawing.Point(1080, Y - 4);
-            this.btnEditManagementNo.Size = new System.Drawing.Size(100, 28);
+            this.btnEditManagementNo.Location = new System.Drawing.Point(1130, Y - 4);
+            this.btnEditManagementNo.Size = new System.Drawing.Size(90, 30);
             this.btnEditManagementNo.Text = "Sửa Số QL";
             this.btnEditManagementNo.Click += new System.EventHandler(this.btnEditManagementNo_Click);
 
             Y += ROW_H;
-            AddLabel("Loại Jig", LEFT_LABEL_X, Y); SetCtrl(this.cboJigType, LEFT_CTRL_X, Y - 4, 270);
+            AddLabel("Loại Jig", LEFT_LABEL_X, Y); SetCtrl(this.cboJigType, LEFT_CTRL_X, Y - 4, LEFT_W);
             AddLabel("Tần suất kiểm tra", RIGHT_LABEL_X, Y); SetCtrl(this.cboFrequency, RIGHT_CTRL_X, Y - 4, CTRL_W);
 
             Y += ROW_H;
-            AddLabel("Size", LEFT_LABEL_X, Y); SetCtrl(this.txtSize, LEFT_CTRL_X, Y - 4, 270);
+            AddLabel("Size", LEFT_LABEL_X, Y); SetCtrl(this.txtSize, LEFT_CTRL_X, Y - 4, LEFT_W);
             AddLabel("Sản phẩm sử dụng", RIGHT_LABEL_X, Y); SetCtrl(this.txtUseProduct, RIGHT_CTRL_X, Y - 4, CTRL_W);
 
             Y += ROW_H;
-            AddLabel("Báo cáo kiểm tra", LEFT_LABEL_X, Y); SetCtrl(this.cboReportForm, LEFT_CTRL_X, Y - 4, 270);
-            this.groupInfo.Controls.Add(this.btnBrowseReport);
-            this.btnBrowseReport.Location = new System.Drawing.Point(460, Y - 4);
-            this.btnBrowseReport.Size = new System.Drawing.Size(90, 28);
-            this.btnBrowseReport.Text = "Browse";
-            this.btnBrowseReport.Click += new System.EventHandler(this.btnBrowseReport_Click);
+            AddLabel("Biểu mẫu báo cáo", LEFT_LABEL_X, Y); SetCtrl(this.cboReportForm, LEFT_CTRL_X, Y - 4, LEFT_W);
             AddLabel("Vị trí", RIGHT_LABEL_X, Y); SetCtrl(this.txtLocation, RIGHT_CTRL_X, Y - 4, CTRL_W);
 
             Y += ROW_H;
-            AddLabel("KQ kiểm tra lần đầu", LEFT_LABEL_X, Y); SetCtrl(this.txtFirstCheckFile, LEFT_CTRL_X, Y - 4, 360);
+            AddLabel("Báo cáo kiểm tra", LEFT_LABEL_X, Y); SetCtrl(this.txtReportFile, LEFT_CTRL_X, Y - 4, 400);
+            this.groupInfo.Controls.Add(this.btnBrowseReport);
+            this.btnBrowseReport.Location = new System.Drawing.Point(620, Y - 4);
+            this.btnBrowseReport.Size = new System.Drawing.Size(90, 30);
+            this.btnBrowseReport.Text = "Browse";
+            this.btnBrowseReport.Click += new System.EventHandler(this.btnBrowseReport_Click);
+            AddLabel("Bản vẽ", RIGHT_LABEL_X, Y); SetCtrl(this.cboDrawing, RIGHT_CTRL_X, Y - 4, CTRL_W);
+
+            Y += ROW_H;
+            AddLabel("KQ kiểm tra lần đầu", LEFT_LABEL_X, Y); SetCtrl(this.txtFirstCheckFile, LEFT_CTRL_X, Y - 4, 400);
             this.groupInfo.Controls.Add(this.btnBrowseResult);
-            this.btnBrowseResult.Location = new System.Drawing.Point(550, Y - 4);
-            this.btnBrowseResult.Size = new System.Drawing.Size(90, 28);
+            this.btnBrowseResult.Location = new System.Drawing.Point(620, Y - 4);
+            this.btnBrowseResult.Size = new System.Drawing.Size(90, 30);
             this.btnBrowseResult.Text = "Browse";
             this.btnBrowseResult.Click += new System.EventHandler(this.btnBrowseResult_Click);
-            AddLabel("Bản vẽ", RIGHT_LABEL_X, Y); SetCtrl(this.cboDrawing, RIGHT_CTRL_X, Y - 4, CTRL_W);
 
             this.cboJigType.EditValueChanged += new System.EventHandler(this.cboJigType_EditValueChanged);
             this.txtSize.EditValueChanged += new System.EventHandler(this.txtSize_EditValueChanged);
 
-            this.btnSave.Location = new System.Drawing.Point(1050, 490);
-            this.btnSave.Size = new System.Drawing.Size(110, 34);
+            this.btnSave.Appearance.BackColor = System.Drawing.Color.FromArgb(30, 136, 229);
+            this.btnSave.Appearance.ForeColor = System.Drawing.Color.White;
+            this.btnSave.Appearance.Options.UseBackColor = true;
+            this.btnSave.Appearance.Options.UseForeColor = true;
+            this.btnSave.Location = new System.Drawing.Point(1048, 520);
+            this.btnSave.Size = new System.Drawing.Size(110, 36);
             this.btnSave.Text = "Lưu";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
 
-            this.btnClose.Location = new System.Drawing.Point(1170, 490);
-            this.btnClose.Size = new System.Drawing.Size(110, 34);
-            this.btnClose.Text = "Close";
+            this.btnClose.Location = new System.Drawing.Point(1172, 520);
+            this.btnClose.Size = new System.Drawing.Size(110, 36);
+            this.btnClose.Text = "Đóng";
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
 
+            this.Appearance.BackColor = System.Drawing.Color.FromArgb(243, 246, 252);
+            this.Appearance.Options.UseBackColor = true;
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.groupInfo);
             this.Controls.Add(this.lblTitle);
-            this.ClientSize = new System.Drawing.Size(1300, 540);
-            this.Name = "FRM_JIG_REGISTER_LIST";
+            this.ClientSize = new System.Drawing.Size(1308, 575);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "FRM_JIG_REGISTER";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Đăng ký Jig mới";
-            this.Load += new System.EventHandler(this.FRM_JIG_REGISTER_LIST_Load);
+            this.Load += new System.EventHandler(this.FRM_JIG_REGISTER_Load);
             ((System.ComponentModel.ISupportInitialize)(this.groupInfo)).EndInit();
             this.groupInfo.ResumeLayout(false);
             this.groupInfo.PerformLayout();
@@ -139,6 +158,7 @@ namespace JigFlow.Forms
             ((System.ComponentModel.ISupportInitialize)(this.txtSize.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtUseProduct.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboReportForm.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtReportFile.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtLocation.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtManagementNo.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtFirstCheckFile.Properties)).EndInit();
@@ -152,8 +172,10 @@ namespace JigFlow.Forms
             var lb = new DevExpress.XtraEditors.LabelControl();
             lb.Text = text;
             lb.Location = new System.Drawing.Point(x, y);
-            lb.Appearance.Font = new System.Drawing.Font("Times New Roman", 14F, System.Drawing.FontStyle.Bold);
+            lb.Appearance.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+            lb.Appearance.ForeColor = System.Drawing.Color.FromArgb(33, 33, 33);
             lb.Appearance.Options.UseFont = true;
+            lb.Appearance.Options.UseForeColor = true;
             this.groupInfo.Controls.Add(lb);
         }
 
@@ -161,7 +183,7 @@ namespace JigFlow.Forms
         {
             c.Location = new System.Drawing.Point(x, y);
             c.Width = w;
-            c.Height = 28;
+            c.Height = 30;
             this.groupInfo.Controls.Add(c);
         }
 
@@ -175,6 +197,7 @@ namespace JigFlow.Forms
         private DevExpress.XtraEditors.TextEdit txtSize;
         private DevExpress.XtraEditors.TextEdit txtUseProduct;
         private DevExpress.XtraEditors.LookUpEdit cboReportForm;
+        private DevExpress.XtraEditors.TextEdit txtReportFile;
         private DevExpress.XtraEditors.SimpleButton btnBrowseReport;
         private DevExpress.XtraEditors.TextEdit txtLocation;
         private DevExpress.XtraEditors.TextEdit txtManagementNo;
