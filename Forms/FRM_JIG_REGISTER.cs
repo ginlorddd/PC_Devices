@@ -24,7 +24,6 @@ namespace JigFlow.Forms
             txtNameJig.Properties.ReadOnly = true;
             txtSize.Properties.ReadOnly = true;
             txtFirstCheckFile.Properties.ReadOnly = true;
-            txtReportFile.Properties.ReadOnly = true;
         }
 
         private void ConfigureEditors()
@@ -147,17 +146,6 @@ namespace JigFlow.Forms
             _allowEditManagementNo = !_allowEditManagementNo;
             txtManagementNo.Properties.ReadOnly = !_allowEditManagementNo;
             btnEditManagementNo.Text = _allowEditManagementNo ? "Khóa Số QL" : "Sửa Số QL";
-        }
-
-        private void btnBrowseReport_Click(object sender, EventArgs e)
-        {
-            using (var DIALOG = new OpenFileDialog())
-            {
-                if (DIALOG.ShowDialog() == DialogResult.OK)
-                {
-                    txtReportFile.Text = DIALOG.FileName;
-                }
-            }
         }
 
         private void btnBrowseResult_Click(object sender, EventArgs e)

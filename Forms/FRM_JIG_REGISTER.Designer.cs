@@ -22,8 +22,6 @@ namespace JigFlow.Forms
             this.txtSize = new DevExpress.XtraEditors.TextEdit();
             this.txtUseProduct = new DevExpress.XtraEditors.TextEdit();
             this.cboReportForm = new DevExpress.XtraEditors.LookUpEdit();
-            this.txtReportFile = new DevExpress.XtraEditors.TextEdit();
-            this.btnBrowseReport = new DevExpress.XtraEditors.SimpleButton();
             this.txtLocation = new DevExpress.XtraEditors.TextEdit();
             this.txtManagementNo = new DevExpress.XtraEditors.TextEdit();
             this.btnEditManagementNo = new DevExpress.XtraEditors.SimpleButton();
@@ -42,7 +40,6 @@ namespace JigFlow.Forms
             ((System.ComponentModel.ISupportInitialize)(this.txtSize.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtUseProduct.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboReportForm.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtReportFile.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtLocation.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtManagementNo.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtFirstCheckFile.Properties)).BeginInit();
@@ -64,56 +61,48 @@ namespace JigFlow.Forms
             this.groupInfo.AppearanceCaption.Options.UseFont = true;
             this.groupInfo.Text = "Thông tin Jig";
             this.groupInfo.Location = new System.Drawing.Point(24, 64);
-            this.groupInfo.Size = new System.Drawing.Size(1260, 440);
+            this.groupInfo.Size = new System.Drawing.Size(1260, 410);
 
             int LEFT_LABEL_X = 24;
             int LEFT_CTRL_X = 210;
             int RIGHT_LABEL_X = 690;
             int RIGHT_CTRL_X = 870;
             int CTRL_W = 350;
-            int LEFT_W = 320;
+            int LEFT_W = 430;
             int ROW_H = 48;
             int Y = 42;
 
             AddLabel("Bộ phận", LEFT_LABEL_X, Y); SetCtrl(this.cboDepartment, LEFT_CTRL_X, Y - 4, LEFT_W);
-            AddLabel("Nhà máy", RIGHT_LABEL_X, Y); SetCtrl(this.cboFactory, RIGHT_CTRL_X, Y - 4, 220);
-
-            Y += ROW_H;
-            AddLabel("Tên Jig", LEFT_LABEL_X, Y); SetCtrl(this.txtNameJig, LEFT_CTRL_X, Y - 4, LEFT_W);
-            AddLabel("Số quản lý", RIGHT_LABEL_X, Y); SetCtrl(this.txtManagementNo, RIGHT_CTRL_X, Y - 4, 250);
+            AddLabel("Nhà máy", RIGHT_LABEL_X, Y); SetCtrl(this.cboFactory, RIGHT_CTRL_X, Y - 4, 160);
+            AddLabel("Số quản lý", 1050, Y); SetCtrl(this.txtManagementNo, 1170, Y - 4, 90);
             this.groupInfo.Controls.Add(this.btnEditManagementNo);
-            this.btnEditManagementNo.Location = new System.Drawing.Point(1130, Y - 4);
-            this.btnEditManagementNo.Size = new System.Drawing.Size(90, 30);
+            this.btnEditManagementNo.Location = new System.Drawing.Point(1050, Y + 30);
+            this.btnEditManagementNo.Size = new System.Drawing.Size(210, 26);
             this.btnEditManagementNo.Text = "Sửa Số QL";
             this.btnEditManagementNo.Click += new System.EventHandler(this.btnEditManagementNo_Click);
 
             Y += ROW_H;
-            AddLabel("Loại Jig", LEFT_LABEL_X, Y); SetCtrl(this.cboJigType, LEFT_CTRL_X, Y - 4, LEFT_W);
+            AddLabel("Tên Jig", LEFT_LABEL_X, Y); SetCtrl(this.txtNameJig, LEFT_CTRL_X, Y - 4, LEFT_W);
             AddLabel("Tần suất kiểm tra", RIGHT_LABEL_X, Y); SetCtrl(this.cboFrequency, RIGHT_CTRL_X, Y - 4, CTRL_W);
 
             Y += ROW_H;
-            AddLabel("Size", LEFT_LABEL_X, Y); SetCtrl(this.txtSize, LEFT_CTRL_X, Y - 4, LEFT_W);
-            AddLabel("Sản phẩm sử dụng", RIGHT_LABEL_X, Y); SetCtrl(this.txtUseProduct, RIGHT_CTRL_X, Y - 4, CTRL_W);
+            AddLabel("Loại Jig", LEFT_LABEL_X, Y); SetCtrl(this.cboJigType, LEFT_CTRL_X, Y - 4, LEFT_W);
+            AddLabel("Size", RIGHT_LABEL_X, Y); SetCtrl(this.txtSize, RIGHT_CTRL_X, Y - 4, CTRL_W);
 
             Y += ROW_H;
-            AddLabel("Biểu mẫu báo cáo", LEFT_LABEL_X, Y); SetCtrl(this.cboReportForm, LEFT_CTRL_X, Y - 4, LEFT_W);
-            AddLabel("Vị trí", RIGHT_LABEL_X, Y); SetCtrl(this.txtLocation, RIGHT_CTRL_X, Y - 4, CTRL_W);
+            AddLabel("Sản phẩm sử dụng", LEFT_LABEL_X, Y); SetCtrl(this.txtUseProduct, LEFT_CTRL_X, Y - 4, LEFT_W);
+            AddLabel("Báo cáo kiểm tra", RIGHT_LABEL_X, Y); SetCtrl(this.cboReportForm, RIGHT_CTRL_X, Y - 4, CTRL_W);
 
             Y += ROW_H;
-            AddLabel("Báo cáo kiểm tra", LEFT_LABEL_X, Y); SetCtrl(this.txtReportFile, LEFT_CTRL_X, Y - 4, 400);
-            this.groupInfo.Controls.Add(this.btnBrowseReport);
-            this.btnBrowseReport.Location = new System.Drawing.Point(620, Y - 4);
-            this.btnBrowseReport.Size = new System.Drawing.Size(90, 30);
-            this.btnBrowseReport.Text = "Browse";
-            this.btnBrowseReport.Click += new System.EventHandler(this.btnBrowseReport_Click);
+            AddLabel("Vị trí", LEFT_LABEL_X, Y); SetCtrl(this.txtLocation, LEFT_CTRL_X, Y - 4, LEFT_W);
             AddLabel("Bản vẽ", RIGHT_LABEL_X, Y); SetCtrl(this.cboDrawing, RIGHT_CTRL_X, Y - 4, CTRL_W);
 
             Y += ROW_H;
-            AddLabel("KQ kiểm tra lần đầu", LEFT_LABEL_X, Y); SetCtrl(this.txtFirstCheckFile, LEFT_CTRL_X, Y - 4, 400);
+            AddLabel("KQ kiểm tra lần đầu", LEFT_LABEL_X, Y); SetCtrl(this.txtFirstCheckFile, LEFT_CTRL_X, Y - 4, 330);
             this.groupInfo.Controls.Add(this.btnBrowseResult);
-            this.btnBrowseResult.Location = new System.Drawing.Point(620, Y - 4);
+            this.btnBrowseResult.Location = new System.Drawing.Point(550, Y - 4);
             this.btnBrowseResult.Size = new System.Drawing.Size(90, 30);
-            this.btnBrowseResult.Text = "Browse";
+            this.btnBrowseResult.Text = "Duyệt";
             this.btnBrowseResult.Click += new System.EventHandler(this.btnBrowseResult_Click);
 
             this.cboJigType.EditValueChanged += new System.EventHandler(this.cboJigType_EditValueChanged);
@@ -158,7 +147,6 @@ namespace JigFlow.Forms
             ((System.ComponentModel.ISupportInitialize)(this.txtSize.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtUseProduct.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboReportForm.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.txtReportFile.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtLocation.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtManagementNo.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtFirstCheckFile.Properties)).EndInit();
@@ -197,8 +185,6 @@ namespace JigFlow.Forms
         private DevExpress.XtraEditors.TextEdit txtSize;
         private DevExpress.XtraEditors.TextEdit txtUseProduct;
         private DevExpress.XtraEditors.LookUpEdit cboReportForm;
-        private DevExpress.XtraEditors.TextEdit txtReportFile;
-        private DevExpress.XtraEditors.SimpleButton btnBrowseReport;
         private DevExpress.XtraEditors.TextEdit txtLocation;
         private DevExpress.XtraEditors.TextEdit txtManagementNo;
         private DevExpress.XtraEditors.SimpleButton btnEditManagementNo;
