@@ -81,7 +81,13 @@ namespace JigFlow.Forms
         private void btnAccountManagement_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_ACCOUNT_MANAGEMENT));
         private void btnJigFunctionList_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_FUNCTION_LIST));
         private void btnJigVisualList_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_VISUAL_LIST));
-        private void btnJigRegisterList_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_REGISTER_LIST));
+        private void btnJigRegisterList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            using (var FORM = new FRM_JIG_REGISTER_LIST())
+            {
+                FORM.ShowDialog(this);
+            }
+        }
         private void btnJigNewWaitingApprove_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_NEW_WAITING_APPROVE_LIST));
         private void btnJigRegisterHistory_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_REGISTER_HISTORY_LIST));
         private void btnJigNotChecked_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_NOT_CHECKED_LIST));
