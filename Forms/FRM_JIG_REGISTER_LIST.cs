@@ -1,0 +1,182 @@
+using JigFlow.Data;
+using System;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+
+namespace JigFlow.Forms
+{
+    public partial class FRM_JIG_REGISTER_LIST : DevExpress.XtraEditors.XtraForm
+    {
+        private readonly JigRegisterService _service = new JigRegisterService();
+        private bool _allowEditManagementNo = false;
+
+        public FRM_JIG_REGISTER_LIST()
+        {
+            InitializeComponent();
+        }
+
+        private void FRM_JIG_REGISTER_LIST_Load(object sender, EventArgs e)
+        {
+            LoadCombos();
+            txtManagementNo.Properties.ReadOnly = true;
+            txtNameJig.Properties.ReadOnly = true;
+            txtSize.Properties.ReadOnly = true;
+            txtFirstCheckFile.Properties.ReadOnly = true;
+        }
+
+        private void LoadCombos()
+        {
+            cboJigType.Properties.DataSource = _service.GetJigTypes();
+            cboJigType.Properties.DisplayMember = "JIG_TYPE_NAME";
+            cboJigType.Properties.ValueMember = "JIG_TYPE_CODE";
+            cboJigType.Properties.NullText = string.Empty;
+
+            cboReportForm.Properties.DataSource = _service.GetFormMasters();
+            cboReportForm.Properties.DisplayMember = "FORM_NAME";
+            cboReportForm.Properties.ValueMember = "FORM_CODE";
+            cboReportForm.Properties.NullText = string.Empty;
+
+            cboDrawing.Properties.DataSource = _service.GetDrawings();
+            cboDrawing.Properties.DisplayMember = "DRAWING_NAME";
+            cboDrawing.Properties.ValueMember = "DRAWING_CODE";
+            cboDrawing.Properties.NullText = string.Empty;
+
+            cboDepartment.Properties.Items.Clear();
+            cboDepartment.Properties.Items.AddRange(new object[] { "QA", "QC", "PE" });
+
+            cboFactory.Properties.Items.Clear();
+            cboFactory.Properties.Items.AddRange(new object[] { "F1", "F2", "F3" });
+
+            cboFrequency.Properties.Items.Clear();
+            cboFrequency.Properties.Items.AddRange(new object[] { "1 tháng", "3 tháng", "6 tháng", "1 năm", "2 năm" });
+        }
+
+        private void cboJigType_EditValueChanged(object sender, EventArgs e)
+        {
+            AutoFillNameAndManagementNo();
+        }
+
+        private void txtSize_EditValueChanged(object sender, EventArgs e)
+        {
+            if (txtSize.Properties.ReadOnly) return;
+            AutoFillNameAndManagementNo();
+        }
+
+        private void AutoFillNameAndManagementNo()
+        {
+            var TYPE_CODE = Convert.ToString(cboJigType.EditValue);
+            if (string.IsNullOrWhiteSpace(TYPE_CODE)) return;
+
+            var TYPE_NAME = cboJigType.Text ?? string.Empty;
+            var IS_BRACKET = TYPE_NAME.ToUpper().Contains("BRACKET") || TYPE_CODE.ToUpper().Contains("BRACKET");
+            var IS_HLC = TYPE_CODE.ToUpper().Contains("HLC");
+
+            txtSize.Properties.ReadOnly = !IS_BRACKET;
+            if (!IS_BRACKET)
+            {
+                txtSize.Text = string.Empty;
+            }
+
+            if (IS_HLC)
+            {
+                txtNameJig.Text = "J";
+            }
+            else if (IS_BRACKET)
+            {
+                var NUMBER_MATCH = Regex.Match(TYPE_NAME, "\\d+");
+                var BRACKET_NO = NUMBER_MATCH.Success ? NUMBER_MATCH.Value : "1";
+                txtNameJig.Text = $"BK{BRACKET_NO}";
+            }
+            else
+            {
+                txtNameJig.Text = "QA-Jig";
+            }
+
+            var YYMM = DateTime.Now.ToString("yyMM");
+            string PREFIX;
+
+            if (IS_HLC)
+            {
+                PREFIX = "J-";
+                var SEQ_HLC = _service.GetNextSequenceByPrefix(PREFIX);
+                txtManagementNo.Text = $"J-{SEQ_HLC:000}";
+                return;
+            }
+
+            if (IS_BRACKET)
+            {
+                var SIZE_PART = string.IsNullOrWhiteSpace(txtSize.Text) ? "KT" : txtSize.Text.Trim();
+                PREFIX = $"{txtNameJig.Text}-{SIZE_PART}-{YYMM}-";
+            }
+            else
+            {
+                PREFIX = $"{txtNameJig.Text}-{YYMM}-";
+            }
+
+            var SEQ = _service.GetNextSequenceByPrefix(PREFIX);
+            txtManagementNo.Text = $"{PREFIX}{SEQ:000}";
+        }
+
+        private void btnEditManagementNo_Click(object sender, EventArgs e)
+        {
+            _allowEditManagementNo = !_allowEditManagementNo;
+            txtManagementNo.Properties.ReadOnly = !_allowEditManagementNo;
+            btnEditManagementNo.Text = _allowEditManagementNo ? "Khóa Số QL" : "Sửa Số QL";
+        }
+
+        private void btnBrowseReport_Click(object sender, EventArgs e)
+        {
+            using (var DIALOG = new OpenFileDialog())
+            {
+                if (DIALOG.ShowDialog() == DialogResult.OK)
+                {
+                    cboReportForm.ToolTip = DIALOG.FileName;
+                }
+            }
+        }
+
+        private void btnBrowseResult_Click(object sender, EventArgs e)
+        {
+            using (var DIALOG = new OpenFileDialog())
+            {
+                if (DIALOG.ShowDialog() == DialogResult.OK)
+                {
+                    txtFirstCheckFile.Text = DIALOG.FileName;
+                }
+            }
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtManagementNo.Text) || string.IsNullOrWhiteSpace(txtNameJig.Text))
+            {
+                MessageBox.Show("Vui lòng chọn loại Jig để tự sinh Tên Jig và Số quản lý.", "Thiếu dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var CREATED_BY = string.IsNullOrWhiteSpace(AppSession.UserId) ? "SYSTEM" : AppSession.UserId;
+            _service.CreateRegisterRequest(
+                Convert.ToString(cboDepartment.EditValue),
+                Convert.ToString(cboFactory.EditValue),
+                txtManagementNo.Text.Trim(),
+                txtNameJig.Text.Trim(),
+                Convert.ToString(cboJigType.EditValue),
+                txtSize.Text.Trim(),
+                txtUseProduct.Text.Trim(),
+                txtLocation.Text.Trim(),
+                cboFrequency.Text,
+                Convert.ToString(cboReportForm.EditValue),
+                txtFirstCheckFile.Text.Trim(),
+                Convert.ToString(cboDrawing.EditValue),
+                CREATED_BY);
+
+            MessageBox.Show("Đã lưu đăng ký. Trạng thái sử dụng chuyển sang chờ duyệt.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            Close();
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+    }
+}
