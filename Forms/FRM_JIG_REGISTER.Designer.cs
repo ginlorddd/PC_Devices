@@ -62,6 +62,9 @@ namespace JigFlow.Forms
             this.groupInfo.Text = "Thông tin Jig";
             this.groupInfo.Location = new System.Drawing.Point(24, 64);
             this.groupInfo.Size = new System.Drawing.Size(1260, 410);
+            this.groupInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
 
             int LEFT_LABEL_X = 24;
             int LEFT_CTRL_X = 210;
@@ -69,14 +72,14 @@ namespace JigFlow.Forms
             int RIGHT_CTRL_X = 870;
             int CTRL_W = 350;
             int LEFT_W = 430;
-            int ROW_H = 48;
+            int ROW_H = 56;
             int Y = 42;
 
             AddLabel("Bộ phận", LEFT_LABEL_X, Y); SetCtrl(this.cboDepartment, LEFT_CTRL_X, Y - 4, LEFT_W);
             AddLabel("Nhà máy", RIGHT_LABEL_X, Y); SetCtrl(this.cboFactory, RIGHT_CTRL_X, Y - 4, 160);
             AddLabel("Số quản lý", 1050, Y); SetCtrl(this.txtManagementNo, 1170, Y - 4, 90);
             this.groupInfo.Controls.Add(this.btnEditManagementNo);
-            this.btnEditManagementNo.Location = new System.Drawing.Point(1050, Y + 30);
+            this.btnEditManagementNo.Location = new System.Drawing.Point(1050, Y + 26);
             this.btnEditManagementNo.Size = new System.Drawing.Size(210, 26);
             this.btnEditManagementNo.Text = "Sửa Số QL";
             this.btnEditManagementNo.Click += new System.EventHandler(this.btnEditManagementNo_Click);
@@ -114,11 +117,13 @@ namespace JigFlow.Forms
             this.btnSave.Appearance.Options.UseForeColor = true;
             this.btnSave.Location = new System.Drawing.Point(1048, 520);
             this.btnSave.Size = new System.Drawing.Size(110, 36);
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSave.Text = "Lưu";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
 
             this.btnClose.Location = new System.Drawing.Point(1172, 520);
             this.btnClose.Size = new System.Drawing.Size(110, 36);
+            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClose.Text = "Đóng";
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
 
@@ -129,9 +134,8 @@ namespace JigFlow.Forms
             this.Controls.Add(this.groupInfo);
             this.Controls.Add(this.lblTitle);
             this.ClientSize = new System.Drawing.Size(1308, 575);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
+            this.MinimumSize = new System.Drawing.Size(1180, 600);
             this.Name = "FRM_JIG_REGISTER";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Đăng ký Jig mới";
