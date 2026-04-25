@@ -200,6 +200,7 @@ namespace JigFlow.Forms
             {
                 _service.UpdateJigMasterFromRegister(
                     _masterControlNo,
+                    txtManagementNo.Text.Trim(),
                     Convert.ToString(cboDepartment.EditValue),
                     Convert.ToString(cboFactory.EditValue),
                     txtNameJig.Text.Trim(),

@@ -54,6 +54,11 @@ namespace JigFlow.Forms
             gvJig.Columns.AddVisible("NEXT_CHECK_PLAN_DATE", "Kế hoạch kiểm tra định kỳ tiếp theo");
             gvJig.Columns.AddVisible("CHECK_RESULT", "Kết quả kiểm tra định kỳ");
             gvJig.Columns.AddVisible("CHECK_FREQUENCY", "Tần suất kiểm tra định kỳ");
+            foreach (DevExpress.XtraGrid.Columns.GridColumn C in gvJig.Columns)
+            {
+                C.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
+                C.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
+            }
             gvJig.BestFitColumns();
         }
 
