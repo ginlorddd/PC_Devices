@@ -1,6 +1,7 @@
 using DevExpress.XtraEditors.Controls;
 using JigFlow.Data;
 using System;
+using System.Data;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -10,9 +11,16 @@ namespace JigFlow.Forms
     {
         private readonly JigRegisterService _service = new JigRegisterService();
         private bool _allowEditManagementNo = false;
+        private readonly int? _requestId;
 
         public FRM_JIG_REGISTER()
         {
+            InitializeComponent();
+        }
+
+        public FRM_JIG_REGISTER(int REQUEST_ID)
+        {
+            _requestId = REQUEST_ID;
             InitializeComponent();
         }
 
@@ -21,9 +29,16 @@ namespace JigFlow.Forms
             ConfigureEditors();
             LoadCombos();
             txtManagementNo.Properties.ReadOnly = true;
-            txtNameJig.Properties.ReadOnly = true;
+            txtNameJig.Properties.ReadOnly = !_requestId.HasValue;
             txtSize.Properties.ReadOnly = true;
             txtFirstCheckFile.Properties.ReadOnly = true;
+
+            if (_requestId.HasValue)
+            {
+                Text = "Cập nhật đăng ký Jig";
+                lblTitle.Text = "Cập nhật đăng ký Jig";
+                LoadRequestData(_requestId.Value);
+            }
         }
 
         private void ConfigureEditors()
@@ -168,25 +183,69 @@ namespace JigFlow.Forms
             }
 
             var CREATED_BY = string.IsNullOrWhiteSpace(AppSession.UserId) ? "SYSTEM" : AppSession.UserId;
-            _service.CreateRegisterRequest(
-                Convert.ToString(cboDepartment.EditValue),
-                Convert.ToString(cboFactory.EditValue),
-                txtManagementNo.Text.Trim(),
-                txtNameJig.Text.Trim(),
-                Convert.ToString(cboJigType.EditValue),
-                txtSize.Text.Trim(),
-                txtUseProduct.Text.Trim(),
-                txtLocation.Text.Trim(),
-                cboFrequency.Text,
-                Convert.ToString(cboReportForm.EditValue),
-                txtFirstCheckFile.Text.Trim(),
-                Convert.ToString(cboDrawing.EditValue),
-                CREATED_BY);
+            if (_requestId.HasValue)
+            {
+                _service.UpdateRegisterRequest(
+                    _requestId.Value,
+                    Convert.ToString(cboDepartment.EditValue),
+                    Convert.ToString(cboFactory.EditValue),
+                    txtManagementNo.Text.Trim(),
+                    txtNameJig.Text.Trim(),
+                    Convert.ToString(cboJigType.EditValue),
+                    txtSize.Text.Trim(),
+                    txtUseProduct.Text.Trim(),
+                    txtLocation.Text.Trim(),
+                    cboFrequency.Text,
+                    Convert.ToString(cboReportForm.EditValue),
+                    txtFirstCheckFile.Text.Trim(),
+                    Convert.ToString(cboDrawing.EditValue),
+                    CREATED_BY);
 
-            MessageBox.Show("Đã lưu đăng ký. Trạng thái sử dụng chuyển sang chờ duyệt.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Đã cập nhật đăng ký Jig chờ duyệt.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                _service.CreateRegisterRequest(
+                    Convert.ToString(cboDepartment.EditValue),
+                    Convert.ToString(cboFactory.EditValue),
+                    txtManagementNo.Text.Trim(),
+                    txtNameJig.Text.Trim(),
+                    Convert.ToString(cboJigType.EditValue),
+                    txtSize.Text.Trim(),
+                    txtUseProduct.Text.Trim(),
+                    txtLocation.Text.Trim(),
+                    cboFrequency.Text,
+                    Convert.ToString(cboReportForm.EditValue),
+                    txtFirstCheckFile.Text.Trim(),
+                    Convert.ToString(cboDrawing.EditValue),
+                    CREATED_BY);
+
+                MessageBox.Show("Đã lưu đăng ký. Trạng thái sử dụng chuyển sang chờ duyệt.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
             Close();
         }
 
         private void btnClose_Click(object sender, EventArgs e) => Close();
+
+        private void LoadRequestData(int REQUEST_ID)
+        {
+            DataRow ROW = _service.GetRegisterRequestById(REQUEST_ID);
+            if (ROW == null) return;
+
+            cboDepartment.EditValue = Convert.ToString(ROW["DEPARTMENT"]);
+            cboFactory.EditValue = Convert.ToString(ROW["FACTORY"]);
+            txtManagementNo.Text = Convert.ToString(ROW["MANAGEMENT_NO"]);
+            txtNameJig.Text = Convert.ToString(ROW["JIG_NAME"]);
+            cboJigType.EditValue = Convert.ToString(ROW["JIG_TYPE_CODE"]);
+            txtSize.Text = Convert.ToString(ROW["JIG_SIZE"]);
+            txtUseProduct.Text = Convert.ToString(ROW["USE_PRODUCT"]);
+            txtLocation.Text = Convert.ToString(ROW["LOCATION_CODE"]);
+            cboFrequency.EditValue = Convert.ToString(ROW["CHECK_FREQUENCY"]);
+            cboReportForm.EditValue = Convert.ToString(ROW["REPORT_FORM_CODE"]);
+            txtFirstCheckFile.Text = Convert.ToString(ROW["FIRST_CHECK_RESULT_FILE"]);
+            cboDrawing.EditValue = Convert.ToString(ROW["DRAWING_CODE"]);
+            txtSize.Properties.ReadOnly = !((Convert.ToString(ROW["JIG_TYPE_CODE"]) ?? string.Empty).ToUpper().Contains("BRACKET"));
+        }
     }
 }
