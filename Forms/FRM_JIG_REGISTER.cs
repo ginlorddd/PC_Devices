@@ -203,6 +203,7 @@ namespace JigFlow.Forms
                     CREATED_BY);
 
                 MessageBox.Show("Đã cập nhật đăng ký Jig chờ duyệt.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                DataChangeNotifier.Notify("JIG_REGISTER_REQUEST");
             }
             else
             {
@@ -223,12 +224,22 @@ namespace JigFlow.Forms
                     CREATED_BY);
 
                 MessageBox.Show("Đã lưu đăng ký. Trạng thái sử dụng chuyển sang chờ duyệt.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                DataChangeNotifier.Notify("JIG_REGISTER_REQUEST");
             }
 
             Close();
         }
 
         private void btnClose_Click(object sender, EventArgs e) => Close();
+
+        private void btnRefreshData_Click(object sender, EventArgs e)
+        {
+            LoadCombos();
+            if (_requestId.HasValue)
+            {
+                LoadRequestData(_requestId.Value);
+            }
+        }
 
         private void LoadRequestData(int REQUEST_ID)
         {

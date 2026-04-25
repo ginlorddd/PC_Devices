@@ -44,6 +44,7 @@ namespace JigFlow.Forms
             this.btnBrowseResult = new DevExpress.XtraEditors.SimpleButton();
             this.btnSave = new DevExpress.XtraEditors.SimpleButton();
             this.btnClose = new DevExpress.XtraEditors.SimpleButton();
+            this.btnRefreshData = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.groupInfo)).BeginInit();
             this.groupInfo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cboDepartment.Properties)).BeginInit();
@@ -409,6 +410,7 @@ namespace JigFlow.Forms
             this.ClientSize = new System.Drawing.Size(1308, 575);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnClose);
+            this.Controls.Add(this.btnRefreshData);
             this.Controls.Add(this.groupInfo);
             this.Controls.Add(this.lblTitle);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
@@ -417,6 +419,14 @@ namespace JigFlow.Forms
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Đăng ký Jig mới";
             this.Load += new System.EventHandler(this.FRM_JIG_REGISTER_Load);
+            // btnRefreshData
+            this.btnRefreshData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRefreshData.Location = new System.Drawing.Point(1172, 20);
+            this.btnRefreshData.Name = "btnRefreshData";
+            this.btnRefreshData.Size = new System.Drawing.Size(110, 30);
+            this.btnRefreshData.TabIndex = 3;
+            this.btnRefreshData.Text = "Refresh";
+            this.btnRefreshData.Click += new System.EventHandler(this.btnRefreshData_Click);
             ((System.ComponentModel.ISupportInitialize)(this.groupInfo)).EndInit();
             this.groupInfo.ResumeLayout(false);
             this.groupInfo.PerformLayout();
@@ -470,5 +480,6 @@ namespace JigFlow.Forms
         private DevExpress.XtraEditors.SimpleButton btnBrowseResult;
         private DevExpress.XtraEditors.SimpleButton btnSave;
         private DevExpress.XtraEditors.SimpleButton btnClose;
+        private DevExpress.XtraEditors.SimpleButton btnRefreshData;
     }
 }

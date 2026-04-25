@@ -13,12 +13,14 @@ namespace JigFlow.Forms
         public FRM_JIG_NEW_WAITING_APPROVE_LIST()
         {
             InitializeComponent();
+            this.FormClosed += FRM_JIG_NEW_WAITING_APPROVE_LIST_FormClosed;
         }
 
         private void FRM_JIG_NEW_WAITING_APPROVE_LIST_Load(object sender, EventArgs e)
         {
             SetupGridFormat(gvWaiting);
             ApplyPermissionState();
+            DataChangeNotifier.Changed += DataChangeNotifier_Changed;
             LoadData();
         }
 
@@ -75,6 +77,7 @@ namespace JigFlow.Forms
             if (AFFECTED > 0)
             {
                 MessageBox.Show("Đã xóa đăng ký chờ duyệt.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                DataChangeNotifier.Notify("JIG_REGISTER_REQUEST");
                 LoadData();
             }
             else
@@ -93,6 +96,8 @@ namespace JigFlow.Forms
             var APPROVE_BY = string.IsNullOrWhiteSpace(AppSession.UserId) ? "SYSTEM" : AppSession.UserId;
             _service.ApproveRegisterRequest(REQUEST_ID.Value, APPROVE_BY);
             MessageBox.Show("Duyệt thành công. Jig đã chuyển sang JIG MASTER và hiển thị theo JIG TYPE.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            DataChangeNotifier.Notify("JIG_REGISTER_REQUEST");
+            DataChangeNotifier.Notify("JIG_MASTER");
             LoadData();
         }
 
@@ -166,6 +171,19 @@ namespace JigFlow.Forms
             btnUpdate.Enabled = CAN_OPERATE;
             btnApprove.Enabled = CAN_OPERATE;
             btnDelete.Enabled = CAN_OPERATE;
+        }
+
+        private void DataChangeNotifier_Changed(string ENTITY)
+        {
+            if (string.Equals(ENTITY, "JIG_REGISTER_REQUEST", StringComparison.OrdinalIgnoreCase))
+            {
+                if (IsHandleCreated) BeginInvoke(new Action(LoadData));
+            }
+        }
+
+        private void FRM_JIG_NEW_WAITING_APPROVE_LIST_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            DataChangeNotifier.Changed -= DataChangeNotifier_Changed;
         }
     }
 }

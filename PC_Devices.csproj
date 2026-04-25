@@ -52,6 +52,7 @@
     <Compile Include="Data\AppSession.cs" />
     <Compile Include="Data\AuthService.cs" />
     <Compile Include="Data\DbUtils.cs" />
+    <Compile Include="Data\DataChangeNotifier.cs" />
     <Compile Include="Data\UserManagementService.cs" />
     <Compile Include="Data\JigFunctionService.cs" />
     <Compile Include="Data\JigRegisterService.cs" />

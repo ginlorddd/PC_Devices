@@ -17,11 +17,13 @@ namespace JigFlow.Forms
         public FRM_JIG_FUNCTION_LIST()
         {
             InitializeComponent();
+            this.FormClosed += FRM_JIG_FUNCTION_LIST_FormClosed;
         }
 
         private void FRM_JIG_FUNCTION_LIST_Load(object sender, EventArgs e)
         {
             SetupGridFormat(gvJig);
+            DataChangeNotifier.Changed += DataChangeNotifier_Changed;
             LoadData();
         }
 
@@ -159,6 +161,7 @@ namespace JigFlow.Forms
                 }
 
                 MessageBox.Show("Import thành công.");
+                DataChangeNotifier.Notify("JIG_MASTER");
                 LoadData();
             }
         }
@@ -172,6 +175,19 @@ namespace JigFlow.Forms
         private void btnClose_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void DataChangeNotifier_Changed(string ENTITY)
+        {
+            if (string.Equals(ENTITY, "JIG_MASTER", StringComparison.OrdinalIgnoreCase))
+            {
+                if (IsHandleCreated) BeginInvoke(new Action(LoadData));
+            }
+        }
+
+        private void FRM_JIG_FUNCTION_LIST_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            DataChangeNotifier.Changed -= DataChangeNotifier_Changed;
         }
     }
 }
