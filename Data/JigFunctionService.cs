@@ -19,6 +19,7 @@ SELECT
     JM.JIG_SIZE,
     JM.USE_PRODUCT,
     JM.LOCATION_CODE,
+    JM.FACTORY,
     JM.STATUS_USE,
     JM.USE_SECTION,
     JM.LAST_CHECK_DATE,
@@ -47,6 +48,7 @@ SELECT
     JM.JIG_SIZE,
     JM.USE_PRODUCT,
     JM.LOCATION_CODE,
+    JM.FACTORY,
     JM.STATUS_USE,
     JM.USE_SECTION,
     JM.LAST_CHECK_DATE,
@@ -68,6 +70,7 @@ ORDER BY JM.JIG_ID";
             string JIG_SIZE,
             string USE_PRODUCT,
             string LOCATION_CODE,
+            string FACTORY,
             string STATUS_USE,
             string USE_SECTION,
             DateTime? LAST_CHECK_DATE,
@@ -84,6 +87,8 @@ BEGIN
         JIG_SIZE = @JIG_SIZE,
         USE_PRODUCT = @USE_PRODUCT,
         LOCATION_CODE = @LOCATION_CODE,
+        FACTORY = @FACTORY,
+        JIG_TYPE = ISNULL(NULLIF(@JIG_TYPE_CODE, ''), JIG_TYPE),
         STATUS_USE = @STATUS_USE,
         USE_SECTION = @USE_SECTION,
         LAST_CHECK_DATE = @LAST_CHECK_DATE,
@@ -96,10 +101,10 @@ END
 ELSE
 BEGIN
     INSERT INTO dbo.JIG_MASTER
-    (CONTROL_NO, JIG_NAME, JIG_TYPE_CODE, JIG_SIZE, USE_PRODUCT, LOCATION_CODE, STATUS_USE, USE_SECTION,
+    (CONTROL_NO, JIG_NAME, JIG_TYPE, JIG_TYPE_CODE, JIG_SIZE, USE_PRODUCT, LOCATION_CODE, FACTORY, STATUS_USE, USE_SECTION,
      LAST_CHECK_DATE, NEXT_CHECK_PLAN_DATE, CHECK_RESULT, CHECK_FREQUENCY, IS_ACTIVE, CREATED_AT)
-    VALUES
-    (@CONTROL_NO, @JIG_NAME, @JIG_TYPE_CODE, @JIG_SIZE, @USE_PRODUCT, @LOCATION_CODE, @STATUS_USE, @USE_SECTION,
+VALUES
+    (@CONTROL_NO, @JIG_NAME, ISNULL(NULLIF(@JIG_TYPE_CODE, ''), N'JIG_UNKNOWN'), @JIG_TYPE_CODE, @JIG_SIZE, @USE_PRODUCT, @LOCATION_CODE, @FACTORY, @STATUS_USE, @USE_SECTION,
      @LAST_CHECK_DATE, @NEXT_CHECK_PLAN_DATE, @CHECK_RESULT, @CHECK_FREQUENCY, 1, GETDATE())
 END";
 
@@ -110,6 +115,7 @@ END";
                 new SqlParameter("@JIG_SIZE", (object)JIG_SIZE ?? DBNull.Value),
                 new SqlParameter("@USE_PRODUCT", (object)USE_PRODUCT ?? DBNull.Value),
                 new SqlParameter("@LOCATION_CODE", (object)LOCATION_CODE ?? DBNull.Value),
+                new SqlParameter("@FACTORY", (object)FACTORY ?? DBNull.Value),
                 new SqlParameter("@STATUS_USE", (object)STATUS_USE ?? DBNull.Value),
                 new SqlParameter("@USE_SECTION", (object)USE_SECTION ?? DBNull.Value),
                 new SqlParameter("@LAST_CHECK_DATE", (object)LAST_CHECK_DATE ?? DBNull.Value),

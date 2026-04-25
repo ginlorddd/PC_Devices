@@ -45,6 +45,7 @@ namespace JigFlow.Forms
             gvJig.Columns.AddVisible("JIG_SIZE", "Size");
             gvJig.Columns.AddVisible("USE_PRODUCT", "Sản phẩm sử dụng");
             gvJig.Columns.AddVisible("LOCATION_CODE", "Vị trí");
+            gvJig.Columns.AddVisible("FACTORY", "Nhà máy");
             gvJig.Columns.AddVisible("STATUS_USE", "Trạng thái sử dụng");
             gvJig.Columns.AddVisible("USE_SECTION", "Bộ phận sử dụng");
             gvJig.Columns.AddVisible("LAST_CHECK_DATE", "Ngày kiểm tra định kỳ gần nhất");
@@ -147,6 +148,7 @@ namespace JigFlow.Forms
                         Convert.ToString(R["JIG_SIZE"]),
                         Convert.ToString(R["USE_PRODUCT"]),
                         Convert.ToString(R["LOCATION_CODE"]),
+                        DT.Columns.Contains("FACTORY") ? Convert.ToString(R["FACTORY"]) : null,
                         Convert.ToString(R["STATUS_USE"]),
                         Convert.ToString(R["USE_SECTION"]),
                         ParseDate(R["LAST_CHECK_DATE"]),
