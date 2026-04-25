@@ -44,7 +44,6 @@ namespace JigFlow.Forms
             this.btnBrowseResult = new DevExpress.XtraEditors.SimpleButton();
             this.btnSave = new DevExpress.XtraEditors.SimpleButton();
             this.btnClose = new DevExpress.XtraEditors.SimpleButton();
-            this.btnRefreshData = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.groupInfo)).BeginInit();
             this.groupInfo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cboDepartment.Properties)).BeginInit();
@@ -143,7 +142,7 @@ namespace JigFlow.Forms
             this.lblManagementNo.Appearance.ForeColor = System.Drawing.Color.FromArgb(33, 33, 33);
             this.lblManagementNo.Appearance.Options.UseFont = true;
             this.lblManagementNo.Appearance.Options.UseForeColor = true;
-            this.lblManagementNo.Location = new System.Drawing.Point(1050, 42);
+            this.lblManagementNo.Location = new System.Drawing.Point(1010, 42);
             this.lblManagementNo.Name = "lblManagementNo";
             this.lblManagementNo.Size = new System.Drawing.Size(79, 20);
             this.lblManagementNo.Text = "Số quản lý (*)";
@@ -244,8 +243,8 @@ namespace JigFlow.Forms
             this.lblLastCheckDate.Appearance.Options.UseForeColor = true;
             this.lblLastCheckDate.Location = new System.Drawing.Point(690, 322);
             this.lblLastCheckDate.Name = "lblLastCheckDate";
-            this.lblLastCheckDate.Size = new System.Drawing.Size(167, 20);
-            this.lblLastCheckDate.Text = "Ngày kiểm tra định kỳ gần nhất";
+            this.lblLastCheckDate.Size = new System.Drawing.Size(129, 20);
+            this.lblLastCheckDate.Text = "Ngày KTĐK gần nhất";
             // 
             // lblFirstCheck
             // 
@@ -269,21 +268,21 @@ namespace JigFlow.Forms
             // 
             this.cboFactory.Location = new System.Drawing.Point(870, 38);
             this.cboFactory.Name = "cboFactory";
-            this.cboFactory.Size = new System.Drawing.Size(160, 20);
+            this.cboFactory.Size = new System.Drawing.Size(130, 20);
             this.cboFactory.TabIndex = 1;
             // 
             // txtManagementNo
             // 
-            this.txtManagementNo.Location = new System.Drawing.Point(1170, 38);
+            this.txtManagementNo.Location = new System.Drawing.Point(1095, 38);
             this.txtManagementNo.Name = "txtManagementNo";
-            this.txtManagementNo.Size = new System.Drawing.Size(90, 20);
+            this.txtManagementNo.Size = new System.Drawing.Size(165, 20);
             this.txtManagementNo.TabIndex = 2;
             // 
             // btnEditManagementNo
             // 
-            this.btnEditManagementNo.Location = new System.Drawing.Point(1050, 64);
+            this.btnEditManagementNo.Location = new System.Drawing.Point(1095, 64);
             this.btnEditManagementNo.Name = "btnEditManagementNo";
-            this.btnEditManagementNo.Size = new System.Drawing.Size(210, 23);
+            this.btnEditManagementNo.Size = new System.Drawing.Size(165, 23);
             this.btnEditManagementNo.TabIndex = 3;
             this.btnEditManagementNo.Text = "Sửa Số QL";
             this.btnEditManagementNo.Click += new System.EventHandler(this.btnEditManagementNo_Click);
@@ -299,7 +298,7 @@ namespace JigFlow.Forms
             // 
             this.cboFrequency.Location = new System.Drawing.Point(870, 94);
             this.cboFrequency.Name = "cboFrequency";
-            this.cboFrequency.Size = new System.Drawing.Size(350, 20);
+            this.cboFrequency.Size = new System.Drawing.Size(390, 20);
             this.cboFrequency.TabIndex = 5;
             // 
             // cboJigType
@@ -314,7 +313,7 @@ namespace JigFlow.Forms
             // 
             this.txtSize.Location = new System.Drawing.Point(870, 150);
             this.txtSize.Name = "txtSize";
-            this.txtSize.Size = new System.Drawing.Size(350, 20);
+            this.txtSize.Size = new System.Drawing.Size(390, 20);
             this.txtSize.TabIndex = 7;
             this.txtSize.EditValueChanged += new System.EventHandler(this.txtSize_EditValueChanged);
             // 
@@ -329,7 +328,7 @@ namespace JigFlow.Forms
             // 
             this.cboReportForm.Location = new System.Drawing.Point(870, 206);
             this.cboReportForm.Name = "cboReportForm";
-            this.cboReportForm.Size = new System.Drawing.Size(350, 20);
+            this.cboReportForm.Size = new System.Drawing.Size(390, 20);
             this.cboReportForm.TabIndex = 9;
             // 
             // txtLocation
@@ -343,7 +342,7 @@ namespace JigFlow.Forms
             // 
             this.cboDrawing.Location = new System.Drawing.Point(870, 262);
             this.cboDrawing.Name = "cboDrawing";
-            this.cboDrawing.Size = new System.Drawing.Size(350, 20);
+            this.cboDrawing.Size = new System.Drawing.Size(390, 20);
             this.cboDrawing.TabIndex = 11;
             // 
             // deLastCheckDate
@@ -360,7 +359,7 @@ namespace JigFlow.Forms
             this.deLastCheckDate.Properties.EditFormat.FormatString = "dd-MM-yyyy";
             this.deLastCheckDate.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
             this.deLastCheckDate.Properties.Mask.EditMask = "dd-MM-yyyy";
-            this.deLastCheckDate.Size = new System.Drawing.Size(350, 20);
+            this.deLastCheckDate.Size = new System.Drawing.Size(390, 20);
             this.deLastCheckDate.TabIndex = 12;
             // 
             // txtFirstCheckFile
@@ -410,7 +409,6 @@ namespace JigFlow.Forms
             this.ClientSize = new System.Drawing.Size(1308, 575);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnClose);
-            this.Controls.Add(this.btnRefreshData);
             this.Controls.Add(this.groupInfo);
             this.Controls.Add(this.lblTitle);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
@@ -419,14 +417,6 @@ namespace JigFlow.Forms
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Đăng ký Jig mới";
             this.Load += new System.EventHandler(this.FRM_JIG_REGISTER_Load);
-            // btnRefreshData
-            this.btnRefreshData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRefreshData.Location = new System.Drawing.Point(1172, 20);
-            this.btnRefreshData.Name = "btnRefreshData";
-            this.btnRefreshData.Size = new System.Drawing.Size(110, 30);
-            this.btnRefreshData.TabIndex = 3;
-            this.btnRefreshData.Text = "Refresh";
-            this.btnRefreshData.Click += new System.EventHandler(this.btnRefreshData_Click);
             ((System.ComponentModel.ISupportInitialize)(this.groupInfo)).EndInit();
             this.groupInfo.ResumeLayout(false);
             this.groupInfo.PerformLayout();
@@ -480,6 +470,5 @@ namespace JigFlow.Forms
         private DevExpress.XtraEditors.SimpleButton btnBrowseResult;
         private DevExpress.XtraEditors.SimpleButton btnSave;
         private DevExpress.XtraEditors.SimpleButton btnClose;
-        private DevExpress.XtraEditors.SimpleButton btnRefreshData;
     }
 }

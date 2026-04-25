@@ -262,15 +262,6 @@ namespace JigFlow.Forms
 
         private void btnClose_Click(object sender, EventArgs e) => Close();
 
-        private void btnRefreshData_Click(object sender, EventArgs e)
-        {
-            LoadCombos();
-            if (_requestId.HasValue)
-            {
-                LoadRequestData(_requestId.Value);
-            }
-        }
-
         private void LoadRequestData(int REQUEST_ID)
         {
             DataRow ROW = _service.GetRegisterRequestById(REQUEST_ID);
