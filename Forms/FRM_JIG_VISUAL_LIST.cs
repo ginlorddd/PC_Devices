@@ -202,14 +202,19 @@ namespace JigFlow.Forms
 
         private string GetSelectedControlNo()
         {
-            if (gvJig.FocusedRowHandle < 0)
+            var SELECTED_ROWS = gvJig.GetSelectedRows();
+            var ROW_HANDLE = (SELECTED_ROWS != null && SELECTED_ROWS.Length > 0)
+                ? SELECTED_ROWS[0]
+                : gvJig.FocusedRowHandle;
+
+            if (ROW_HANDLE < 0)
             {
                 MessageBox.Show("Vui lòng chọn 1 dòng dữ liệu.", "Thiếu lựa chọn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return null;
             }
 
-            var VALUE = gvJig.GetRowCellValue(gvJig.FocusedRowHandle, "CONTROL_NO");
-            var CONTROL_NO = Convert.ToString(VALUE);
+            var VALUE = gvJig.GetRowCellValue(ROW_HANDLE, "CONTROL_NO");
+            var CONTROL_NO = Convert.ToString(VALUE)?.Trim();
             if (string.IsNullOrWhiteSpace(CONTROL_NO))
             {
                 MessageBox.Show("Không lấy được Control No.", "Lỗi dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);

@@ -75,7 +75,7 @@ namespace JigFlow.Forms
             this.panelBottom.Height = 70;
             // buttons
             this.btnExport.Location = new System.Drawing.Point(16, 18); this.btnExport.Size = new System.Drawing.Size(90, 35); this.btnExport.Text = "Export"; this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
-            this.btnUpdate.Location = new System.Drawing.Point(112, 18); this.btnUpdate.Size = new System.Drawing.Size(90, 35); this.btnUpdate.Text = "Update"; this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
+            this.btnUpdate.Location = new System.Drawing.Point(112, 18); this.btnUpdate.Size = new System.Drawing.Size(90, 35); this.btnUpdate.Text = "Edit"; this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
             this.btnApprove.Location = new System.Drawing.Point(208, 18); this.btnApprove.Size = new System.Drawing.Size(90, 35); this.btnApprove.Text = "Approve"; this.btnApprove.Click += new System.EventHandler(this.btnApprove_Click);
             this.btnDelete.Location = new System.Drawing.Point(304, 18); this.btnDelete.Size = new System.Drawing.Size(90, 35); this.btnDelete.Text = "Delete"; this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             this.btnClose.Location = new System.Drawing.Point(400, 18); this.btnClose.Size = new System.Drawing.Size(90, 35); this.btnClose.Text = "Close"; this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
