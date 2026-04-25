@@ -25,6 +25,7 @@ namespace JigFlow.Forms
             this.lblReportForm = new DevExpress.XtraEditors.LabelControl();
             this.lblLocation = new DevExpress.XtraEditors.LabelControl();
             this.lblDrawing = new DevExpress.XtraEditors.LabelControl();
+            this.lblLastCheckDate = new DevExpress.XtraEditors.LabelControl();
             this.lblFirstCheck = new DevExpress.XtraEditors.LabelControl();
             this.cboDepartment = new DevExpress.XtraEditors.ComboBoxEdit();
             this.cboFactory = new DevExpress.XtraEditors.ComboBoxEdit();
@@ -38,6 +39,7 @@ namespace JigFlow.Forms
             this.cboReportForm = new DevExpress.XtraEditors.LookUpEdit();
             this.txtLocation = new DevExpress.XtraEditors.TextEdit();
             this.cboDrawing = new DevExpress.XtraEditors.LookUpEdit();
+            this.deLastCheckDate = new DevExpress.XtraEditors.DateEdit();
             this.txtFirstCheckFile = new DevExpress.XtraEditors.TextEdit();
             this.btnBrowseResult = new DevExpress.XtraEditors.SimpleButton();
             this.btnSave = new DevExpress.XtraEditors.SimpleButton();
@@ -55,6 +57,8 @@ namespace JigFlow.Forms
             ((System.ComponentModel.ISupportInitialize)(this.cboReportForm.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtLocation.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboDrawing.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.deLastCheckDate.Properties.CalendarTimeProperties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.deLastCheckDate.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtFirstCheckFile.Properties)).BeginInit();
             this.SuspendLayout();
             // 
@@ -87,6 +91,7 @@ namespace JigFlow.Forms
             this.groupInfo.Controls.Add(this.lblReportForm);
             this.groupInfo.Controls.Add(this.lblLocation);
             this.groupInfo.Controls.Add(this.lblDrawing);
+            this.groupInfo.Controls.Add(this.lblLastCheckDate);
             this.groupInfo.Controls.Add(this.lblFirstCheck);
             this.groupInfo.Controls.Add(this.cboDepartment);
             this.groupInfo.Controls.Add(this.cboFactory);
@@ -100,6 +105,7 @@ namespace JigFlow.Forms
             this.groupInfo.Controls.Add(this.cboReportForm);
             this.groupInfo.Controls.Add(this.txtLocation);
             this.groupInfo.Controls.Add(this.cboDrawing);
+            this.groupInfo.Controls.Add(this.deLastCheckDate);
             this.groupInfo.Controls.Add(this.txtFirstCheckFile);
             this.groupInfo.Controls.Add(this.btnBrowseResult);
             this.groupInfo.Location = new System.Drawing.Point(24, 64);
@@ -229,6 +235,17 @@ namespace JigFlow.Forms
             this.lblDrawing.Size = new System.Drawing.Size(47, 20);
             this.lblDrawing.Text = "Bản vẽ";
             // 
+            // lblLastCheckDate
+            // 
+            this.lblLastCheckDate.Appearance.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+            this.lblLastCheckDate.Appearance.ForeColor = System.Drawing.Color.FromArgb(33, 33, 33);
+            this.lblLastCheckDate.Appearance.Options.UseFont = true;
+            this.lblLastCheckDate.Appearance.Options.UseForeColor = true;
+            this.lblLastCheckDate.Location = new System.Drawing.Point(690, 322);
+            this.lblLastCheckDate.Name = "lblLastCheckDate";
+            this.lblLastCheckDate.Size = new System.Drawing.Size(167, 20);
+            this.lblLastCheckDate.Text = "Ngày kiểm tra định kỳ gần nhất";
+            // 
             // lblFirstCheck
             // 
             this.lblFirstCheck.Appearance.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
@@ -328,19 +345,36 @@ namespace JigFlow.Forms
             this.cboDrawing.Size = new System.Drawing.Size(350, 20);
             this.cboDrawing.TabIndex = 11;
             // 
+            // deLastCheckDate
+            // 
+            this.deLastCheckDate.EditValue = null;
+            this.deLastCheckDate.Location = new System.Drawing.Point(870, 318);
+            this.deLastCheckDate.Name = "deLastCheckDate";
+            this.deLastCheckDate.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.deLastCheckDate.Properties.CalendarTimeProperties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.deLastCheckDate.Properties.DisplayFormat.FormatString = "dd-MM-yyyy";
+            this.deLastCheckDate.Properties.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+            this.deLastCheckDate.Properties.EditFormat.FormatString = "dd-MM-yyyy";
+            this.deLastCheckDate.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+            this.deLastCheckDate.Properties.Mask.EditMask = "dd-MM-yyyy";
+            this.deLastCheckDate.Size = new System.Drawing.Size(350, 20);
+            this.deLastCheckDate.TabIndex = 12;
+            // 
             // txtFirstCheckFile
             // 
             this.txtFirstCheckFile.Location = new System.Drawing.Point(210, 318);
             this.txtFirstCheckFile.Name = "txtFirstCheckFile";
             this.txtFirstCheckFile.Size = new System.Drawing.Size(330, 20);
-            this.txtFirstCheckFile.TabIndex = 12;
+            this.txtFirstCheckFile.TabIndex = 13;
             // 
             // btnBrowseResult
             // 
             this.btnBrowseResult.Location = new System.Drawing.Point(550, 318);
             this.btnBrowseResult.Name = "btnBrowseResult";
             this.btnBrowseResult.Size = new System.Drawing.Size(90, 23);
-            this.btnBrowseResult.TabIndex = 13;
+            this.btnBrowseResult.TabIndex = 14;
             this.btnBrowseResult.Text = "Duyệt";
             this.btnBrowseResult.Click += new System.EventHandler(this.btnBrowseResult_Click);
             // 
@@ -397,6 +431,8 @@ namespace JigFlow.Forms
             ((System.ComponentModel.ISupportInitialize)(this.cboReportForm.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtLocation.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboDrawing.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.deLastCheckDate.Properties.CalendarTimeProperties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.deLastCheckDate.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtFirstCheckFile.Properties)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -415,6 +451,7 @@ namespace JigFlow.Forms
         private DevExpress.XtraEditors.LabelControl lblReportForm;
         private DevExpress.XtraEditors.LabelControl lblLocation;
         private DevExpress.XtraEditors.LabelControl lblDrawing;
+        private DevExpress.XtraEditors.LabelControl lblLastCheckDate;
         private DevExpress.XtraEditors.LabelControl lblFirstCheck;
         private DevExpress.XtraEditors.ComboBoxEdit cboDepartment;
         private DevExpress.XtraEditors.ComboBoxEdit cboFactory;
@@ -428,6 +465,7 @@ namespace JigFlow.Forms
         private DevExpress.XtraEditors.LookUpEdit cboReportForm;
         private DevExpress.XtraEditors.TextEdit txtLocation;
         private DevExpress.XtraEditors.LookUpEdit cboDrawing;
+        private DevExpress.XtraEditors.DateEdit deLastCheckDate;
         private DevExpress.XtraEditors.TextEdit txtFirstCheckFile;
         private DevExpress.XtraEditors.SimpleButton btnBrowseResult;
         private DevExpress.XtraEditors.SimpleButton btnSave;

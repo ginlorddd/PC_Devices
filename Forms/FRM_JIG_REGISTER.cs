@@ -195,6 +195,7 @@ namespace JigFlow.Forms
                     txtSize.Text.Trim(),
                     txtUseProduct.Text.Trim(),
                     txtLocation.Text.Trim(),
+                    deLastCheckDate.DateTime == DateTime.MinValue ? (DateTime?)null : deLastCheckDate.DateTime.Date,
                     cboFrequency.Text,
                     Convert.ToString(cboReportForm.EditValue),
                     txtFirstCheckFile.Text.Trim(),
@@ -214,6 +215,7 @@ namespace JigFlow.Forms
                     txtSize.Text.Trim(),
                     txtUseProduct.Text.Trim(),
                     txtLocation.Text.Trim(),
+                    deLastCheckDate.DateTime == DateTime.MinValue ? (DateTime?)null : deLastCheckDate.DateTime.Date,
                     cboFrequency.Text,
                     Convert.ToString(cboReportForm.EditValue),
                     txtFirstCheckFile.Text.Trim(),
@@ -245,6 +247,14 @@ namespace JigFlow.Forms
             cboReportForm.EditValue = Convert.ToString(ROW["REPORT_FORM_CODE"]);
             txtFirstCheckFile.Text = Convert.ToString(ROW["FIRST_CHECK_RESULT_FILE"]);
             cboDrawing.EditValue = Convert.ToString(ROW["DRAWING_CODE"]);
+            if (ROW["LAST_CHECK_DATE"] != DBNull.Value)
+            {
+                deLastCheckDate.EditValue = Convert.ToDateTime(ROW["LAST_CHECK_DATE"]);
+            }
+            else
+            {
+                deLastCheckDate.EditValue = null;
+            }
             txtSize.Properties.ReadOnly = !((Convert.ToString(ROW["JIG_TYPE_CODE"]) ?? string.Empty).ToUpper().Contains("BRACKET"));
         }
     }
