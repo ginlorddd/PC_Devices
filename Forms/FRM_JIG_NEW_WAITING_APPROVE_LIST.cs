@@ -91,16 +91,9 @@ namespace JigFlow.Forms
             if (MessageBox.Show("Xác nhận duyệt đăng ký Jig này?", "Approve", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
 
             var APPROVE_BY = string.IsNullOrWhiteSpace(AppSession.UserId) ? "SYSTEM" : AppSession.UserId;
-            var AFFECTED = _service.ApproveRegisterRequest(REQUEST_ID.Value, APPROVE_BY);
-            if (AFFECTED > 0)
-            {
-                MessageBox.Show("Duyệt thành công. Jig đã chuyển sang danh sách sử dụng với trạng thái 'Đang sử dụng'.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                LoadData();
-            }
-            else
-            {
-                MessageBox.Show("Không tìm thấy dữ liệu chờ duyệt hoặc dữ liệu đã được xử lý.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+            _service.ApproveRegisterRequest(REQUEST_ID.Value, APPROVE_BY);
+            MessageBox.Show("Duyệt thành công. Jig đã chuyển sang JIG MASTER và hiển thị theo JIG TYPE.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            LoadData();
         }
 
         private void SetupGridFormat(GridView VIEW)
