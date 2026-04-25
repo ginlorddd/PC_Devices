@@ -12,6 +12,7 @@ namespace JigFlow.Forms
         private readonly JigRegisterService _service = new JigRegisterService();
         private bool _allowEditManagementNo = false;
         private readonly int? _requestId;
+        private readonly string _masterControlNo;
 
         public FRM_JIG_REGISTER()
         {
@@ -21,6 +22,12 @@ namespace JigFlow.Forms
         public FRM_JIG_REGISTER(int REQUEST_ID)
         {
             _requestId = REQUEST_ID;
+            InitializeComponent();
+        }
+
+        public FRM_JIG_REGISTER(string CONTROL_NO)
+        {
+            _masterControlNo = CONTROL_NO;
             InitializeComponent();
         }
 
@@ -38,6 +45,12 @@ namespace JigFlow.Forms
                 Text = "Cập nhật đăng ký Jig";
                 lblTitle.Text = "Cập nhật đăng ký Jig";
                 LoadRequestData(_requestId.Value);
+            }
+            else if (!string.IsNullOrWhiteSpace(_masterControlNo))
+            {
+                Text = "Cập nhật Jig";
+                lblTitle.Text = "Cập nhật Jig";
+                LoadMasterData(_masterControlNo);
             }
         }
 
@@ -183,7 +196,24 @@ namespace JigFlow.Forms
             }
 
             var CREATED_BY = string.IsNullOrWhiteSpace(AppSession.UserId) ? "SYSTEM" : AppSession.UserId;
-            if (_requestId.HasValue)
+            if (!string.IsNullOrWhiteSpace(_masterControlNo))
+            {
+                _service.UpdateJigMasterFromRegister(
+                    _masterControlNo,
+                    Convert.ToString(cboDepartment.EditValue),
+                    Convert.ToString(cboFactory.EditValue),
+                    txtNameJig.Text.Trim(),
+                    Convert.ToString(cboJigType.EditValue),
+                    txtSize.Text.Trim(),
+                    txtUseProduct.Text.Trim(),
+                    txtLocation.Text.Trim(),
+                    deLastCheckDate.DateTime == DateTime.MinValue ? (DateTime?)null : deLastCheckDate.DateTime.Date,
+                    cboFrequency.Text);
+
+                MessageBox.Show("Đã cập nhật Jig.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                DataChangeNotifier.Notify("JIG_MASTER");
+            }
+            else if (_requestId.HasValue)
             {
                 _service.UpdateRegisterRequest(
                     _requestId.Value,
@@ -265,6 +295,27 @@ namespace JigFlow.Forms
             else
             {
                 deLastCheckDate.EditValue = null;
+            }
+            txtSize.Properties.ReadOnly = !((Convert.ToString(ROW["JIG_TYPE_CODE"]) ?? string.Empty).ToUpper().Contains("BRACKET"));
+        }
+
+        private void LoadMasterData(string CONTROL_NO)
+        {
+            DataRow ROW = _service.GetJigMasterByControlNo(CONTROL_NO);
+            if (ROW == null) return;
+
+            cboDepartment.EditValue = Convert.ToString(ROW["USE_SECTION"]);
+            cboFactory.EditValue = Convert.ToString(ROW["FACTORY"]);
+            txtManagementNo.Text = Convert.ToString(ROW["CONTROL_NO"]);
+            txtNameJig.Text = Convert.ToString(ROW["JIG_NAME"]);
+            cboJigType.EditValue = Convert.ToString(ROW["JIG_TYPE_CODE"]);
+            txtSize.Text = Convert.ToString(ROW["JIG_SIZE"]);
+            txtUseProduct.Text = Convert.ToString(ROW["USE_PRODUCT"]);
+            txtLocation.Text = Convert.ToString(ROW["LOCATION_CODE"]);
+            cboFrequency.EditValue = Convert.ToString(ROW["CHECK_FREQUENCY"]);
+            if (ROW.Table.Columns.Contains("LAST_CHECK_DATE") && ROW["LAST_CHECK_DATE"] != DBNull.Value)
+            {
+                deLastCheckDate.EditValue = Convert.ToDateTime(ROW["LAST_CHECK_DATE"]);
             }
             txtSize.Properties.ReadOnly = !((Convert.ToString(ROW["JIG_TYPE_CODE"]) ?? string.Empty).ToUpper().Contains("BRACKET"));
         }

@@ -284,5 +284,58 @@ WHERE REQUEST_ID = @REQUEST_ID
                 new SqlParameter("@REQUEST_ID", REQUEST_ID),
                 new SqlParameter("@APPROVE_BY", (object)APPROVE_BY ?? DBNull.Value));
         }
+
+        public DataRow GetJigMasterByControlNo(string CONTROL_NO)
+        {
+            const string SQL_QUERY = @"
+SELECT TOP 1 *
+FROM dbo.JIG_MASTER
+WHERE CONTROL_NO = @CONTROL_NO
+  AND IS_ACTIVE = 1;";
+            var DT = DbUtils.GetData(SQL_QUERY, new SqlParameter("@CONTROL_NO", CONTROL_NO));
+            return DT.Rows.Count == 0 ? null : DT.Rows[0];
+        }
+
+        public int UpdateJigMasterFromRegister(
+            string CONTROL_NO,
+            string DEPARTMENT,
+            string FACTORY,
+            string JIG_NAME,
+            string JIG_TYPE_CODE,
+            string JIG_SIZE,
+            string USE_PRODUCT,
+            string LOCATION_CODE,
+            DateTime? LAST_CHECK_DATE,
+            string CHECK_FREQUENCY)
+        {
+            const string SQL_QUERY = @"
+UPDATE dbo.JIG_MASTER
+SET JIG_NAME = @JIG_NAME,
+    JIG_TYPE = ISNULL(NULLIF(@JIG_TYPE_CODE, ''), JIG_TYPE),
+    JIG_TYPE_CODE = @JIG_TYPE_CODE,
+    JIG_SIZE = @JIG_SIZE,
+    USE_PRODUCT = @USE_PRODUCT,
+    LOCATION_CODE = @LOCATION_CODE,
+    FACTORY = @FACTORY,
+    USE_SECTION = @DEPARTMENT,
+    LAST_CHECK_DATE = @LAST_CHECK_DATE,
+    CHECK_FREQUENCY = @CHECK_FREQUENCY,
+    UPDATED_AT = GETDATE()
+WHERE CONTROL_NO = @CONTROL_NO
+  AND IS_ACTIVE = 1;";
+
+            return DbUtils.Execute(
+                SQL_QUERY,
+                new SqlParameter("@CONTROL_NO", (object)CONTROL_NO ?? DBNull.Value),
+                new SqlParameter("@DEPARTMENT", (object)DEPARTMENT ?? DBNull.Value),
+                new SqlParameter("@FACTORY", (object)FACTORY ?? DBNull.Value),
+                new SqlParameter("@JIG_NAME", (object)JIG_NAME ?? DBNull.Value),
+                new SqlParameter("@JIG_TYPE_CODE", (object)JIG_TYPE_CODE ?? DBNull.Value),
+                new SqlParameter("@JIG_SIZE", (object)JIG_SIZE ?? DBNull.Value),
+                new SqlParameter("@USE_PRODUCT", (object)USE_PRODUCT ?? DBNull.Value),
+                new SqlParameter("@LOCATION_CODE", (object)LOCATION_CODE ?? DBNull.Value),
+                new SqlParameter("@LAST_CHECK_DATE", (object)LAST_CHECK_DATE ?? DBNull.Value),
+                new SqlParameter("@CHECK_FREQUENCY", (object)CHECK_FREQUENCY ?? DBNull.Value));
+        }
     }
 }

@@ -124,7 +124,7 @@ namespace JigFlow.Forms
             this.lblDepartment.Location = new System.Drawing.Point(24, 42);
             this.lblDepartment.Name = "lblDepartment";
             this.lblDepartment.Size = new System.Drawing.Size(62, 20);
-            this.lblDepartment.Text = "Bộ phận";
+            this.lblDepartment.Text = "Bộ phận (*)";
             // 
             // lblFactory
             // 
@@ -135,7 +135,7 @@ namespace JigFlow.Forms
             this.lblFactory.Location = new System.Drawing.Point(690, 42);
             this.lblFactory.Name = "lblFactory";
             this.lblFactory.Size = new System.Drawing.Size(61, 20);
-            this.lblFactory.Text = "Nhà máy";
+            this.lblFactory.Text = "Nhà máy (*)";
             // 
             // lblManagementNo
             // 
@@ -146,7 +146,7 @@ namespace JigFlow.Forms
             this.lblManagementNo.Location = new System.Drawing.Point(1050, 42);
             this.lblManagementNo.Name = "lblManagementNo";
             this.lblManagementNo.Size = new System.Drawing.Size(79, 20);
-            this.lblManagementNo.Text = "Số quản lý";
+            this.lblManagementNo.Text = "Số quản lý (*)";
             // 
             // lblNameJig
             // 
@@ -157,7 +157,7 @@ namespace JigFlow.Forms
             this.lblNameJig.Location = new System.Drawing.Point(24, 98);
             this.lblNameJig.Name = "lblNameJig";
             this.lblNameJig.Size = new System.Drawing.Size(52, 20);
-            this.lblNameJig.Text = "Tên Jig";
+            this.lblNameJig.Text = "Tên Jig (*)";
             // 
             // lblFrequency
             // 
@@ -168,7 +168,7 @@ namespace JigFlow.Forms
             this.lblFrequency.Location = new System.Drawing.Point(690, 98);
             this.lblFrequency.Name = "lblFrequency";
             this.lblFrequency.Size = new System.Drawing.Size(122, 20);
-            this.lblFrequency.Text = "Tần suất kiểm tra";
+            this.lblFrequency.Text = "Tần suất kiểm tra (*)";
             // 
             // lblJigType
             // 
@@ -179,7 +179,7 @@ namespace JigFlow.Forms
             this.lblJigType.Location = new System.Drawing.Point(24, 154);
             this.lblJigType.Name = "lblJigType";
             this.lblJigType.Size = new System.Drawing.Size(56, 20);
-            this.lblJigType.Text = "Loại Jig";
+            this.lblJigType.Text = "Loại Jig (*)";
             // 
             // lblSize
             // 

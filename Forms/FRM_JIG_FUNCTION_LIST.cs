@@ -168,8 +168,14 @@ namespace JigFlow.Forms
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            LoadData();
-            MessageBox.Show("Đã refresh dữ liệu.");
+            if (!EnsureCanOperate()) return;
+            var CONTROL_NO = GetSelectedControlNo();
+            if (string.IsNullOrWhiteSpace(CONTROL_NO)) return;
+
+            using (var FORM = new FRM_JIG_REGISTER(CONTROL_NO))
+            {
+                FORM.ShowDialog(this);
+            }
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -188,6 +194,41 @@ namespace JigFlow.Forms
         private void FRM_JIG_FUNCTION_LIST_FormClosed(object sender, FormClosedEventArgs e)
         {
             DataChangeNotifier.Changed -= DataChangeNotifier_Changed;
+        }
+
+        private string GetSelectedControlNo()
+        {
+            if (gvJig.FocusedRowHandle < 0)
+            {
+                MessageBox.Show("Vui lòng chọn 1 dòng dữ liệu.", "Thiếu lựa chọn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            var VALUE = gvJig.GetRowCellValue(gvJig.FocusedRowHandle, "CONTROL_NO");
+            var CONTROL_NO = Convert.ToString(VALUE);
+            if (string.IsNullOrWhiteSpace(CONTROL_NO))
+            {
+                MessageBox.Show("Không lấy được Control No.", "Lỗi dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
+            return CONTROL_NO;
+        }
+
+        private bool EnsureCanOperate()
+        {
+            if (string.IsNullOrWhiteSpace(AppSession.UserId))
+            {
+                MessageBox.Show("Vui lòng đăng nhập để thao tác.", "Chưa đăng nhập", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (!string.Equals(AppSession.RoleCode, "ADMIN", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("Bạn không có quyền thao tác chức năng này.", "Không đủ quyền", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            return true;
         }
     }
 }
