@@ -119,6 +119,11 @@ namespace JigFlow.Forms
 
         private void AutoFillNameAndManagementNo()
         {
+            if (_requestId.HasValue || !string.IsNullOrWhiteSpace(_masterControlNo))
+            {
+                return;
+            }
+
             var TYPE_CODE = Convert.ToString(cboJigType.EditValue);
             if (string.IsNullOrWhiteSpace(TYPE_CODE)) return;
 

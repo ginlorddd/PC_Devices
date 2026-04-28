@@ -273,16 +273,16 @@ namespace JigFlow.Forms
             // 
             // txtManagementNo
             // 
-            this.txtManagementNo.Location = new System.Drawing.Point(1095, 38);
+            this.txtManagementNo.Location = new System.Drawing.Point(1135, 38);
             this.txtManagementNo.Name = "txtManagementNo";
-            this.txtManagementNo.Size = new System.Drawing.Size(165, 20);
+            this.txtManagementNo.Size = new System.Drawing.Size(125, 20);
             this.txtManagementNo.TabIndex = 2;
             // 
             // btnEditManagementNo
             // 
-            this.btnEditManagementNo.Location = new System.Drawing.Point(1095, 64);
+            this.btnEditManagementNo.Location = new System.Drawing.Point(1135, 64);
             this.btnEditManagementNo.Name = "btnEditManagementNo";
-            this.btnEditManagementNo.Size = new System.Drawing.Size(165, 23);
+            this.btnEditManagementNo.Size = new System.Drawing.Size(125, 23);
             this.btnEditManagementNo.TabIndex = 3;
             this.btnEditManagementNo.Text = "Sửa Số QL";
             this.btnEditManagementNo.Click += new System.EventHandler(this.btnEditManagementNo_Click);
