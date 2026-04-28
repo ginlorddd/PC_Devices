@@ -97,5 +97,6 @@ namespace JigFlow.Forms
         private void btnJigCancelHistory_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_CANCEL_HISTORY_LIST));
         private void btnJigDrawing_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_DRAWING_LIST));
         private void btnFormMaster_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_FORM_MASTER));
+        private void btnJigTypeMaster_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_TYPE_MASTER));
     }
 }
