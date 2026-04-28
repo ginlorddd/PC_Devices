@@ -200,12 +200,27 @@ namespace JigFlow.Forms
                 return;
             }
 
+            var MANAGEMENT_NO = txtManagementNo.Text.Trim();
+            if (string.IsNullOrWhiteSpace(_masterControlNo))
+            {
+                var IS_DUPLICATED = _service.IsManagementNoDuplicated(MANAGEMENT_NO, _requestId);
+                if (IS_DUPLICATED)
+                {
+                    MessageBox.Show(
+                        "Số quản lý đã tồn tại trong JIG MASTER hoặc danh sách đăng ký. Vui lòng kiểm tra lại.",
+                        "Trùng số quản lý",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+
             var CREATED_BY = string.IsNullOrWhiteSpace(AppSession.UserId) ? "SYSTEM" : AppSession.UserId;
             if (!string.IsNullOrWhiteSpace(_masterControlNo))
             {
                 _service.UpdateJigMasterFromRegister(
                     _masterControlNo,
-                    txtManagementNo.Text.Trim(),
+                    MANAGEMENT_NO,
                     Convert.ToString(cboDepartment.EditValue),
                     Convert.ToString(cboFactory.EditValue),
                     txtNameJig.Text.Trim(),
@@ -225,7 +240,7 @@ namespace JigFlow.Forms
                     _requestId.Value,
                     Convert.ToString(cboDepartment.EditValue),
                     Convert.ToString(cboFactory.EditValue),
-                    txtManagementNo.Text.Trim(),
+                    MANAGEMENT_NO,
                     txtNameJig.Text.Trim(),
                     Convert.ToString(cboJigType.EditValue),
                     txtSize.Text.Trim(),
@@ -246,7 +261,7 @@ namespace JigFlow.Forms
                 _service.CreateRegisterRequest(
                     Convert.ToString(cboDepartment.EditValue),
                     Convert.ToString(cboFactory.EditValue),
-                    txtManagementNo.Text.Trim(),
+                    MANAGEMENT_NO,
                     txtNameJig.Text.Trim(),
                     Convert.ToString(cboJigType.EditValue),
                     txtSize.Text.Trim(),

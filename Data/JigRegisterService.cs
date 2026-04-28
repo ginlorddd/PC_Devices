@@ -34,6 +34,35 @@ WHERE MANAGEMENT_NO LIKE @PREFIX + '%';";
             return Convert.ToInt32(DT.Rows[0]["MAX_SEQ"]) + 1;
         }
 
+        public bool IsManagementNoDuplicated(string MANAGEMENT_NO, int? EXCLUDE_REQUEST_ID = null)
+        {
+            const string SQL_QUERY = @"
+DECLARE @NORMALIZED_NO NVARCHAR(100) = UPPER(LTRIM(RTRIM(@MANAGEMENT_NO)));
+
+SELECT CASE WHEN EXISTS
+(
+    SELECT 1
+    FROM dbo.JIG_MASTER
+    WHERE IS_ACTIVE = 1
+      AND UPPER(LTRIM(RTRIM(CONTROL_NO))) = @NORMALIZED_NO
+)
+OR EXISTS
+(
+    SELECT 1
+    FROM dbo.JIG_REGISTER_REQUEST
+    WHERE UPPER(LTRIM(RTRIM(MANAGEMENT_NO))) = @NORMALIZED_NO
+      AND (@EXCLUDE_REQUEST_ID IS NULL OR REQUEST_ID <> @EXCLUDE_REQUEST_ID)
+)
+THEN 1 ELSE 0 END AS IS_DUPLICATED;";
+
+            var DT = DbUtils.GetData(
+                SQL_QUERY,
+                new SqlParameter("@MANAGEMENT_NO", (object)MANAGEMENT_NO ?? DBNull.Value),
+                new SqlParameter("@EXCLUDE_REQUEST_ID", (object)EXCLUDE_REQUEST_ID ?? DBNull.Value));
+
+            return DT.Rows.Count > 0 && Convert.ToInt32(DT.Rows[0]["IS_DUPLICATED"]) == 1;
+        }
+
         public int CreateRegisterRequest(
             string DEPARTMENT,
             string FACTORY,
