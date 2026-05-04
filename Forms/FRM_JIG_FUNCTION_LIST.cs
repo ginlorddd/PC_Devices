@@ -4,7 +4,6 @@ using System;
 using System.Data;
 using System.Data.OleDb;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 
@@ -67,6 +66,11 @@ namespace JigFlow.Forms
             var DATA = _service.GetJigFunctionList();
             gcJig.DataSource = DATA;
             BuildColumns();
+            if (gvJig.Columns["NEXT_CHECK_PLAN_DATE"] != null)
+            {
+                gvJig.Columns["NEXT_CHECK_PLAN_DATE"].DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                gvJig.Columns["NEXT_CHECK_PLAN_DATE"].DisplayFormat.FormatString = "dd-MM-yyyy";
+            }
             lblRecord.Text = $"Record: {gvJig.RowCount}";
         }
 
@@ -78,7 +82,7 @@ namespace JigFlow.Forms
             if (VALUE == null || VALUE == DBNull.Value) return;
 
             DateTime PLAN_DATE;
-            if (!DateTime.TryParse(Convert.ToString(VALUE, CultureInfo.InvariantCulture), out PLAN_DATE)) return;
+            if (!TryGetPlanDate(VALUE, out PLAN_DATE)) return;
 
             var TODAY = DateTime.Today;
             if (PLAN_DATE.Date < TODAY)
@@ -137,6 +141,20 @@ namespace JigFlow.Forms
             if (VALUE == null || VALUE == DBNull.Value) return null;
             DateTime D;
             return DateTime.TryParse(Convert.ToString(VALUE), out D) ? D : (DateTime?)null;
+        }
+
+        private bool TryGetPlanDate(object VALUE, out DateTime PLAN_DATE)
+        {
+            PLAN_DATE = DateTime.MinValue;
+            if (VALUE == null || VALUE == DBNull.Value) return false;
+
+            if (VALUE is DateTime)
+            {
+                PLAN_DATE = ((DateTime)VALUE).Date;
+                return true;
+            }
+
+            return DateTime.TryParse(Convert.ToString(VALUE), out PLAN_DATE);
         }
 
         private void btnImport_Click(object sender, EventArgs e)
