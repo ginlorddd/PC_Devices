@@ -29,6 +29,7 @@ namespace JigFlow.Forms
             VIEW.Appearance.HeaderPanel.Options.UseFont = true;
             VIEW.OptionsView.ColumnAutoWidth = false;
             VIEW.RowCellStyle += gvHistory_RowCellStyle;
+            VIEW.DoubleClick += gvHistory_DoubleClick;
         }
 
         private void LoadData()
@@ -107,6 +108,22 @@ namespace JigFlow.Forms
         private void btnClose_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void gvHistory_DoubleClick(object sender, EventArgs e)
+        {
+            var HIT = gvHistory.CalcHitInfo(gvHistory.GridControl.PointToClient(Cursor.Position));
+            if (!HIT.InRowCell || HIT.Column == null) return;
+            if (!string.Equals(HIT.Column.FieldName, "FIRST_CHECK_RESULT_FILE", StringComparison.OrdinalIgnoreCase)) return;
+
+            var VALUE = gvHistory.GetRowCellValue(HIT.RowHandle, "FIRST_CHECK_RESULT_FILE");
+            var FILE_PATH = Convert.ToString(VALUE);
+            if (string.IsNullOrWhiteSpace(FILE_PATH)) return;
+
+            using (var FORM = new FRM_PDF_VIEWER_ADV(FILE_PATH))
+            {
+                FORM.ShowDialog(this);
+            }
         }
     }
 }

@@ -108,6 +108,7 @@ namespace JigFlow.Forms
             VIEW.Appearance.HeaderPanel.Font = new Font(VIEW.Appearance.HeaderPanel.Font, FontStyle.Bold);
             VIEW.Appearance.HeaderPanel.Options.UseFont = true;
             VIEW.OptionsView.ColumnAutoWidth = false;
+            VIEW.DoubleClick += GvWaiting_DoubleClick;
         }
 
         private void BuildColumns()
@@ -184,6 +185,22 @@ namespace JigFlow.Forms
         private void FRM_JIG_NEW_WAITING_APPROVE_LIST_FormClosed(object sender, FormClosedEventArgs e)
         {
             DataChangeNotifier.Changed -= DataChangeNotifier_Changed;
+        }
+
+        private void GvWaiting_DoubleClick(object sender, EventArgs e)
+        {
+            var HIT = gvWaiting.CalcHitInfo(gvWaiting.GridControl.PointToClient(Cursor.Position));
+            if (!HIT.InRowCell || HIT.Column == null) return;
+            if (!string.Equals(HIT.Column.FieldName, "FIRST_CHECK_RESULT_FILE", StringComparison.OrdinalIgnoreCase)) return;
+
+            var VALUE = gvWaiting.GetRowCellValue(HIT.RowHandle, "FIRST_CHECK_RESULT_FILE");
+            var FILE_PATH = Convert.ToString(VALUE);
+            if (string.IsNullOrWhiteSpace(FILE_PATH)) return;
+
+            using (var FORM = new FRM_PDF_VIEWER_ADV(FILE_PATH))
+            {
+                FORM.ShowDialog(this);
+            }
         }
     }
 }
