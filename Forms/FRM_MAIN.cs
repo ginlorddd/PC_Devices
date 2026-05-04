@@ -83,7 +83,7 @@ namespace JigFlow.Forms
         private void btnJigVisualList_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_VISUAL_LIST));
         private void btnJigRegisterList_ItemClick(object sender, ItemClickEventArgs e)
         {
-            using (var FORM = new FRM_JIG_REGISTER_LIST())
+            using (var FORM = new FRM_JIG_REGISTER())
             {
                 FORM.ShowDialog(this);
             }
@@ -97,5 +97,6 @@ namespace JigFlow.Forms
         private void btnJigCancelHistory_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_CANCEL_HISTORY_LIST));
         private void btnJigDrawing_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_DRAWING_LIST));
         private void btnFormMaster_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_FORM_MASTER));
+        private void btnJigTypeMaster_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_TYPE_MASTER));
     }
 }
