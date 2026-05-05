@@ -64,6 +64,33 @@ ORDER BY JM.JIG_ID";
             return DbUtils.GetData(SQL_QUERY);
         }
 
+        public DataTable GetNotCheckedJigs(DateTime MONTH_REFERENCE)
+        {
+            var MONTH_START = new DateTime(MONTH_REFERENCE.Year, MONTH_REFERENCE.Month, 1);
+            var NEXT_MONTH_START = MONTH_START.AddMonths(1);
+
+            const string SQL_QUERY = @"
+SELECT
+    ROW_NUMBER() OVER (ORDER BY JM.NEXT_CHECK_PLAN_DATE, JM.JIG_ID) AS STT,
+    JM.CONTROL_NO,
+    JM.JIG_NAME,
+    COALESCE(JTM.JIG_TYPE_NAME, JM.JIG_TYPE) AS JIG_TYPE_NAME,
+    JM.JIG_SIZE,
+    JM.NEXT_CHECK_PLAN_DATE,
+    JM.USE_SECTION,
+    JM.CHECK_RESULT
+FROM dbo.JIG_MASTER JM
+LEFT JOIN dbo.JIG_TYPE_MASTER JTM ON JM.JIG_TYPE_CODE = JTM.JIG_TYPE_CODE
+WHERE JM.IS_ACTIVE = 1
+  AND JM.NEXT_CHECK_PLAN_DATE IS NOT NULL
+  AND JM.NEXT_CHECK_PLAN_DATE < @NEXT_MONTH_START
+ORDER BY JM.NEXT_CHECK_PLAN_DATE, JM.JIG_ID;";
+
+            return DbUtils.GetData(
+                SQL_QUERY,
+                new SqlParameter("@NEXT_MONTH_START", NEXT_MONTH_START));
+        }
+
         public void UpsertJig(
             string CONTROL_NO,
             string JIG_NAME,
