@@ -33,6 +33,7 @@ namespace JigFlow.Forms
             this.btnJigCancelHistory = new DevExpress.XtraBars.BarButtonItem();
             this.btnJigDrawing = new DevExpress.XtraBars.BarButtonItem();
             this.btnFormMaster = new DevExpress.XtraBars.BarButtonItem();
+            this.btnJigTypeMaster = new DevExpress.XtraBars.BarButtonItem();
             this.ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.rpgMaster = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.rpgRegister = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
@@ -66,9 +67,10 @@ namespace JigFlow.Forms
                 this.btnJigCancelWaitingApprove,
                 this.btnJigCancelHistory,
                 this.btnJigDrawing,
-                this.btnFormMaster});
+                this.btnFormMaster,
+                this.btnJigTypeMaster});
             this.ribbonControl1.Location = new System.Drawing.Point(0, 0);
-            this.ribbonControl1.MaxItemId = 20;
+            this.ribbonControl1.MaxItemId = 21;
             this.ribbonControl1.Name = "ribbonControl1";
             this.ribbonControl1.PageHeaderItemLinks.Add(this.subUser);
             this.ribbonControl1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] { this.ribbonPage1 });
@@ -109,6 +111,7 @@ namespace JigFlow.Forms
             this.btnJigCancelHistory.Caption = "Lịch sử hủy Jig"; this.btnJigCancelHistory.Id = 17; this.btnJigCancelHistory.Name = "btnJigCancelHistory"; this.btnJigCancelHistory.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnJigCancelHistory_ItemClick);
             this.btnJigDrawing.Caption = "Bản vẽ Jig"; this.btnJigDrawing.Id = 18; this.btnJigDrawing.Name = "btnJigDrawing"; this.btnJigDrawing.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnJigDrawing_ItemClick);
             this.btnFormMaster.Caption = "Form Master"; this.btnFormMaster.Id = 19; this.btnFormMaster.Name = "btnFormMaster"; this.btnFormMaster.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnFormMaster_ItemClick);
+            this.btnJigTypeMaster.Caption = "Loại Jig Master"; this.btnJigTypeMaster.Id = 20; this.btnJigTypeMaster.Name = "btnJigTypeMaster"; this.btnJigTypeMaster.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnJigTypeMaster_ItemClick);
 
             // ribbon page/groups
             this.ribbonPage1.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] {
@@ -124,6 +127,7 @@ namespace JigFlow.Forms
             this.rpgMaster.ItemLinks.Add(this.btnJigVisualList);
             this.rpgMaster.ItemLinks.Add(this.btnJigDrawing);
             this.rpgMaster.ItemLinks.Add(this.btnFormMaster);
+            this.rpgMaster.ItemLinks.Add(this.btnJigTypeMaster);
             this.rpgMaster.Text = "Master";
 
             this.rpgRegister.ItemLinks.Add(this.btnJigRegisterList);
@@ -197,5 +201,6 @@ namespace JigFlow.Forms
         private DevExpress.XtraBars.BarButtonItem btnJigCancelHistory;
         private DevExpress.XtraBars.BarButtonItem btnJigDrawing;
         private DevExpress.XtraBars.BarButtonItem btnFormMaster;
+        private DevExpress.XtraBars.BarButtonItem btnJigTypeMaster;
     }
 }
