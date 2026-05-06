@@ -27,16 +27,31 @@ namespace JigFlow.Forms
 
         private void ConfigureLookUp()
         {
+            txtSearchManagementNo.Properties.ReadOnly = true;
+            txtSearchManagementNo.Properties.NullValuePrompt = "Tự động điền khi chọn ở ô bên phải";
+            txtSearchManagementNo.Properties.NullValuePromptShowForEmptyValue = true;
+
             lueManagementNo.Properties.TextEditStyle = TextEditStyles.Standard;
             lueManagementNo.Properties.SearchMode = DevExpress.XtraEditors.Controls.SearchMode.AutoSearch;
             lueManagementNo.Properties.PopupFilterMode = PopupFilterMode.Contains;
             lueManagementNo.Properties.ImmediatePopup = true;
             lueManagementNo.Properties.NullText = "Nhập/chọn số quản lý";
+            lueManagementNo.Properties.Buttons.Clear();
+            lueManagementNo.Properties.Buttons.Add(new EditorButton(ButtonPredefines.Combo));
 
             lueReason.Properties.TextEditStyle = TextEditStyles.DisableTextEditor;
             lueReason.Properties.ShowHeader = false;
             lueReason.Properties.ShowFooter = false;
             lueReason.Properties.NullText = "Chọn lý do hủy";
+            lueReason.Properties.Buttons.Clear();
+            lueReason.Properties.Buttons.Add(new EditorButton(ButtonPredefines.Combo));
+
+            deExpectedCancelDate.Properties.Buttons.Clear();
+            deExpectedCancelDate.Properties.Buttons.Add(new EditorButton(ButtonPredefines.Combo));
+            deExpectedCancelDate.Properties.CalendarTimeProperties.Buttons.Clear();
+            deExpectedCancelDate.Properties.CalendarTimeProperties.Buttons.Add(new EditorButton(ButtonPredefines.Combo));
+            deExpectedCancelDate.Properties.TextEditStyle = TextEditStyles.DisableTextEditor;
+            deExpectedCancelDate.Properties.NullText = "Chọn ngày hủy dự kiến";
         }
 
         private void ConfigureReadOnlyInfo()
