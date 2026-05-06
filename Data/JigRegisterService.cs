@@ -462,6 +462,30 @@ WHERE JIG_ID = @JIG_ID;";
                 new SqlParameter("@APPROVE_BY", (object)APPROVE_BY ?? DBNull.Value));
         }
 
+        public DataTable GetCancelHistory()
+        {
+            const string SQL_QUERY = @"
+SELECT
+    ROW_NUMBER() OVER(ORDER BY CR.APPROVE_AT DESC, CR.REQUEST_AT DESC) AS STT,
+    CR.CANCEL_ID,
+    JM.CONTROL_NO,
+    JM.JIG_NAME,
+    ISNULL(JM.JIG_TYPE, JM.JIG_TYPE_CODE) AS JIG_TYPE,
+    JM.JIG_SIZE,
+    JM.USE_PRODUCT,
+    JM.LOCATION_CODE,
+    JM.USE_SECTION,
+    CR.REQUEST_AT,
+    CR.REQUEST_BY,
+    CR.CANCEL_REASON,
+    CR.APPROVE_AT
+FROM dbo.JIG_CANCEL_REQUEST CR
+INNER JOIN dbo.JIG_MASTER JM ON CR.JIG_ID = JM.JIG_ID
+WHERE CR.REQUEST_STATUS = 'APPROVED'
+ORDER BY CR.APPROVE_AT DESC, CR.REQUEST_AT DESC;";
+            return DbUtils.GetData(SQL_QUERY);
+        }
+
         public DataRow GetJigMasterByControlNo(string CONTROL_NO)
         {
             const string SQL_QUERY = @"

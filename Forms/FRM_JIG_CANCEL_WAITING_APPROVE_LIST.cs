@@ -77,7 +77,7 @@ namespace JigFlow.Forms
                 return false;
             }
 
-            if (!string.Equals(AppSession.RoleCode, "ADMIN", StringComparison.OrdinalIgnoreCase))
+            if (!RoleHelper.CanApprove())
             {
                 MessageBox.Show("Bạn không có quyền duyệt/xóa.", "Không đủ quyền", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
@@ -88,9 +88,9 @@ namespace JigFlow.Forms
 
         private void ApplyPermissionState()
         {
-            var canOperate = !string.IsNullOrWhiteSpace(AppSession.UserId) && string.Equals(AppSession.RoleCode, "ADMIN", StringComparison.OrdinalIgnoreCase);
-            btnApprove.Enabled = canOperate;
-            btnDelete.Enabled = canOperate;
+            var canApprove = RoleHelper.IsLoggedIn() && RoleHelper.CanApprove();
+            btnApprove.Enabled = canApprove;
+            btnDelete.Enabled = RoleHelper.IsLoggedIn() && RoleHelper.IsSystemAdmin();
         }
 
         private void btnRefresh_Click(object sender, EventArgs e) => LoadData();
@@ -98,6 +98,11 @@ namespace JigFlow.Forms
         private void btnDelete_Click(object sender, EventArgs e)
         {
             if (!EnsureCanOperate()) return;
+            if (!RoleHelper.IsSystemAdmin())
+            {
+                MessageBox.Show("Chỉ SYSTEM_ADMIN mới có quyền xóa.", "Không đủ quyền", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             var id = GetSelectedCancelId();
             if (!id.HasValue) return;
             if (MessageBox.Show("Bạn có chắc muốn xóa đăng ký hủy đã chọn?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;

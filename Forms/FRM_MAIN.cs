@@ -29,7 +29,7 @@ namespace JigFlow.Forms
             btnChangePassMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
             btnLogoutMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
             btnExitMenu.Visibility = BarItemVisibility.Always;
-            btnAccountManagement.Enabled = LOGGED_IN && AppSession.RoleCode == "ADMIN";
+            btnAccountManagement.Enabled = LOGGED_IN && RoleHelper.IsSystemAdmin();
             subUser.Caption = LOGGED_IN ? AppSession.FullName : "Đăng nhập";
             btnUserInfoMenu.Caption = LOGGED_IN ? AppSession.FullName : string.Empty;
         }
