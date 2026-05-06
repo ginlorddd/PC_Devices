@@ -19,6 +19,8 @@ namespace JigFlow.Forms
             this.txtJigTypeCode = new DevExpress.XtraEditors.TextEdit();
             this.lblJigTypeName = new DevExpress.XtraEditors.LabelControl();
             this.txtJigTypeName = new DevExpress.XtraEditors.TextEdit();
+            this.lblJigTypeMain = new DevExpress.XtraEditors.LabelControl();
+            this.cboJigTypeMain = new DevExpress.XtraEditors.ComboBoxEdit();
             this.chkIsActive = new DevExpress.XtraEditors.CheckEdit();
             this.btnNew = new DevExpress.XtraEditors.SimpleButton();
             this.btnSave = new DevExpress.XtraEditors.SimpleButton();
@@ -31,6 +33,7 @@ namespace JigFlow.Forms
             this.panelInput.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtJigTypeCode.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtJigTypeName.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cboJigTypeMain.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkIsActive.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gcJigType)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gvJigType)).BeginInit();
@@ -50,6 +53,8 @@ namespace JigFlow.Forms
             this.panelInput.Controls.Add(this.txtJigTypeCode);
             this.panelInput.Controls.Add(this.lblJigTypeName);
             this.panelInput.Controls.Add(this.txtJigTypeName);
+            this.panelInput.Controls.Add(this.lblJigTypeMain);
+            this.panelInput.Controls.Add(this.cboJigTypeMain);
             this.panelInput.Controls.Add(this.chkIsActive);
             this.panelInput.Controls.Add(this.btnNew);
             this.panelInput.Controls.Add(this.btnSave);
@@ -68,8 +73,14 @@ namespace JigFlow.Forms
             // txtJigTypeName
             this.txtJigTypeName.Location = new System.Drawing.Point(392, 13);
             this.txtJigTypeName.Size = new System.Drawing.Size(330, 20);
+            // lblJigTypeMain
+            this.lblJigTypeMain.Location = new System.Drawing.Point(742, 16);
+            this.lblJigTypeMain.Text = "Nhóm chính";
+            // cboJigTypeMain
+            this.cboJigTypeMain.Location = new System.Drawing.Point(820, 13);
+            this.cboJigTypeMain.Size = new System.Drawing.Size(120, 20);
             // chkIsActive
-            this.chkIsActive.Location = new System.Drawing.Point(742, 13);
+            this.chkIsActive.Location = new System.Drawing.Point(950, 13);
             this.chkIsActive.Properties.Caption = "Kích hoạt";
             this.chkIsActive.Size = new System.Drawing.Size(80, 20);
             // btnNew
@@ -120,6 +131,7 @@ namespace JigFlow.Forms
             this.panelInput.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtJigTypeCode.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtJigTypeName.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cboJigTypeMain.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkIsActive.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gcJigType)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gvJigType)).EndInit();
@@ -135,6 +147,8 @@ namespace JigFlow.Forms
         private DevExpress.XtraEditors.TextEdit txtJigTypeCode;
         private DevExpress.XtraEditors.LabelControl lblJigTypeName;
         private DevExpress.XtraEditors.TextEdit txtJigTypeName;
+        private DevExpress.XtraEditors.LabelControl lblJigTypeMain;
+        private DevExpress.XtraEditors.ComboBoxEdit cboJigTypeMain;
         private DevExpress.XtraEditors.CheckEdit chkIsActive;
         private DevExpress.XtraEditors.SimpleButton btnNew;
         private DevExpress.XtraEditors.SimpleButton btnSave;

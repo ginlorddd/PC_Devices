@@ -3,6 +3,7 @@ using JigFlow.Data;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using DevExpress.XtraEditors.Controls;
 
 namespace JigFlow.Forms
 {
@@ -17,6 +18,9 @@ namespace JigFlow.Forms
 
         private void FRM_JIG_TYPE_MASTER_Load(object sender, EventArgs e)
         {
+            cboJigTypeMain.Properties.Items.Clear();
+            cboJigTypeMain.Properties.Items.AddRange(new object[] { "FUNCTION", "VISUAL" });
+            cboJigTypeMain.Properties.TextEditStyle = TextEditStyles.DisableTextEditor;
             SetupGridFormat(gvJigType);
             LoadData();
         }
@@ -53,11 +57,16 @@ namespace JigFlow.Forms
                 gvJigType.Columns["JIG_TYPE_NAME"].Caption = "Tên loại Jig";
                 gvJigType.Columns["JIG_TYPE_NAME"].VisibleIndex = 2;
             }
+            if (gvJigType.Columns["JIG_TYPE_MAIN"] != null)
+            {
+                gvJigType.Columns["JIG_TYPE_MAIN"].Caption = "Nhóm chính";
+                gvJigType.Columns["JIG_TYPE_MAIN"].VisibleIndex = 3;
+            }
 
             if (gvJigType.Columns["IS_ACTIVE"] != null)
             {
                 gvJigType.Columns["IS_ACTIVE"].Caption = "Kích hoạt";
-                gvJigType.Columns["IS_ACTIVE"].VisibleIndex = 3;
+                gvJigType.Columns["IS_ACTIVE"].VisibleIndex = 4;
             }
 
             gvJigType.BestFitColumns();
@@ -71,6 +80,7 @@ namespace JigFlow.Forms
 
             txtJigTypeCode.Text = Convert.ToString(ROW["JIG_TYPE_CODE"]);
             txtJigTypeName.Text = Convert.ToString(ROW["JIG_TYPE_NAME"]);
+            cboJigTypeMain.EditValue = Convert.ToString(ROW["JIG_TYPE_MAIN"]);
             chkIsActive.Checked = Convert.ToInt32(ROW["IS_ACTIVE"]) == 1;
         }
 
@@ -78,13 +88,14 @@ namespace JigFlow.Forms
         {
             var CODE = txtJigTypeCode.Text.Trim();
             var NAME = txtJigTypeName.Text.Trim();
-            if (string.IsNullOrWhiteSpace(CODE) || string.IsNullOrWhiteSpace(NAME))
+            var TYPE_MAIN = Convert.ToString(cboJigTypeMain.EditValue);
+            if (string.IsNullOrWhiteSpace(CODE) || string.IsNullOrWhiteSpace(NAME) || string.IsNullOrWhiteSpace(TYPE_MAIN))
             {
-                MessageBox.Show("Vui lòng nhập đầy đủ Mã loại Jig và Tên loại Jig.", "Thiếu dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng nhập đầy đủ Mã loại Jig, Tên loại Jig và Nhóm chính.", "Thiếu dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            _service.UpsertJigTypeMaster(CODE, NAME, chkIsActive.Checked);
+            _service.UpsertJigTypeMaster(CODE, NAME, TYPE_MAIN, chkIsActive.Checked);
             MessageBox.Show("Đã lưu loại Jig.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LoadData();
         }
@@ -98,6 +109,7 @@ namespace JigFlow.Forms
         {
             txtJigTypeCode.Text = string.Empty;
             txtJigTypeName.Text = string.Empty;
+            cboJigTypeMain.EditValue = "FUNCTION";
             chkIsActive.Checked = true;
             txtJigTypeCode.Focus();
         }
