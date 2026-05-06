@@ -91,6 +91,63 @@ ORDER BY JM.NEXT_CHECK_PLAN_DATE, JM.JIG_ID;";
                 new SqlParameter("@NEXT_MONTH_START", NEXT_MONTH_START));
         }
 
+        public DataTable GetJigCheckHistory()
+        {
+            const string SQL_QUERY = @"
+SELECT
+    ROW_NUMBER() OVER (ORDER BY JM.LAST_CHECK_DATE DESC, JM.JIG_ID DESC) AS STT,
+    JM.JIG_ID,
+    JM.CONTROL_NO,
+    JM.JIG_NAME,
+    COALESCE(JTM.JIG_TYPE_NAME, JM.JIG_TYPE) AS JIG_TYPE_NAME,
+    JM.JIG_SIZE,
+    JM.USE_PRODUCT,
+    JM.LOCATION_CODE,
+    JM.STATUS_USE,
+    JM.USE_SECTION,
+    JM.LAST_CHECK_DATE,
+    ISNULL(NULLIF(JM.CHECK_RESULT, ''), CH.CHECK_RESULT) AS CHECK_RESULT,
+    CH.REPORT_FILE,
+    CH.CHECK_BY,
+    CH.CHECKER_BY,
+    CH.APPROVE_BY,
+    CH.NOTE
+FROM dbo.JIG_MASTER JM
+LEFT JOIN dbo.JIG_TYPE_MASTER JTM ON JM.JIG_TYPE_CODE = JTM.JIG_TYPE_CODE
+OUTER APPLY
+(
+    SELECT TOP 1 H.CHECK_RESULT, H.CHECK_BY, H.CHECKER_BY, H.APPROVE_BY, H.REPORT_FILE, H.NOTE
+    FROM dbo.JIG_CHECK_HISTORY H
+    WHERE H.JIG_ID = JM.JIG_ID
+    ORDER BY H.CHECK_ID DESC
+) CH
+WHERE JM.IS_ACTIVE = 1
+  AND JM.LAST_CHECK_DATE IS NOT NULL
+ORDER BY JM.LAST_CHECK_DATE DESC, JM.JIG_ID DESC;";
+            return DbUtils.GetData(SQL_QUERY);
+        }
+
+        public int ApproveJigCheck(int JIG_ID, string APPROVE_BY)
+        {
+            const string SQL_QUERY = @"
+UPDATE H
+SET H.APPROVE_BY = @APPROVE_BY,
+    H.APPROVE_AT = GETDATE()
+FROM dbo.JIG_CHECK_HISTORY H
+INNER JOIN
+(
+    SELECT TOP 1 CHECK_ID
+    FROM dbo.JIG_CHECK_HISTORY
+    WHERE JIG_ID = @JIG_ID
+    ORDER BY CHECK_ID DESC
+) LATEST ON H.CHECK_ID = LATEST.CHECK_ID;";
+
+            return DbUtils.Execute(
+                SQL_QUERY,
+                new SqlParameter("@JIG_ID", JIG_ID),
+                new SqlParameter("@APPROVE_BY", (object)APPROVE_BY ?? DBNull.Value));
+        }
+
         public void UpsertJig(
             string CONTROL_NO,
             string JIG_NAME,
