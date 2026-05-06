@@ -359,6 +359,48 @@ WHERE REQUEST_ID = @REQUEST_ID
                 new SqlParameter("@APPROVE_BY", (object)APPROVE_BY ?? DBNull.Value));
         }
 
+        public DataTable GetJigsAvailableForCancel()
+        {
+            const string SQL_QUERY = @"
+SELECT
+    JIG_ID,
+    CONTROL_NO,
+    JIG_NAME,
+    USE_SECTION
+FROM dbo.JIG_MASTER
+WHERE IS_ACTIVE = 1
+  AND ISNULL(STATUS_USE, N'') <> N'Ngưng sử dụng'
+ORDER BY CONTROL_NO;";
+            return DbUtils.GetData(SQL_QUERY);
+        }
+
+        public bool HasWaitingCancelRequest(int JIG_ID)
+        {
+            const string SQL_QUERY = @"
+SELECT CASE WHEN EXISTS
+(
+    SELECT 1
+    FROM dbo.JIG_CANCEL_REQUEST
+    WHERE JIG_ID = @JIG_ID
+      AND REQUEST_STATUS = 'WAITING_APPROVE'
+)
+THEN 1 ELSE 0 END AS HAS_WAITING;";
+            var DT = DbUtils.GetData(SQL_QUERY, new SqlParameter("@JIG_ID", JIG_ID));
+            return DT.Rows.Count > 0 && Convert.ToInt32(DT.Rows[0]["HAS_WAITING"]) == 1;
+        }
+
+        public int CreateCancelRequest(int JIG_ID, string CANCEL_REASON, string REQUEST_BY)
+        {
+            const string SQL_QUERY = @"
+INSERT INTO dbo.JIG_CANCEL_REQUEST(JIG_ID, REQUEST_STATUS, CANCEL_REASON, REQUEST_BY)
+VALUES (@JIG_ID, 'WAITING_APPROVE', @CANCEL_REASON, @REQUEST_BY);";
+            return DbUtils.Execute(
+                SQL_QUERY,
+                new SqlParameter("@JIG_ID", JIG_ID),
+                new SqlParameter("@CANCEL_REASON", (object)CANCEL_REASON ?? DBNull.Value),
+                new SqlParameter("@REQUEST_BY", (object)REQUEST_BY ?? DBNull.Value));
+        }
+
         public DataRow GetJigMasterByControlNo(string CONTROL_NO)
         {
             const string SQL_QUERY = @"
