@@ -422,5 +422,82 @@ WHERE CONTROL_NO = @OLD_CONTROL_NO
                 new SqlParameter("@LAST_CHECK_DATE", (object)LAST_CHECK_DATE ?? DBNull.Value),
                 new SqlParameter("@CHECK_FREQUENCY", (object)CHECK_FREQUENCY ?? DBNull.Value));
         }
+
+        public DataTable GetActiveJigForCancelLookup()
+        {
+            const string SQL_QUERY = @"
+SELECT JM.JIG_ID, JM.CONTROL_NO, JM.JIG_NAME, JM.USE_SECTION, JM.FACTORY
+FROM dbo.JIG_MASTER JM
+WHERE JM.IS_ACTIVE = 1
+ORDER BY JM.CONTROL_NO;";
+            return DbUtils.GetData(SQL_QUERY);
+        }
+
+        public DataRow GetJigByControlNo(string CONTROL_NO)
+        {
+            const string SQL_QUERY = @"
+SELECT TOP 1
+    JM.JIG_ID,
+    JM.CONTROL_NO,
+    JM.JIG_NAME,
+    COALESCE(JTM.JIG_TYPE_NAME, JM.JIG_TYPE) AS JIG_TYPE_NAME,
+    JM.JIG_SIZE,
+    JM.USE_PRODUCT,
+    JM.LOCATION_CODE,
+    JM.FACTORY,
+    JM.USE_SECTION,
+    JM.CHECK_FREQUENCY
+FROM dbo.JIG_MASTER JM
+LEFT JOIN dbo.JIG_TYPE_MASTER JTM ON JM.JIG_TYPE_CODE = JTM.JIG_TYPE_CODE
+WHERE JM.IS_ACTIVE = 1 AND JM.CONTROL_NO = @CONTROL_NO;";
+            var dt = DbUtils.GetData(SQL_QUERY, new SqlParameter("@CONTROL_NO", (object)CONTROL_NO ?? DBNull.Value));
+            return dt.Rows.Count == 0 ? null : dt.Rows[0];
+        }
+
+        public int CreateCancelRequest(int JIG_ID, string CANCEL_REASON, DateTime CANCEL_PLAN_DATE, string ABNORMAL_NO, string NOTE, string REQUEST_BY)
+        {
+            const string SQL_QUERY = @"
+IF EXISTS
+(
+    SELECT 1 FROM dbo.JIG_CANCEL_REQUEST
+    WHERE JIG_ID = @JIG_ID
+      AND REQUEST_STATUS = 'WAITING_APPROVE'
+)
+BEGIN
+    SELECT 0;
+    RETURN;
+END
+
+INSERT INTO dbo.JIG_CANCEL_REQUEST
+(
+    JIG_ID,
+    REQUEST_STATUS,
+    CANCEL_REASON,
+    CANCEL_PLAN_DATE,
+    ABNORMAL_NO,
+    NOTE,
+    REQUEST_BY
+)
+VALUES
+(
+    @JIG_ID,
+    'WAITING_APPROVE',
+    @CANCEL_REASON,
+    @CANCEL_PLAN_DATE,
+    @ABNORMAL_NO,
+    @NOTE,
+    @REQUEST_BY
+);";
+
+            return DbUtils.Execute(
+                SQL_QUERY,
+                new SqlParameter("@JIG_ID", JIG_ID),
+                new SqlParameter("@CANCEL_REASON", (object)CANCEL_REASON ?? DBNull.Value),
+                new SqlParameter("@CANCEL_PLAN_DATE", CANCEL_PLAN_DATE),
+                new SqlParameter("@ABNORMAL_NO", (object)ABNORMAL_NO ?? DBNull.Value),
+                new SqlParameter("@NOTE", (object)NOTE ?? DBNull.Value),
+                new SqlParameter("@REQUEST_BY", (object)REQUEST_BY ?? DBNull.Value));
+        }
+
     }
 }
