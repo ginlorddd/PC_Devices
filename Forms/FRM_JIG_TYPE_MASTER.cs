@@ -23,6 +23,7 @@ namespace JigFlow.Forms
             cboJigTypeMain.Properties.Items.AddRange(new object[] { "FUNCTION", "VISUAL" });
             cboJigTypeMain.Properties.TextEditStyle = TextEditStyles.DisableTextEditor;
             SetupGridFormat(gvJigType);
+            gvJigType.DoubleClick += gvJigType_DoubleClick;
             LoadData();
         }
 
@@ -138,10 +139,28 @@ namespace JigFlow.Forms
         {
             using (var dialog = new OpenFileDialog())
             {
-                dialog.Filter = "Drawing files|*.pdf;*.dwg;*.dxf;*.png;*.jpg;*.jpeg|All files|*.*";
+                dialog.Filter = "PDF files|*.pdf";
                 if (dialog.ShowDialog() != DialogResult.OK) return;
                 txtDrawingFilePath.Text = dialog.FileName;
                 if (string.IsNullOrWhiteSpace(txtDrawingName.Text)) txtDrawingName.Text = Path.GetFileNameWithoutExtension(dialog.FileName);
+            }
+        }
+
+        private void gvJigType_DoubleClick(object sender, EventArgs e)
+        {
+            var hit = gvJigType.CalcHitInfo(gvJigType.GridControl.PointToClient(Cursor.Position));
+            if (!hit.InRowCell || hit.RowHandle < 0) return;
+
+            var path = Convert.ToString(gvJigType.GetRowCellValue(hit.RowHandle, "DRAWING_FILE_PATH"));
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            {
+                MessageBox.Show("Không tìm thấy file PDF bản vẽ.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using (var form = new FRM_PDF_VIEWER_ADV(path))
+            {
+                form.ShowDialog(this);
             }
         }
     }
