@@ -131,7 +131,7 @@ namespace JigFlow.Forms
             if (string.IsNullOrWhiteSpace(TYPE_CODE)) return;
             if (_jigTypes != null)
             {
-                var rows = _jigTypes.Select($"JIG_TYPE_CODE = '{TYPE_CODE.Replace(\"'\", \"''\")}'");
+                var rows = _jigTypes.Select($"JIG_TYPE_CODE = '{TYPE_CODE.Replace("'", "''")}'");
                 if (rows.Length > 0)
                 {
                     var defaultDrawing = Convert.ToString(rows[0]["DEFAULT_DRAWING_CODE"]);
