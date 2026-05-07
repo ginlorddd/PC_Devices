@@ -143,7 +143,8 @@ namespace JigFlow.Forms
             }
 
             var TYPE_NAME = cboJigType.Text ?? string.Empty;
-            var IS_BRACKET = TYPE_NAME.ToUpper().Contains("BRACKET") || TYPE_CODE.ToUpper().Contains("BRACKET");
+            var IS_BRACKET = TYPE_NAME.ToUpper().Contains("BRACKET")
+                             || TYPE_CODE.ToUpper().Contains("BRACKET");
             var IS_HLC = TYPE_CODE.ToUpper().Contains("HLC");
 
             txtSize.Properties.ReadOnly = !IS_BRACKET;
@@ -155,7 +156,7 @@ namespace JigFlow.Forms
             }
             else if (IS_BRACKET)
             {
-                var NUMBER_MATCH = Regex.Match(TYPE_NAME, "\\d+");
+                var NUMBER_MATCH = Regex.Match(TYPE_NAME, @"\d+");
                 var BRACKET_NO = NUMBER_MATCH.Success ? NUMBER_MATCH.Value : "1";
                 txtNameJig.Text = $"BK{BRACKET_NO}";
             }
