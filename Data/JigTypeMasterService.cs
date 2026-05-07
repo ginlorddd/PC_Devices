@@ -34,8 +34,7 @@ BEGIN
         UPDATE dbo.JIG_DRAWING_MASTER
         SET DRAWING_NAME = @DRAWING_NAME,
             FILE_PATH = @DRAWING_FILE_PATH,
-            IS_ACTIVE = 1,
-            UPDATED_AT = GETDATE()
+            IS_ACTIVE = 1
         WHERE DRAWING_CODE = @DEFAULT_DRAWING_CODE;
     END
     ELSE
