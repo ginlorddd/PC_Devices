@@ -4,6 +4,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using DevExpress.XtraEditors.Controls;
+using System.IO;
 
 namespace JigFlow.Forms
 {
@@ -81,6 +82,9 @@ namespace JigFlow.Forms
             txtJigTypeCode.Text = Convert.ToString(ROW["JIG_TYPE_CODE"]);
             txtJigTypeName.Text = Convert.ToString(ROW["JIG_TYPE_NAME"]);
             cboJigTypeMain.EditValue = Convert.ToString(ROW["JIG_TYPE_MAIN"]);
+            txtDrawingCode.Text = Convert.ToString(ROW["DEFAULT_DRAWING_CODE"]);
+            txtDrawingName.Text = Convert.ToString(ROW["DRAWING_NAME"]);
+            txtDrawingFilePath.Text = Convert.ToString(ROW["DRAWING_FILE_PATH"]);
             chkIsActive.Checked = Convert.ToInt32(ROW["IS_ACTIVE"]) == 1;
         }
 
@@ -95,7 +99,20 @@ namespace JigFlow.Forms
                 return;
             }
 
-            _service.UpsertJigTypeMaster(CODE, NAME, TYPE_MAIN, chkIsActive.Checked);
+            var drawingCode = txtDrawingCode.Text.Trim();
+            var drawingName = txtDrawingName.Text.Trim();
+            var sourcePath = txtDrawingFilePath.Text.Trim();
+            var storedPath = sourcePath;
+            if (!string.IsNullOrWhiteSpace(sourcePath) && File.Exists(sourcePath))
+            {
+                var targetFolder = Path.Combine(StorageConfig.FolderFileUpload, "JigDrawings", CODE);
+                Directory.CreateDirectory(targetFolder);
+                var targetFile = Path.Combine(targetFolder, Path.GetFileName(sourcePath));
+                File.Copy(sourcePath, targetFile, true);
+                storedPath = targetFile;
+            }
+
+            _service.UpsertJigTypeMaster(CODE, NAME, TYPE_MAIN, drawingCode, drawingName, storedPath, chkIsActive.Checked);
             MessageBox.Show("Đã lưu loại Jig.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LoadData();
         }
@@ -110,8 +127,22 @@ namespace JigFlow.Forms
             txtJigTypeCode.Text = string.Empty;
             txtJigTypeName.Text = string.Empty;
             cboJigTypeMain.EditValue = "FUNCTION";
+            txtDrawingCode.Text = string.Empty;
+            txtDrawingName.Text = string.Empty;
+            txtDrawingFilePath.Text = string.Empty;
             chkIsActive.Checked = true;
             txtJigTypeCode.Focus();
+        }
+
+        private void btnBrowseDrawing_Click(object sender, EventArgs e)
+        {
+            using (var dialog = new OpenFileDialog())
+            {
+                dialog.Filter = "Drawing files|*.pdf;*.dwg;*.dxf;*.png;*.jpg;*.jpeg|All files|*.*";
+                if (dialog.ShowDialog() != DialogResult.OK) return;
+                txtDrawingFilePath.Text = dialog.FileName;
+                if (string.IsNullOrWhiteSpace(txtDrawingName.Text)) txtDrawingName.Text = Path.GetFileNameWithoutExtension(dialog.FileName);
+            }
         }
     }
 }

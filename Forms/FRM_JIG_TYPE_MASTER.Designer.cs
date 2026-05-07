@@ -25,6 +25,13 @@ namespace JigFlow.Forms
             this.btnNew = new DevExpress.XtraEditors.SimpleButton();
             this.btnSave = new DevExpress.XtraEditors.SimpleButton();
             this.btnRefresh = new DevExpress.XtraEditors.SimpleButton();
+            this.lblDrawingCode = new DevExpress.XtraEditors.LabelControl();
+            this.txtDrawingCode = new DevExpress.XtraEditors.TextEdit();
+            this.lblDrawingName = new DevExpress.XtraEditors.LabelControl();
+            this.txtDrawingName = new DevExpress.XtraEditors.TextEdit();
+            this.lblDrawingPath = new DevExpress.XtraEditors.LabelControl();
+            this.txtDrawingFilePath = new DevExpress.XtraEditors.TextEdit();
+            this.btnBrowseDrawing = new DevExpress.XtraEditors.SimpleButton();
             this.gcJigType = new DevExpress.XtraGrid.GridControl();
             this.gvJigType = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.panelBottom = new System.Windows.Forms.Panel();
@@ -38,6 +45,9 @@ namespace JigFlow.Forms
             ((System.ComponentModel.ISupportInitialize)(this.gcJigType)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gvJigType)).BeginInit();
             this.panelBottom.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtDrawingCode.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtDrawingName.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtDrawingFilePath.Properties)).BeginInit();
             this.SuspendLayout();
             // panelTop
             this.panelTop.Controls.Add(this.lblTitle);
@@ -59,8 +69,15 @@ namespace JigFlow.Forms
             this.panelInput.Controls.Add(this.btnNew);
             this.panelInput.Controls.Add(this.btnSave);
             this.panelInput.Controls.Add(this.btnRefresh);
+            this.panelInput.Controls.Add(this.lblDrawingCode);
+            this.panelInput.Controls.Add(this.txtDrawingCode);
+            this.panelInput.Controls.Add(this.lblDrawingName);
+            this.panelInput.Controls.Add(this.txtDrawingName);
+            this.panelInput.Controls.Add(this.lblDrawingPath);
+            this.panelInput.Controls.Add(this.txtDrawingFilePath);
+            this.panelInput.Controls.Add(this.btnBrowseDrawing);
             this.panelInput.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelInput.Height = 78;
+            this.panelInput.Height = 112;
             // lblJigTypeCode
             this.lblJigTypeCode.Location = new System.Drawing.Point(16, 16);
             this.lblJigTypeCode.Text = "Mã loại Jig";
@@ -98,9 +115,16 @@ namespace JigFlow.Forms
             this.btnRefresh.Size = new System.Drawing.Size(90, 26);
             this.btnRefresh.Text = "Refresh";
             this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            this.lblDrawingCode.Location = new System.Drawing.Point(16, 80); this.lblDrawingCode.Text = "Mã bản vẽ";
+            this.txtDrawingCode.Location = new System.Drawing.Point(95, 77); this.txtDrawingCode.Size = new System.Drawing.Size(150, 20);
+            this.lblDrawingName.Location = new System.Drawing.Point(260, 80); this.lblDrawingName.Text = "Tên bản vẽ";
+            this.txtDrawingName.Location = new System.Drawing.Point(330, 77); this.txtDrawingName.Size = new System.Drawing.Size(220, 20);
+            this.lblDrawingPath.Location = new System.Drawing.Point(560, 80); this.lblDrawingPath.Text = "File";
+            this.txtDrawingFilePath.Location = new System.Drawing.Point(590, 77); this.txtDrawingFilePath.Size = new System.Drawing.Size(350, 20);
+            this.btnBrowseDrawing.Location = new System.Drawing.Point(950, 75); this.btnBrowseDrawing.Size = new System.Drawing.Size(90, 24); this.btnBrowseDrawing.Text = "Browse"; this.btnBrowseDrawing.Click += new System.EventHandler(this.btnBrowseDrawing_Click);
             // gcJigType
             this.gcJigType.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gcJigType.Location = new System.Drawing.Point(0, 134);
+            this.gcJigType.Location = new System.Drawing.Point(0, 168);
             this.gcJigType.MainView = this.gvJigType;
             this.gcJigType.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.gvJigType });
             // gvJigType
@@ -137,6 +161,9 @@ namespace JigFlow.Forms
             ((System.ComponentModel.ISupportInitialize)(this.gvJigType)).EndInit();
             this.panelBottom.ResumeLayout(false);
             this.panelBottom.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtDrawingCode.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtDrawingName.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtDrawingFilePath.Properties)).EndInit();
             this.ResumeLayout(false);
         }
 
@@ -153,6 +180,13 @@ namespace JigFlow.Forms
         private DevExpress.XtraEditors.SimpleButton btnNew;
         private DevExpress.XtraEditors.SimpleButton btnSave;
         private DevExpress.XtraEditors.SimpleButton btnRefresh;
+        private DevExpress.XtraEditors.LabelControl lblDrawingCode;
+        private DevExpress.XtraEditors.TextEdit txtDrawingCode;
+        private DevExpress.XtraEditors.LabelControl lblDrawingName;
+        private DevExpress.XtraEditors.TextEdit txtDrawingName;
+        private DevExpress.XtraEditors.LabelControl lblDrawingPath;
+        private DevExpress.XtraEditors.TextEdit txtDrawingFilePath;
+        private DevExpress.XtraEditors.SimpleButton btnBrowseDrawing;
         private DevExpress.XtraGrid.GridControl gcJigType;
         private DevExpress.XtraGrid.Views.Grid.GridView gvJigType;
         private System.Windows.Forms.Panel panelBottom;
