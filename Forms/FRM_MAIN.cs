@@ -32,6 +32,10 @@ namespace JigFlow.Forms
             btnAccountManagement.Enabled = LOGGED_IN && RoleHelper.IsSystemAdmin();
             subUser.Caption = LOGGED_IN ? AppSession.FullName : "Đăng nhập";
             btnUserInfoMenu.Caption = string.Empty;
+            btnAccountFloat.Text = LOGGED_IN ? AppSession.FullName : "Đăng nhập";
+            mnuLogin.Visible = !LOGGED_IN;
+            mnuLogout.Visible = LOGGED_IN;
+            mnuChangePassword.Visible = LOGGED_IN;
         }
 
         private void OpenOrActivate(Type FORM_TYPE)
@@ -77,6 +81,16 @@ namespace JigFlow.Forms
         {
             Close();
         }
+
+        private void btnAccountFloat_Click(object sender, EventArgs e)
+        {
+            accountMenu.Show(btnAccountFloat, 0, btnAccountFloat.Height);
+        }
+
+        private void mnuLogin_Click(object sender, EventArgs e) => btnLoginMenu_ItemClick(sender, null);
+        private void mnuLogout_Click(object sender, EventArgs e) => btnLogoutMenu_ItemClick(sender, null);
+        private void mnuChangePassword_Click(object sender, EventArgs e) => btnChangePassMenu_ItemClick(sender, null);
+        private void mnuExit_Click(object sender, EventArgs e) => btnExitMenu_ItemClick(sender, null);
 
         private void btnAccountManagement_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_ACCOUNT_MANAGEMENT));
         private void btnJigFunctionList_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_FUNCTION_LIST));

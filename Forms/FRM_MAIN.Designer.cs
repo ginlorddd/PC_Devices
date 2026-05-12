@@ -42,8 +42,15 @@ namespace JigFlow.Forms
             this.rpgSystem = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.ribbonStatusBar1 = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
             this.xtraTabbedMdiManager1 = new DevExpress.XtraTabbedMdi.XtraTabbedMdiManager(this.components);
+            this.btnAccountFloat = new DevExpress.XtraEditors.SimpleButton();
+            this.accountMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mnuLogin = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuLogout = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuChangePassword = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuExit = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabbedMdiManager1)).BeginInit();
+            this.accountMenu.SuspendLayout();
             this.SuspendLayout();
             // ribbonControl1
             this.ribbonControl1.ExpandCollapseItem.Id = 0;
@@ -153,12 +160,32 @@ namespace JigFlow.Forms
             this.ribbonStatusBar1.Size = new System.Drawing.Size(1280, 31);
 
             this.xtraTabbedMdiManager1.MdiParent = this;
+            this.btnAccountFloat.Anchor = (System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right);
+            this.btnAccountFloat.Location = new System.Drawing.Point(1120, 8);
+            this.btnAccountFloat.Size = new System.Drawing.Size(150, 30);
+            this.btnAccountFloat.Text = "Đăng nhập";
+            this.btnAccountFloat.Click += new System.EventHandler(this.btnAccountFloat_Click);
+
+            this.accountMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuLogin,
+            this.mnuLogout,
+            this.mnuChangePassword,
+            this.mnuExit});
+            this.mnuLogin.Text = "Đăng nhập";
+            this.mnuLogin.Click += new System.EventHandler(this.mnuLogin_Click);
+            this.mnuLogout.Text = "Đăng xuất";
+            this.mnuLogout.Click += new System.EventHandler(this.mnuLogout_Click);
+            this.mnuChangePassword.Text = "Đổi mật khẩu";
+            this.mnuChangePassword.Click += new System.EventHandler(this.mnuChangePassword_Click);
+            this.mnuExit.Text = "Thoát";
+            this.mnuExit.Click += new System.EventHandler(this.mnuExit_Click);
 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1280, 720);
             this.Controls.Add(this.ribbonStatusBar1);
             this.Controls.Add(this.ribbonControl1);
+            this.Controls.Add(this.btnAccountFloat);
             this.IsMdiContainer = true;
             this.Name = "FRM_MAIN";
             this.Ribbon = this.ribbonControl1;
@@ -168,6 +195,7 @@ namespace JigFlow.Forms
             this.Load += new System.EventHandler(this.FRM_MAIN_Load);
             ((System.ComponentModel.ISupportInitialize)(this.ribbonControl1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabbedMdiManager1)).EndInit();
+            this.accountMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -201,5 +229,11 @@ namespace JigFlow.Forms
         private DevExpress.XtraBars.BarButtonItem btnJigDrawing;
         private DevExpress.XtraBars.BarButtonItem btnFormMaster;
         private DevExpress.XtraBars.BarButtonItem btnJigTypeMaster;
+        private DevExpress.XtraEditors.SimpleButton btnAccountFloat;
+        private System.Windows.Forms.ContextMenuStrip accountMenu;
+        private System.Windows.Forms.ToolStripMenuItem mnuLogin;
+        private System.Windows.Forms.ToolStripMenuItem mnuLogout;
+        private System.Windows.Forms.ToolStripMenuItem mnuChangePassword;
+        private System.Windows.Forms.ToolStripMenuItem mnuExit;
     }
 }
