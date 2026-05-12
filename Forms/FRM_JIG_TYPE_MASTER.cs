@@ -11,6 +11,7 @@ namespace JigFlow.Forms
     public partial class FRM_JIG_TYPE_MASTER : DevExpress.XtraEditors.XtraForm
     {
         private readonly JigTypeMasterService _service = new JigTypeMasterService();
+        private string _selectedDrawingFilePath = string.Empty;
 
         public FRM_JIG_TYPE_MASTER()
         {
@@ -19,6 +20,10 @@ namespace JigFlow.Forms
 
         private void FRM_JIG_TYPE_MASTER_Load(object sender, EventArgs e)
         {
+            lblDrawingCode.Visible = false;
+            txtDrawingCode.Visible = false;
+            lblDrawingPath.Visible = false;
+            txtDrawingFilePath.Visible = false;
             cboJigTypeMain.Properties.Items.Clear();
             cboJigTypeMain.Properties.Items.AddRange(new object[] { "FUNCTION", "VISUAL" });
             cboJigTypeMain.Properties.TextEditStyle = TextEditStyles.DisableTextEditor;
@@ -70,6 +75,8 @@ namespace JigFlow.Forms
                 gvJigType.Columns["IS_ACTIVE"].Caption = "Kích hoạt";
                 gvJigType.Columns["IS_ACTIVE"].VisibleIndex = 4;
             }
+            if (gvJigType.Columns["DEFAULT_DRAWING_CODE"] != null) gvJigType.Columns["DEFAULT_DRAWING_CODE"].Visible = false;
+            if (gvJigType.Columns["DRAWING_FILE_PATH"] != null) gvJigType.Columns["DRAWING_FILE_PATH"].Visible = false;
 
             gvJigType.BestFitColumns();
             lblRecord.Text = $"Record: {gvJigType.RowCount}";
@@ -83,9 +90,8 @@ namespace JigFlow.Forms
             txtJigTypeCode.Text = Convert.ToString(ROW["JIG_TYPE_CODE"]);
             txtJigTypeName.Text = Convert.ToString(ROW["JIG_TYPE_NAME"]);
             cboJigTypeMain.EditValue = Convert.ToString(ROW["JIG_TYPE_MAIN"]);
-            txtDrawingCode.Text = Convert.ToString(ROW["DEFAULT_DRAWING_CODE"]);
             txtDrawingName.Text = Convert.ToString(ROW["DRAWING_NAME"]);
-            txtDrawingFilePath.Text = Convert.ToString(ROW["DRAWING_FILE_PATH"]);
+            _selectedDrawingFilePath = Convert.ToString(ROW["DRAWING_FILE_PATH"]);
             chkIsActive.Checked = Convert.ToInt32(ROW["IS_ACTIVE"]) == 1;
         }
 
@@ -100,10 +106,10 @@ namespace JigFlow.Forms
                 return;
             }
 
-            var drawingCode = txtDrawingCode.Text.Trim();
+            var drawingCode = string.Empty;
             var drawingName = txtDrawingName.Text.Trim();
-            var sourcePath = txtDrawingFilePath.Text.Trim();
-            var storedPath = sourcePath;
+            var sourcePath = _selectedDrawingFilePath;
+            var storedPath = _selectedDrawingFilePath;
             if (!string.IsNullOrWhiteSpace(sourcePath) && File.Exists(sourcePath))
             {
                 var targetFolder = Path.Combine(StorageConfig.FolderFileUpload, "JigDrawings", CODE);
@@ -128,9 +134,8 @@ namespace JigFlow.Forms
             txtJigTypeCode.Text = string.Empty;
             txtJigTypeName.Text = string.Empty;
             cboJigTypeMain.EditValue = "FUNCTION";
-            txtDrawingCode.Text = string.Empty;
             txtDrawingName.Text = string.Empty;
-            txtDrawingFilePath.Text = string.Empty;
+            _selectedDrawingFilePath = string.Empty;
             chkIsActive.Checked = true;
             txtJigTypeCode.Focus();
         }
@@ -141,7 +146,7 @@ namespace JigFlow.Forms
             {
                 dialog.Filter = "PDF files|*.pdf";
                 if (dialog.ShowDialog() != DialogResult.OK) return;
-                txtDrawingFilePath.Text = dialog.FileName;
+                _selectedDrawingFilePath = dialog.FileName;
                 if (string.IsNullOrWhiteSpace(txtDrawingName.Text)) txtDrawingName.Text = Path.GetFileNameWithoutExtension(dialog.FileName);
             }
         }
