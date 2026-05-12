@@ -51,6 +51,7 @@ namespace JigFlow.Forms
             this.gcJig.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.gvJig });
             // gvJig
             this.gvJig.GridControl = this.gcJig;
+            this.gvJig.OptionsBehavior.Editable = false;
             this.gvJig.Columns.AddVisible("STT", "STT");
             this.gvJig.Columns.AddVisible("CONTROL_NO", "Control No.");
             this.gvJig.Columns.AddVisible("JIG_NAME", "Tên Jig");

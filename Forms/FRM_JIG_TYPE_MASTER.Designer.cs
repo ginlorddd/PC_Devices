@@ -129,6 +129,7 @@ namespace JigFlow.Forms
             this.gcJigType.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.gvJigType });
             // gvJigType
             this.gvJigType.GridControl = this.gcJigType;
+            this.gvJigType.OptionsBehavior.Editable = false;
             this.gvJigType.FocusedRowChanged += new DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventHandler(this.gvJigType_FocusedRowChanged);
             // panelBottom
             this.panelBottom.Controls.Add(this.lblRecord);

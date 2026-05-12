@@ -31,6 +31,7 @@ namespace JigFlow.Forms
             this.btnRefresh.Anchor = (System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right); this.btnRefresh.Location = new System.Drawing.Point(1680, 12); this.btnRefresh.Size = new System.Drawing.Size(100, 32); this.btnRefresh.Text = "Refresh"; this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             this.gcHistory.Dock = System.Windows.Forms.DockStyle.Fill; this.gcHistory.Location = new System.Drawing.Point(0, 56); this.gcHistory.MainView = this.gvHistory; this.gcHistory.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.gvHistory });
             this.gvHistory.GridControl = this.gcHistory;
+            this.gvHistory.OptionsBehavior.Editable = false;
             this.panelBottom.Controls.Add(this.btnExport); this.panelBottom.Controls.Add(this.btnDelete); this.panelBottom.Controls.Add(this.btnClose); this.panelBottom.Controls.Add(this.lblRecord); this.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom; this.panelBottom.Height = 86;
             this.btnExport.Location = new System.Drawing.Point(20, 18); this.btnExport.Size = new System.Drawing.Size(90, 35); this.btnExport.Text = "Export"; this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             this.btnDelete.Location = new System.Drawing.Point(116, 18); this.btnDelete.Size = new System.Drawing.Size(90, 35); this.btnDelete.Text = "Delete"; this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);

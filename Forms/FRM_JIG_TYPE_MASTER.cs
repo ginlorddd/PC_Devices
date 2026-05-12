@@ -78,6 +78,11 @@ namespace JigFlow.Forms
                 gvJigType.Columns["IS_ACTIVE"].Caption = "Kích hoạt";
                 gvJigType.Columns["IS_ACTIVE"].VisibleIndex = 4;
             }
+            if (gvJigType.Columns["DRAWING_NAME"] != null)
+            {
+                gvJigType.Columns["DRAWING_NAME"].Caption = "Tên bản vẽ";
+                gvJigType.Columns["DRAWING_NAME"].VisibleIndex = 5;
+            }
             if (gvJigType.Columns["DEFAULT_DRAWING_CODE"] != null) gvJigType.Columns["DEFAULT_DRAWING_CODE"].Visible = false;
             if (gvJigType.Columns["DRAWING_FILE_PATH"] != null) gvJigType.Columns["DRAWING_FILE_PATH"].Visible = false;
 
@@ -158,6 +163,7 @@ namespace JigFlow.Forms
         {
             var hit = gvJigType.CalcHitInfo(gvJigType.GridControl.PointToClient(Cursor.Position));
             if (!hit.InRowCell || hit.RowHandle < 0) return;
+            if (hit.Column == null || !string.Equals(hit.Column.FieldName, "DRAWING_NAME", StringComparison.OrdinalIgnoreCase)) return;
 
             var path = Convert.ToString(gvJigType.GetRowCellValue(hit.RowHandle, "DRAWING_FILE_PATH"));
             if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))

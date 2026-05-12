@@ -46,6 +46,7 @@ namespace JigFlow.Forms
             this.gcWaiting.MainView = this.gvWaiting;
             this.gcWaiting.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.gvWaiting });
             this.gvWaiting.GridControl = this.gcWaiting;
+            this.gvWaiting.OptionsBehavior.Editable = false;
             this.panelBottom.Controls.Add(this.btnDelete);
             this.panelBottom.Controls.Add(this.btnApprove);
             this.panelBottom.Controls.Add(this.btnExport);
