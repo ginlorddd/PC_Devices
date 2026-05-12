@@ -39,6 +39,9 @@ namespace JigFlow.Forms
             VIEW.Appearance.HeaderPanel.Font = new Font(VIEW.Appearance.HeaderPanel.Font, FontStyle.Bold);
             VIEW.Appearance.HeaderPanel.Options.UseFont = true;
             VIEW.OptionsView.ColumnAutoWidth = false;
+            VIEW.OptionsBehavior.Editable = false;
+            VIEW.OptionsBehavior.ReadOnly = true;
+            VIEW.OptionsSelection.EnableAppearanceFocusedCell = false;
         }
 
         private void LoadData()
