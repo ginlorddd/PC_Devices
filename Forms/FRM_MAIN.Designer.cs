@@ -83,7 +83,6 @@ namespace JigFlow.Forms
             this.subUser.Id = 1;
             this.subUser.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
                 new DevExpress.XtraBars.LinkPersistInfo(this.btnLoginMenu),
-                new DevExpress.XtraBars.LinkPersistInfo(this.btnUserInfoMenu),
                 new DevExpress.XtraBars.LinkPersistInfo(this.btnLogoutMenu),
                 new DevExpress.XtraBars.LinkPersistInfo(this.btnChangePassMenu),
                 new DevExpress.XtraBars.LinkPersistInfo(this.btnExitMenu)});

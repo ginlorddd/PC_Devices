@@ -25,13 +25,13 @@ namespace JigFlow.Forms
         private void UpdateAccountMenu(bool LOGGED_IN)
         {
             btnLoginMenu.Visibility = LOGGED_IN ? BarItemVisibility.Never : BarItemVisibility.Always;
-            btnUserInfoMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
+            btnUserInfoMenu.Visibility = BarItemVisibility.Never;
             btnChangePassMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
             btnLogoutMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
             btnExitMenu.Visibility = BarItemVisibility.Always;
             btnAccountManagement.Enabled = LOGGED_IN && RoleHelper.IsSystemAdmin();
             subUser.Caption = LOGGED_IN ? AppSession.FullName : "Đăng nhập";
-            btnUserInfoMenu.Caption = LOGGED_IN ? AppSession.FullName : string.Empty;
+            btnUserInfoMenu.Caption = string.Empty;
         }
 
         private void OpenOrActivate(Type FORM_TYPE)
