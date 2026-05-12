@@ -84,6 +84,11 @@ namespace JigFlow.Forms
 
         private void btnAccountFloat_Click(object sender, EventArgs e)
         {
+            if (!RoleHelper.IsLoggedIn())
+            {
+                btnLoginMenu_ItemClick(sender, null);
+                return;
+            }
             accountMenu.Show(btnAccountFloat, 0, btnAccountFloat.Height);
         }
 
