@@ -186,6 +186,26 @@ BEGIN
     );
 END;
 
+IF OBJECT_ID(N'dbo.JIG_EDIT_HISTORY', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.JIG_EDIT_HISTORY
+    (
+        HISTORY_ID         INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        JIG_NAME           NVARCHAR(200)     NULL,
+        OLD_CONTROL_NO     VARCHAR(100)      NULL,
+        NEW_CONTROL_NO     VARCHAR(100)      NULL,
+        JIG_TYPE_CODE      VARCHAR(50)       NULL,
+        JIG_SIZE           VARCHAR(50)       NULL,
+        USE_PRODUCT        NVARCHAR(300)     NULL,
+        PURPOSE_USE        NVARCHAR(300)     NULL,
+        LOCATION_CODE      VARCHAR(50)       NULL,
+        DEPARTMENT         NVARCHAR(100)     NULL,
+        FACTORY            VARCHAR(50)       NULL,
+        UPDATED_BY         VARCHAR(50)       NULL,
+        UPDATED_AT         DATETIME          NOT NULL DEFAULT(GETDATE())
+    );
+END;
+
 IF OBJECT_ID(N'dbo.FORM_MASTER', N'U') IS NULL
 BEGIN
     CREATE TABLE dbo.FORM_MASTER
