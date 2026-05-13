@@ -37,7 +37,7 @@ namespace JigFlow.Forms
             this.cboJigType = new DevExpress.XtraEditors.LookUpEdit();
             this.txtSize = new DevExpress.XtraEditors.TextEdit();
             this.txtUseProduct = new DevExpress.XtraEditors.TextEdit();
-            this.txtPurposeUse = new DevExpress.XtraEditors.TextEdit();
+            this.txtPurposeUse = new DevExpress.XtraEditors.MemoEdit();
             this.cboReportForm = new DevExpress.XtraEditors.LookUpEdit();
             this.txtLocation = new DevExpress.XtraEditors.TextEdit();
             this.cboDrawing = new DevExpress.XtraEditors.LookUpEdit();
@@ -113,9 +113,9 @@ namespace JigFlow.Forms
             this.groupInfo.Controls.Add(this.deLastCheckDate);
             this.groupInfo.Controls.Add(this.txtFirstCheckFile);
             this.groupInfo.Controls.Add(this.btnBrowseResult);
-            this.groupInfo.Location = new System.Drawing.Point(24, 64);
+            this.groupInfo.Location = new System.Drawing.Point(24, 68);
             this.groupInfo.Name = "groupInfo";
-            this.groupInfo.Size = new System.Drawing.Size(1260, 430);
+            this.groupInfo.Size = new System.Drawing.Size(1314, 476);
             this.groupInfo.TabIndex = 0;
             this.groupInfo.Text = "Thông tin Jig";
             // 
@@ -147,7 +147,7 @@ namespace JigFlow.Forms
             this.lblManagementNo.Appearance.ForeColor = System.Drawing.Color.FromArgb(33, 33, 33);
             this.lblManagementNo.Appearance.Options.UseFont = true;
             this.lblManagementNo.Appearance.Options.UseForeColor = true;
-            this.lblManagementNo.Location = new System.Drawing.Point(1030, 42);
+            this.lblManagementNo.Location = new System.Drawing.Point(974, 40);
             this.lblManagementNo.Name = "lblManagementNo";
             this.lblManagementNo.Size = new System.Drawing.Size(79, 20);
             this.lblManagementNo.Text = "Số quản lý (*)";
@@ -213,7 +213,7 @@ namespace JigFlow.Forms
             this.lblPurposeUse.Appearance.ForeColor = System.Drawing.Color.FromArgb(33, 33, 33);
             this.lblPurposeUse.Appearance.Options.UseFont = true;
             this.lblPurposeUse.Appearance.Options.UseForeColor = true;
-            this.lblPurposeUse.Location = new System.Drawing.Point(24, 238);
+            this.lblPurposeUse.Location = new System.Drawing.Point(24, 401);
             this.lblPurposeUse.Name = "lblPurposeUse";
             this.lblPurposeUse.Size = new System.Drawing.Size(108, 20);
             this.lblPurposeUse.Text = "Mục đích sử dụng";
@@ -235,7 +235,7 @@ namespace JigFlow.Forms
             this.lblLocation.Appearance.ForeColor = System.Drawing.Color.FromArgb(33, 33, 33);
             this.lblLocation.Appearance.Options.UseFont = true;
             this.lblLocation.Appearance.Options.UseForeColor = true;
-            this.lblLocation.Location = new System.Drawing.Point(24, 266);
+            this.lblLocation.Location = new System.Drawing.Point(24, 274);
             this.lblLocation.Name = "lblLocation";
             this.lblLocation.Size = new System.Drawing.Size(38, 20);
             this.lblLocation.Text = "Vị trí";
@@ -246,7 +246,7 @@ namespace JigFlow.Forms
             this.lblDrawing.Appearance.ForeColor = System.Drawing.Color.FromArgb(33, 33, 33);
             this.lblDrawing.Appearance.Options.UseFont = true;
             this.lblDrawing.Appearance.Options.UseForeColor = true;
-            this.lblDrawing.Location = new System.Drawing.Point(700, 266);
+            this.lblDrawing.Location = new System.Drawing.Point(700, 274);
             this.lblDrawing.Name = "lblDrawing";
             this.lblDrawing.Size = new System.Drawing.Size(47, 20);
             this.lblDrawing.Text = "Bản vẽ";
@@ -257,7 +257,7 @@ namespace JigFlow.Forms
             this.lblLastCheckDate.Appearance.ForeColor = System.Drawing.Color.FromArgb(33, 33, 33);
             this.lblLastCheckDate.Appearance.Options.UseFont = true;
             this.lblLastCheckDate.Appearance.Options.UseForeColor = true;
-            this.lblLastCheckDate.Location = new System.Drawing.Point(700, 322);
+            this.lblLastCheckDate.Location = new System.Drawing.Point(700, 338);
             this.lblLastCheckDate.Name = "lblLastCheckDate";
             this.lblLastCheckDate.Size = new System.Drawing.Size(129, 20);
             this.lblLastCheckDate.Text = "Ngày KTĐK gần nhất";
@@ -268,7 +268,7 @@ namespace JigFlow.Forms
             this.lblFirstCheck.Appearance.ForeColor = System.Drawing.Color.FromArgb(33, 33, 33);
             this.lblFirstCheck.Appearance.Options.UseFont = true;
             this.lblFirstCheck.Appearance.Options.UseForeColor = true;
-            this.lblFirstCheck.Location = new System.Drawing.Point(24, 322);
+            this.lblFirstCheck.Location = new System.Drawing.Point(24, 338);
             this.lblFirstCheck.Name = "lblFirstCheck";
             this.lblFirstCheck.Size = new System.Drawing.Size(129, 20);
             this.lblFirstCheck.Text = "KQ kiểm tra lần đầu";
@@ -284,21 +284,21 @@ namespace JigFlow.Forms
             // 
             this.cboFactory.Location = new System.Drawing.Point(885, 38);
             this.cboFactory.Name = "cboFactory";
-            this.cboFactory.Size = new System.Drawing.Size(130, 20);
+            this.cboFactory.Size = new System.Drawing.Size(63, 20);
             this.cboFactory.TabIndex = 1;
             // 
             // txtManagementNo
             // 
-            this.txtManagementNo.Location = new System.Drawing.Point(1135, 38);
+            this.txtManagementNo.Location = new System.Drawing.Point(1091, 38);
             this.txtManagementNo.Name = "txtManagementNo";
-            this.txtManagementNo.Size = new System.Drawing.Size(120, 20);
+            this.txtManagementNo.Size = new System.Drawing.Size(184, 20);
             this.txtManagementNo.TabIndex = 2;
             // 
             // btnEditManagementNo
             // 
-            this.btnEditManagementNo.Location = new System.Drawing.Point(1135, 64);
+            this.btnEditManagementNo.Location = new System.Drawing.Point(1193, 65);
             this.btnEditManagementNo.Name = "btnEditManagementNo";
-            this.btnEditManagementNo.Size = new System.Drawing.Size(120, 23);
+            this.btnEditManagementNo.Size = new System.Drawing.Size(82, 23);
             this.btnEditManagementNo.TabIndex = 3;
             this.btnEditManagementNo.Text = "Sửa Số QL";
             this.btnEditManagementNo.Click += new System.EventHandler(this.btnEditManagementNo_Click);
@@ -342,9 +342,9 @@ namespace JigFlow.Forms
             // 
             // txtPurposeUse
             // 
-            this.txtPurposeUse.Location = new System.Drawing.Point(210, 234);
+            this.txtPurposeUse.Location = new System.Drawing.Point(210, 397);
             this.txtPurposeUse.Name = "txtPurposeUse";
-            this.txtPurposeUse.Size = new System.Drawing.Size(430, 20);
+            this.txtPurposeUse.Size = new System.Drawing.Size(430, 58);
             this.txtPurposeUse.TabIndex = 9;
             // 
             // cboReportForm
@@ -356,14 +356,14 @@ namespace JigFlow.Forms
             // 
             // txtLocation
             // 
-            this.txtLocation.Location = new System.Drawing.Point(210, 262);
+            this.txtLocation.Location = new System.Drawing.Point(210, 270);
             this.txtLocation.Name = "txtLocation";
             this.txtLocation.Size = new System.Drawing.Size(430, 20);
             this.txtLocation.TabIndex = 11;
             // 
             // cboDrawing
             // 
-            this.cboDrawing.Location = new System.Drawing.Point(885, 262);
+            this.cboDrawing.Location = new System.Drawing.Point(885, 270);
             this.cboDrawing.Name = "cboDrawing";
             this.cboDrawing.Size = new System.Drawing.Size(390, 20);
             this.cboDrawing.TabIndex = 12;
@@ -371,7 +371,7 @@ namespace JigFlow.Forms
             // deLastCheckDate
             // 
             this.deLastCheckDate.EditValue = null;
-            this.deLastCheckDate.Location = new System.Drawing.Point(885, 318);
+            this.deLastCheckDate.Location = new System.Drawing.Point(885, 334);
             this.deLastCheckDate.Name = "deLastCheckDate";
             this.deLastCheckDate.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -387,14 +387,14 @@ namespace JigFlow.Forms
             // 
             // txtFirstCheckFile
             // 
-            this.txtFirstCheckFile.Location = new System.Drawing.Point(210, 318);
+            this.txtFirstCheckFile.Location = new System.Drawing.Point(210, 334);
             this.txtFirstCheckFile.Name = "txtFirstCheckFile";
             this.txtFirstCheckFile.Size = new System.Drawing.Size(330, 20);
             this.txtFirstCheckFile.TabIndex = 14;
             // 
             // btnBrowseResult
             // 
-            this.btnBrowseResult.Location = new System.Drawing.Point(550, 318);
+            this.btnBrowseResult.Location = new System.Drawing.Point(550, 334);
             this.btnBrowseResult.Name = "btnBrowseResult";
             this.btnBrowseResult.Size = new System.Drawing.Size(90, 23);
             this.btnBrowseResult.TabIndex = 15;
@@ -408,7 +408,7 @@ namespace JigFlow.Forms
             this.btnSave.Appearance.ForeColor = System.Drawing.Color.White;
             this.btnSave.Appearance.Options.UseBackColor = true;
             this.btnSave.Appearance.Options.UseForeColor = true;
-            this.btnSave.Location = new System.Drawing.Point(1048, 520);
+            this.btnSave.Location = new System.Drawing.Point(1104, 561);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(110, 36);
             this.btnSave.TabIndex = 1;
@@ -418,7 +418,7 @@ namespace JigFlow.Forms
             // btnClose
             // 
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.Location = new System.Drawing.Point(1172, 520);
+            this.btnClose.Location = new System.Drawing.Point(1228, 561);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(110, 36);
             this.btnClose.TabIndex = 2;
@@ -429,14 +429,13 @@ namespace JigFlow.Forms
             // 
             this.Appearance.BackColor = System.Drawing.Color.FromArgb(243, 246, 252);
             this.Appearance.Options.UseBackColor = true;
-            this.ClientSize = new System.Drawing.Size(1308, 575);
+            this.ClientSize = new System.Drawing.Size(1350, 609);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.groupInfo);
             this.Controls.Add(this.lblTitle);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
-            this.MinimumSize = new System.Drawing.Size(1280, 620);
-            this.Name = "FRM_JIG_REGISTER";
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+                        this.Name = "FRM_JIG_REGISTER";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Đăng ký Jig mới";
             this.Load += new System.EventHandler(this.FRM_JIG_REGISTER_Load);
@@ -487,7 +486,7 @@ namespace JigFlow.Forms
         private DevExpress.XtraEditors.LookUpEdit cboJigType;
         private DevExpress.XtraEditors.TextEdit txtSize;
         private DevExpress.XtraEditors.TextEdit txtUseProduct;
-        private DevExpress.XtraEditors.TextEdit txtPurposeUse;
+        private DevExpress.XtraEditors.MemoEdit txtPurposeUse;
         private DevExpress.XtraEditors.LookUpEdit cboReportForm;
         private DevExpress.XtraEditors.TextEdit txtLocation;
         private DevExpress.XtraEditors.LookUpEdit cboDrawing;
