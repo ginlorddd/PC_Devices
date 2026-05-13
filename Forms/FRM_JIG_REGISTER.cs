@@ -243,6 +243,7 @@ namespace JigFlow.Forms
                     Convert.ToString(cboJigType.EditValue),
                     txtSize.Text.Trim(),
                     txtUseProduct.Text.Trim(),
+                    txtPurposeUse.Text.Trim(),
                     txtLocation.Text.Trim(),
                     deLastCheckDate.DateTime == DateTime.MinValue ? (DateTime?)null : deLastCheckDate.DateTime.Date,
                     cboFrequency.Text);
@@ -261,6 +262,7 @@ namespace JigFlow.Forms
                     Convert.ToString(cboJigType.EditValue),
                     txtSize.Text.Trim(),
                     txtUseProduct.Text.Trim(),
+                    txtPurposeUse.Text.Trim(),
                     txtLocation.Text.Trim(),
                     deLastCheckDate.DateTime == DateTime.MinValue ? (DateTime?)null : deLastCheckDate.DateTime.Date,
                     cboFrequency.Text,
@@ -282,6 +284,7 @@ namespace JigFlow.Forms
                     Convert.ToString(cboJigType.EditValue),
                     txtSize.Text.Trim(),
                     txtUseProduct.Text.Trim(),
+                    txtPurposeUse.Text.Trim(),
                     txtLocation.Text.Trim(),
                     deLastCheckDate.DateTime == DateTime.MinValue ? (DateTime?)null : deLastCheckDate.DateTime.Date,
                     cboFrequency.Text,
@@ -311,6 +314,7 @@ namespace JigFlow.Forms
             cboJigType.EditValue = Convert.ToString(ROW["JIG_TYPE_CODE"]);
             txtSize.Text = Convert.ToString(ROW["JIG_SIZE"]);
             txtUseProduct.Text = Convert.ToString(ROW["USE_PRODUCT"]);
+            txtPurposeUse.Text = Convert.ToString(ROW["PURPOSE_USE"]);
             txtLocation.Text = Convert.ToString(ROW["LOCATION_CODE"]);
             cboFrequency.EditValue = Convert.ToString(ROW["CHECK_FREQUENCY"]);
             cboReportForm.EditValue = Convert.ToString(ROW["REPORT_FORM_CODE"]);
@@ -339,6 +343,7 @@ namespace JigFlow.Forms
             cboJigType.EditValue = Convert.ToString(ROW["JIG_TYPE_CODE"]);
             txtSize.Text = Convert.ToString(ROW["JIG_SIZE"]);
             txtUseProduct.Text = Convert.ToString(ROW["USE_PRODUCT"]);
+            txtPurposeUse.Text = Convert.ToString(ROW["PURPOSE_USE"]);
             txtLocation.Text = Convert.ToString(ROW["LOCATION_CODE"]);
             cboFrequency.EditValue = Convert.ToString(ROW["CHECK_FREQUENCY"]);
             if (ROW.Table.Columns.Contains("LAST_CHECK_DATE") && ROW["LAST_CHECK_DATE"] != DBNull.Value)

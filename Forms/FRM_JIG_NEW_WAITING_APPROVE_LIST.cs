@@ -122,6 +122,7 @@ namespace JigFlow.Forms
             gvWaiting.Columns.AddVisible("JIG_TYPE_CODE", "Loại Jig");
             gvWaiting.Columns.AddVisible("JIG_SIZE", "Size");
             gvWaiting.Columns.AddVisible("USE_PRODUCT", "Sản phẩm sử dụng");
+            gvWaiting.Columns.AddVisible("PURPOSE_USE", "Mục đích sử dụng");
             gvWaiting.Columns.AddVisible("LOCATION_CODE", "Vị trí");
             gvWaiting.Columns.AddVisible("DEPARTMENT", "Bộ phận đăng ký");
             gvWaiting.Columns.AddVisible("REQUEST_AT", "Ngày đăng ký");

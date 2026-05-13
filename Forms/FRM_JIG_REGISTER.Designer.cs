@@ -22,6 +22,7 @@ namespace JigFlow.Forms
             this.lblJigType = new DevExpress.XtraEditors.LabelControl();
             this.lblSize = new DevExpress.XtraEditors.LabelControl();
             this.lblUseProduct = new DevExpress.XtraEditors.LabelControl();
+            this.lblPurposeUse = new DevExpress.XtraEditors.LabelControl();
             this.lblReportForm = new DevExpress.XtraEditors.LabelControl();
             this.lblLocation = new DevExpress.XtraEditors.LabelControl();
             this.lblDrawing = new DevExpress.XtraEditors.LabelControl();
@@ -36,6 +37,7 @@ namespace JigFlow.Forms
             this.cboJigType = new DevExpress.XtraEditors.LookUpEdit();
             this.txtSize = new DevExpress.XtraEditors.TextEdit();
             this.txtUseProduct = new DevExpress.XtraEditors.TextEdit();
+            this.txtPurposeUse = new DevExpress.XtraEditors.TextEdit();
             this.cboReportForm = new DevExpress.XtraEditors.LookUpEdit();
             this.txtLocation = new DevExpress.XtraEditors.TextEdit();
             this.cboDrawing = new DevExpress.XtraEditors.LookUpEdit();
@@ -54,6 +56,7 @@ namespace JigFlow.Forms
             ((System.ComponentModel.ISupportInitialize)(this.cboJigType.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtSize.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtUseProduct.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtPurposeUse.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboReportForm.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtLocation.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboDrawing.Properties)).BeginInit();
@@ -88,6 +91,7 @@ namespace JigFlow.Forms
             this.groupInfo.Controls.Add(this.lblJigType);
             this.groupInfo.Controls.Add(this.lblSize);
             this.groupInfo.Controls.Add(this.lblUseProduct);
+            this.groupInfo.Controls.Add(this.lblPurposeUse);
             this.groupInfo.Controls.Add(this.lblReportForm);
             this.groupInfo.Controls.Add(this.lblLocation);
             this.groupInfo.Controls.Add(this.lblDrawing);
@@ -102,6 +106,7 @@ namespace JigFlow.Forms
             this.groupInfo.Controls.Add(this.cboJigType);
             this.groupInfo.Controls.Add(this.txtSize);
             this.groupInfo.Controls.Add(this.txtUseProduct);
+            this.groupInfo.Controls.Add(this.txtPurposeUse);
             this.groupInfo.Controls.Add(this.cboReportForm);
             this.groupInfo.Controls.Add(this.txtLocation);
             this.groupInfo.Controls.Add(this.cboDrawing);
@@ -201,6 +206,17 @@ namespace JigFlow.Forms
             this.lblUseProduct.Name = "lblUseProduct";
             this.lblUseProduct.Size = new System.Drawing.Size(118, 20);
             this.lblUseProduct.Text = "Sản phẩm sử dụng";
+            // 
+            // lblPurposeUse
+            // 
+            this.lblPurposeUse.Appearance.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+            this.lblPurposeUse.Appearance.ForeColor = System.Drawing.Color.FromArgb(33, 33, 33);
+            this.lblPurposeUse.Appearance.Options.UseFont = true;
+            this.lblPurposeUse.Appearance.Options.UseForeColor = true;
+            this.lblPurposeUse.Location = new System.Drawing.Point(24, 238);
+            this.lblPurposeUse.Name = "lblPurposeUse";
+            this.lblPurposeUse.Size = new System.Drawing.Size(108, 20);
+            this.lblPurposeUse.Text = "Mục đích sử dụng";
             // 
             // lblReportForm
             // 
@@ -324,26 +340,33 @@ namespace JigFlow.Forms
             this.txtUseProduct.Size = new System.Drawing.Size(430, 20);
             this.txtUseProduct.TabIndex = 8;
             // 
+            // txtPurposeUse
+            // 
+            this.txtPurposeUse.Location = new System.Drawing.Point(210, 234);
+            this.txtPurposeUse.Name = "txtPurposeUse";
+            this.txtPurposeUse.Size = new System.Drawing.Size(430, 20);
+            this.txtPurposeUse.TabIndex = 9;
+            // 
             // cboReportForm
             // 
             this.cboReportForm.Location = new System.Drawing.Point(870, 206);
             this.cboReportForm.Name = "cboReportForm";
             this.cboReportForm.Size = new System.Drawing.Size(390, 20);
-            this.cboReportForm.TabIndex = 9;
+            this.cboReportForm.TabIndex = 10;
             // 
             // txtLocation
             // 
             this.txtLocation.Location = new System.Drawing.Point(210, 262);
             this.txtLocation.Name = "txtLocation";
             this.txtLocation.Size = new System.Drawing.Size(430, 20);
-            this.txtLocation.TabIndex = 10;
+            this.txtLocation.TabIndex = 11;
             // 
             // cboDrawing
             // 
             this.cboDrawing.Location = new System.Drawing.Point(870, 262);
             this.cboDrawing.Name = "cboDrawing";
             this.cboDrawing.Size = new System.Drawing.Size(390, 20);
-            this.cboDrawing.TabIndex = 11;
+            this.cboDrawing.TabIndex = 12;
             // 
             // deLastCheckDate
             // 
@@ -360,21 +383,21 @@ namespace JigFlow.Forms
             this.deLastCheckDate.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
             this.deLastCheckDate.Properties.Mask.EditMask = "dd-MM-yyyy";
             this.deLastCheckDate.Size = new System.Drawing.Size(390, 20);
-            this.deLastCheckDate.TabIndex = 12;
+            this.deLastCheckDate.TabIndex = 13;
             // 
             // txtFirstCheckFile
             // 
             this.txtFirstCheckFile.Location = new System.Drawing.Point(210, 318);
             this.txtFirstCheckFile.Name = "txtFirstCheckFile";
             this.txtFirstCheckFile.Size = new System.Drawing.Size(330, 20);
-            this.txtFirstCheckFile.TabIndex = 13;
+            this.txtFirstCheckFile.TabIndex = 14;
             // 
             // btnBrowseResult
             // 
             this.btnBrowseResult.Location = new System.Drawing.Point(550, 318);
             this.btnBrowseResult.Name = "btnBrowseResult";
             this.btnBrowseResult.Size = new System.Drawing.Size(90, 23);
-            this.btnBrowseResult.TabIndex = 14;
+            this.btnBrowseResult.TabIndex = 15;
             this.btnBrowseResult.Text = "Duyệt";
             this.btnBrowseResult.Click += new System.EventHandler(this.btnBrowseResult_Click);
             // 
@@ -428,6 +451,7 @@ namespace JigFlow.Forms
             ((System.ComponentModel.ISupportInitialize)(this.cboJigType.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtSize.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtUseProduct.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtPurposeUse.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboReportForm.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtLocation.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cboDrawing.Properties)).EndInit();
@@ -448,6 +472,7 @@ namespace JigFlow.Forms
         private DevExpress.XtraEditors.LabelControl lblJigType;
         private DevExpress.XtraEditors.LabelControl lblSize;
         private DevExpress.XtraEditors.LabelControl lblUseProduct;
+        private DevExpress.XtraEditors.LabelControl lblPurposeUse;
         private DevExpress.XtraEditors.LabelControl lblReportForm;
         private DevExpress.XtraEditors.LabelControl lblLocation;
         private DevExpress.XtraEditors.LabelControl lblDrawing;
@@ -462,6 +487,7 @@ namespace JigFlow.Forms
         private DevExpress.XtraEditors.LookUpEdit cboJigType;
         private DevExpress.XtraEditors.TextEdit txtSize;
         private DevExpress.XtraEditors.TextEdit txtUseProduct;
+        private DevExpress.XtraEditors.TextEdit txtPurposeUse;
         private DevExpress.XtraEditors.LookUpEdit cboReportForm;
         private DevExpress.XtraEditors.TextEdit txtLocation;
         private DevExpress.XtraEditors.LookUpEdit cboDrawing;
