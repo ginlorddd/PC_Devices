@@ -52,6 +52,7 @@ namespace JigFlow.Forms
             this.gcWaiting.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.gvWaiting });
             // gvWaiting
             this.gvWaiting.GridControl = this.gcWaiting;
+            this.gvWaiting.OptionsBehavior.Editable = false;
             this.gvWaiting.Columns.AddVisible("STT", "STT");
             this.gvWaiting.Columns.AddVisible("MANAGEMENT_NO", "Control No.");
             this.gvWaiting.Columns.AddVisible("JIG_NAME", "Tên Jig");

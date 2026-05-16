@@ -156,7 +156,7 @@ namespace JigFlow.Forms
                 return false;
             }
 
-            if (!string.Equals(AppSession.RoleCode, "ADMIN", StringComparison.OrdinalIgnoreCase))
+            if (!RoleHelper.CanApprove())
             {
                 MessageBox.Show("Bạn không có quyền thao tác chức năng này.", "Không đủ quyền", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
@@ -167,11 +167,10 @@ namespace JigFlow.Forms
 
         private void ApplyPermissionState()
         {
-            var CAN_OPERATE = !string.IsNullOrWhiteSpace(AppSession.UserId)
-                              && string.Equals(AppSession.RoleCode, "ADMIN", StringComparison.OrdinalIgnoreCase);
+            var CAN_OPERATE = RoleHelper.IsLoggedIn() && RoleHelper.CanApprove();
             btnUpdate.Enabled = CAN_OPERATE;
             btnApprove.Enabled = CAN_OPERATE;
-            btnDelete.Enabled = CAN_OPERATE;
+            btnDelete.Enabled = RoleHelper.IsLoggedIn() && RoleHelper.IsSystemAdmin();
         }
 
         private void DataChangeNotifier_Changed(string ENTITY)

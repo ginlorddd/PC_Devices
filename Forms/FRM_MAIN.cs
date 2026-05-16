@@ -25,13 +25,17 @@ namespace JigFlow.Forms
         private void UpdateAccountMenu(bool LOGGED_IN)
         {
             btnLoginMenu.Visibility = LOGGED_IN ? BarItemVisibility.Never : BarItemVisibility.Always;
-            btnUserInfoMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
+            btnUserInfoMenu.Visibility = BarItemVisibility.Never;
             btnChangePassMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
             btnLogoutMenu.Visibility = LOGGED_IN ? BarItemVisibility.Always : BarItemVisibility.Never;
             btnExitMenu.Visibility = BarItemVisibility.Always;
-            btnAccountManagement.Enabled = LOGGED_IN && AppSession.RoleCode == "ADMIN";
+            btnAccountManagement.Enabled = LOGGED_IN && RoleHelper.IsSystemAdmin();
             subUser.Caption = LOGGED_IN ? AppSession.FullName : "Đăng nhập";
-            btnUserInfoMenu.Caption = LOGGED_IN ? AppSession.FullName : string.Empty;
+            btnUserInfoMenu.Caption = string.Empty;
+            btnAccountFloat.Text = LOGGED_IN ? AppSession.FullName : "Đăng nhập";
+            mnuLogin.Visible = !LOGGED_IN;
+            mnuLogout.Visible = LOGGED_IN;
+            mnuChangePassword.Visible = LOGGED_IN;
         }
 
         private void OpenOrActivate(Type FORM_TYPE)
@@ -78,6 +82,21 @@ namespace JigFlow.Forms
             Close();
         }
 
+        private void btnAccountFloat_Click(object sender, EventArgs e)
+        {
+            if (!RoleHelper.IsLoggedIn())
+            {
+                btnLoginMenu_ItemClick(sender, null);
+                return;
+            }
+            accountMenu.Show(btnAccountFloat, 0, btnAccountFloat.Height);
+        }
+
+        private void mnuLogin_Click(object sender, EventArgs e) => btnLoginMenu_ItemClick(sender, null);
+        private void mnuLogout_Click(object sender, EventArgs e) => btnLogoutMenu_ItemClick(sender, null);
+        private void mnuChangePassword_Click(object sender, EventArgs e) => btnChangePassMenu_ItemClick(sender, null);
+        private void mnuExit_Click(object sender, EventArgs e) => btnExitMenu_ItemClick(sender, null);
+
         private void btnAccountManagement_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_ACCOUNT_MANAGEMENT));
         private void btnJigFunctionList_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_FUNCTION_LIST));
         private void btnJigVisualList_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_VISUAL_LIST));
@@ -92,7 +111,13 @@ namespace JigFlow.Forms
         private void btnJigRegisterHistory_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_REGISTER_HISTORY_LIST));
         private void btnJigNotChecked_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_NOT_CHECKED_LIST));
         private void btnJigCheckHistory_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_CHECK_HISTORY_LIST));
-        private void btnJigCancelRegister_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_CANCEL_REGISTER));
+        private void btnJigCancelRegister_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            using (var FORM = new FRM_JIG_CANCEL_REGISTER())
+            {
+                FORM.ShowDialog(this);
+            }
+        }
         private void btnJigCancelWaitingApprove_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_CANCEL_WAITING_APPROVE_LIST));
         private void btnJigCancelHistory_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_CANCEL_HISTORY_LIST));
         private void btnJigDrawing_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_DRAWING_LIST));

@@ -54,9 +54,9 @@ namespace JigFlow.Forms
 
             this.lblRole.Location = new System.Drawing.Point(750, 10); this.lblRole.Text = "Role";
             this.cboRole.Location = new System.Drawing.Point(750, 30); this.cboRole.Size = new System.Drawing.Size(130, 22);
-            this.cboRole.Properties.Items.AddRange(new object[] { "ADMIN", "USER" });
+            this.cboRole.Properties.Items.AddRange(new object[] { "SYSTEM_ADMIN", "APPROVER", "MEMBER" });
             this.cboRole.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
-            this.cboRole.SelectedIndex = 1;
+            this.cboRole.SelectedIndex = 2;
 
             this.chkIsActive.Location = new System.Drawing.Point(890, 30); this.chkIsActive.Properties.Caption = "Active"; this.chkIsActive.Checked = true;
 

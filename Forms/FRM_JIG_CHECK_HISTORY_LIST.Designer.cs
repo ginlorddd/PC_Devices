@@ -49,6 +49,7 @@ namespace JigFlow.Forms
             this.gcHistory.MainView = this.gvHistory;
             this.gcHistory.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.gvHistory });
             this.gvHistory.GridControl = this.gcHistory;
+            this.gvHistory.OptionsBehavior.Editable = false;
 
             this.panelBottom.Controls.Add(this.btnExport);
             this.panelBottom.Controls.Add(this.btnApprove);

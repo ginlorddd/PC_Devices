@@ -49,6 +49,7 @@ namespace JigFlow.Forms
             this.gcJig.MainView = this.gvJig;
             this.gcJig.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { this.gvJig });
             this.gvJig.GridControl = this.gcJig;
+            this.gvJig.OptionsBehavior.Editable = false;
 
             this.panelBottom.Controls.Add(this.btnExport);
             this.panelBottom.Controls.Add(this.btnUpdate);

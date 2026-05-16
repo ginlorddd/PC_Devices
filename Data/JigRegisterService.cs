@@ -8,7 +8,12 @@ namespace JigFlow.Data
     {
         public DataTable GetJigTypes()
         {
-            const string SQL_QUERY = "SELECT JIG_TYPE_CODE, JIG_TYPE_NAME FROM dbo.JIG_TYPE_MASTER WHERE IS_ACTIVE = 1 ORDER BY JIG_TYPE_NAME";
+            const string SQL_QUERY = @"
+SELECT JTM.JIG_TYPE_CODE, JTM.JIG_TYPE_NAME, JTM.DEFAULT_DRAWING_CODE, DM.DRAWING_NAME
+FROM dbo.JIG_TYPE_MASTER JTM
+LEFT JOIN dbo.JIG_DRAWING_MASTER DM ON JTM.DEFAULT_DRAWING_CODE = DM.DRAWING_CODE
+WHERE JTM.IS_ACTIVE = 1
+ORDER BY JTM.JIG_TYPE_NAME";
             return DbUtils.GetData(SQL_QUERY);
         }
 
@@ -357,6 +362,133 @@ WHERE REQUEST_ID = @REQUEST_ID
                 SQL_QUERY,
                 new SqlParameter("@REQUEST_ID", REQUEST_ID),
                 new SqlParameter("@APPROVE_BY", (object)APPROVE_BY ?? DBNull.Value));
+        }
+
+        public DataTable GetJigsAvailableForCancel()
+        {
+            const string SQL_QUERY = @"
+SELECT
+    JIG_ID,
+    CONTROL_NO,
+    JIG_NAME,
+    USE_SECTION
+FROM dbo.JIG_MASTER
+WHERE IS_ACTIVE = 1
+  AND ISNULL(STATUS_USE, N'') <> N'Ngưng sử dụng'
+ORDER BY CONTROL_NO;";
+            return DbUtils.GetData(SQL_QUERY);
+        }
+
+        public bool HasWaitingCancelRequest(int JIG_ID)
+        {
+            const string SQL_QUERY = @"
+SELECT CASE WHEN EXISTS
+(
+    SELECT 1
+    FROM dbo.JIG_CANCEL_REQUEST
+    WHERE JIG_ID = @JIG_ID
+      AND REQUEST_STATUS = 'WAITING_APPROVE'
+)
+THEN 1 ELSE 0 END AS HAS_WAITING;";
+            var DT = DbUtils.GetData(SQL_QUERY, new SqlParameter("@JIG_ID", JIG_ID));
+            return DT.Rows.Count > 0 && Convert.ToInt32(DT.Rows[0]["HAS_WAITING"]) == 1;
+        }
+
+        public int CreateCancelRequest(int JIG_ID, string CANCEL_REASON, string REQUEST_BY)
+        {
+            const string SQL_QUERY = @"
+INSERT INTO dbo.JIG_CANCEL_REQUEST(JIG_ID, REQUEST_STATUS, CANCEL_REASON, REQUEST_BY)
+VALUES (@JIG_ID, 'WAITING_APPROVE', @CANCEL_REASON, @REQUEST_BY);";
+            return DbUtils.Execute(
+                SQL_QUERY,
+                new SqlParameter("@JIG_ID", JIG_ID),
+                new SqlParameter("@CANCEL_REASON", (object)CANCEL_REASON ?? DBNull.Value),
+                new SqlParameter("@REQUEST_BY", (object)REQUEST_BY ?? DBNull.Value));
+        }
+
+        public DataTable GetCancelWaitingApproveRequests()
+        {
+            const string SQL_QUERY = @"
+SELECT
+    ROW_NUMBER() OVER(ORDER BY CR.REQUEST_AT DESC) AS STT,
+    CR.CANCEL_ID,
+    JM.CONTROL_NO,
+    JM.JIG_NAME,
+    ISNULL(JM.JIG_TYPE, JM.JIG_TYPE_CODE) AS JIG_TYPE,
+    JM.JIG_SIZE,
+    JM.USE_PRODUCT,
+    JM.LOCATION_CODE,
+    JM.USE_SECTION,
+    CR.REQUEST_AT,
+    CR.REQUEST_BY,
+    CR.CANCEL_REASON
+FROM dbo.JIG_CANCEL_REQUEST CR
+INNER JOIN dbo.JIG_MASTER JM ON CR.JIG_ID = JM.JIG_ID
+WHERE CR.REQUEST_STATUS = 'WAITING_APPROVE'
+ORDER BY CR.REQUEST_AT DESC;";
+            return DbUtils.GetData(SQL_QUERY);
+        }
+
+        public int DeleteCancelRequest(int CANCEL_ID)
+        {
+            const string SQL_QUERY = @"
+DELETE FROM dbo.JIG_CANCEL_REQUEST
+WHERE CANCEL_ID = @CANCEL_ID
+  AND REQUEST_STATUS = 'WAITING_APPROVE';";
+            return DbUtils.Execute(SQL_QUERY, new SqlParameter("@CANCEL_ID", CANCEL_ID));
+        }
+
+        public int ApproveCancelRequest(int CANCEL_ID, string APPROVE_BY)
+        {
+            const string SQL_QUERY = @"
+DECLARE @JIG_ID INT;
+SELECT @JIG_ID = JIG_ID
+FROM dbo.JIG_CANCEL_REQUEST
+WHERE CANCEL_ID = @CANCEL_ID
+  AND REQUEST_STATUS = 'WAITING_APPROVE';
+
+IF @JIG_ID IS NULL RETURN;
+
+UPDATE dbo.JIG_CANCEL_REQUEST
+SET REQUEST_STATUS = 'APPROVED',
+    APPROVE_BY = @APPROVE_BY,
+    APPROVE_AT = GETDATE()
+WHERE CANCEL_ID = @CANCEL_ID
+  AND REQUEST_STATUS = 'WAITING_APPROVE';
+
+UPDATE dbo.JIG_MASTER
+SET STATUS_USE = N'Ngưng sử dụng',
+    IS_ACTIVE = 0,
+    UPDATED_AT = GETDATE()
+WHERE JIG_ID = @JIG_ID;";
+            return DbUtils.Execute(
+                SQL_QUERY,
+                new SqlParameter("@CANCEL_ID", CANCEL_ID),
+                new SqlParameter("@APPROVE_BY", (object)APPROVE_BY ?? DBNull.Value));
+        }
+
+        public DataTable GetCancelHistory()
+        {
+            const string SQL_QUERY = @"
+SELECT
+    ROW_NUMBER() OVER(ORDER BY CR.APPROVE_AT DESC, CR.REQUEST_AT DESC) AS STT,
+    CR.CANCEL_ID,
+    JM.CONTROL_NO,
+    JM.JIG_NAME,
+    ISNULL(JM.JIG_TYPE, JM.JIG_TYPE_CODE) AS JIG_TYPE,
+    JM.JIG_SIZE,
+    JM.USE_PRODUCT,
+    JM.LOCATION_CODE,
+    JM.USE_SECTION,
+    CR.REQUEST_AT,
+    CR.REQUEST_BY,
+    CR.CANCEL_REASON,
+    CR.APPROVE_AT
+FROM dbo.JIG_CANCEL_REQUEST CR
+INNER JOIN dbo.JIG_MASTER JM ON CR.JIG_ID = JM.JIG_ID
+WHERE CR.REQUEST_STATUS = 'APPROVED'
+ORDER BY CR.APPROVE_AT DESC, CR.REQUEST_AT DESC;";
+            return DbUtils.GetData(SQL_QUERY);
         }
 
         public DataRow GetJigMasterByControlNo(string CONTROL_NO)

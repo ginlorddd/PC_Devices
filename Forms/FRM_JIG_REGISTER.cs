@@ -10,6 +10,7 @@ namespace JigFlow.Forms
     public partial class FRM_JIG_REGISTER : DevExpress.XtraEditors.XtraForm
     {
         private readonly JigRegisterService _service = new JigRegisterService();
+        private DataTable _jigTypes;
         private bool _allowEditManagementNo = false;
         private readonly int? _requestId;
         private readonly string _masterControlNo;
@@ -88,7 +89,8 @@ namespace JigFlow.Forms
 
         private void LoadCombos()
         {
-            cboJigType.Properties.DataSource = _service.GetJigTypes();
+            _jigTypes = _service.GetJigTypes();
+            cboJigType.Properties.DataSource = _jigTypes;
             cboJigType.Properties.DisplayMember = "JIG_TYPE_NAME";
             cboJigType.Properties.ValueMember = "JIG_TYPE_CODE";
 
@@ -111,6 +113,7 @@ namespace JigFlow.Forms
         }
 
         private void cboJigType_EditValueChanged(object sender, EventArgs e) => AutoFillNameAndManagementNo();
+        
 
         private void txtSize_EditValueChanged(object sender, EventArgs e)
         {
@@ -126,9 +129,22 @@ namespace JigFlow.Forms
 
             var TYPE_CODE = Convert.ToString(cboJigType.EditValue);
             if (string.IsNullOrWhiteSpace(TYPE_CODE)) return;
+            if (_jigTypes != null)
+            {
+                var rows = _jigTypes.Select($"JIG_TYPE_CODE = '{TYPE_CODE.Replace("'", "''")}'");
+                if (rows.Length > 0)
+                {
+                    var defaultDrawing = Convert.ToString(rows[0]["DEFAULT_DRAWING_CODE"]);
+                    if (!string.IsNullOrWhiteSpace(defaultDrawing))
+                    {
+                        cboDrawing.EditValue = defaultDrawing;
+                    }
+                }
+            }
 
             var TYPE_NAME = cboJigType.Text ?? string.Empty;
-            var IS_BRACKET = TYPE_NAME.ToUpper().Contains("BRACKET") || TYPE_CODE.ToUpper().Contains("BRACKET");
+            var IS_BRACKET = TYPE_NAME.ToUpper().Contains("BRACKET")
+                             || TYPE_CODE.ToUpper().Contains("BRACKET");
             var IS_HLC = TYPE_CODE.ToUpper().Contains("HLC");
 
             txtSize.Properties.ReadOnly = !IS_BRACKET;
@@ -140,7 +156,7 @@ namespace JigFlow.Forms
             }
             else if (IS_BRACKET)
             {
-                var NUMBER_MATCH = Regex.Match(TYPE_NAME, "\\d+");
+                var NUMBER_MATCH = Regex.Match(TYPE_NAME, @"\d+");
                 var BRACKET_NO = NUMBER_MATCH.Success ? NUMBER_MATCH.Value : "1";
                 txtNameJig.Text = $"BK{BRACKET_NO}";
             }
