@@ -57,6 +57,7 @@
     <Compile Include="Data\JigFunctionService.cs" />
     <Compile Include="Data\JigRegisterService.cs" />
     <Compile Include="Data\JigTypeMasterService.cs" />
+    <Compile Include="Data\FormMasterService.cs" />
     <Compile Include="DTO\UserDto.cs" />
     <Compile Include="Forms\FRM_MAIN.cs"><SubType>Form</SubType></Compile>
     <Compile Include="Forms\FRM_MAIN.Designer.cs"><DependentUpon>FRM_MAIN.cs</DependentUpon></Compile>
