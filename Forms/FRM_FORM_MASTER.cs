@@ -23,6 +23,10 @@ namespace JigFlow.Forms
             gvForm.OptionsView.ShowGroupPanel = false;
             gvForm.Appearance.HeaderPanel.Font = new Font(gvForm.Appearance.HeaderPanel.Font, FontStyle.Bold);
             gvForm.Appearance.HeaderPanel.Options.UseFont = true;
+            txtTemplatePath.Visible = false;
+            lblTemplate.Visible = false;
+            txtFormCode.Text = _service.GetNextFormCode();
+            txtVersion.Text = "V1";
             LoadData();
         }
 
@@ -44,7 +48,6 @@ namespace JigFlow.Forms
             gvForm.Columns["PART_NAME_CELL"].Caption = "Ô Part Name";
             gvForm.Columns["CONTROL_NO_CELL"].Caption = "Ô Control No";
             gvForm.Columns["CHECK_DATE_CELL"].Caption = "Ô Date";
-            gvForm.Columns["IS_DEFAULT"].Caption = "Mặc định";
             gvForm.Columns["IS_ACTIVE"].Caption = "Kích hoạt";
 
             if (gvForm.Columns["STT"] != null) gvForm.Columns["STT"].Width = 50;
@@ -69,6 +72,7 @@ namespace JigFlow.Forms
         {
             var code = txtFormCode.Text.Trim();
             if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(txtFormName.Text)) { MessageBox.Show("Thiếu mã/tên form"); return; }
+            if (string.IsNullOrWhiteSpace(txtVersion.Text)) txtVersion.Text = "V1";
             var stored = _templatePath;
             if (!string.IsNullOrWhiteSpace(_templatePath) && File.Exists(_templatePath))
             {
@@ -81,9 +85,11 @@ namespace JigFlow.Forms
             }
 
             _service.UpsertFormMaster(code, txtFormName.Text.Trim(), txtVersion.Text.Trim(), txtDescription.Text.Trim(), stored,
-                txtPartNameCell.Text.Trim(), txtControlNoCell.Text.Trim(), txtDateCell.Text.Trim(), chkDefault.Checked, chkActive.Checked);
+                txtPartNameCell.Text.Trim(), txtControlNoCell.Text.Trim(), txtDateCell.Text.Trim(), chkActive.Checked);
             MessageBox.Show("Đã lưu form master");
             LoadData();
+            txtVersion.Text = IncrementVersion(txtVersion.Text.Trim());
+            txtTemplatePath.Text = string.Empty;
         }
 
         private void gvForm_FocusedRowChanged(object sender, DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventArgs e)
@@ -98,8 +104,15 @@ namespace JigFlow.Forms
             txtPartNameCell.Text = Convert.ToString(r["PART_NAME_CELL"]);
             txtControlNoCell.Text = Convert.ToString(r["CONTROL_NO_CELL"]);
             txtDateCell.Text = Convert.ToString(r["CHECK_DATE_CELL"]);
-            chkDefault.Checked = r["IS_DEFAULT"] != DBNull.Value && Convert.ToBoolean(r["IS_DEFAULT"]);
             chkActive.Checked = r["IS_ACTIVE"] != DBNull.Value && Convert.ToBoolean(r["IS_ACTIVE"]);
+        }
+
+        private string IncrementVersion(string current)
+        {
+            if (string.IsNullOrWhiteSpace(current) || !current.StartsWith("V")) return "V1";
+            int n;
+            if (!int.TryParse(current.Substring(1), out n)) return "V1";
+            return "V" + (n + 1);
         }
 
         private void btnGenerateSample_Click(object sender, EventArgs e)

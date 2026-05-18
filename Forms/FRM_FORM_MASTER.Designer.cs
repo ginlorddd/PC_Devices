@@ -25,7 +25,6 @@ namespace JigFlow.Forms
             this.txtPartNameCell = new DevExpress.XtraEditors.TextEdit();
             this.txtControlNoCell = new DevExpress.XtraEditors.TextEdit();
             this.txtDateCell = new DevExpress.XtraEditors.TextEdit();
-            this.chkDefault = new DevExpress.XtraEditors.CheckEdit();
             this.chkActive = new DevExpress.XtraEditors.CheckEdit();
             this.btnBrowse = new DevExpress.XtraEditors.SimpleButton();
             this.btnSave = new DevExpress.XtraEditors.SimpleButton();
@@ -40,7 +39,6 @@ namespace JigFlow.Forms
             ((System.ComponentModel.ISupportInitialize)(this.txtPartNameCell.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtControlNoCell.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtDateCell.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chkDefault.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkActive.Properties)).BeginInit();
             this.SuspendLayout();
 
@@ -70,8 +68,7 @@ namespace JigFlow.Forms
             this.lblDateCell.Location = new System.Drawing.Point(970, 230); this.lblDateCell.Text = "Ô Date";
             this.txtDateCell.Location = new System.Drawing.Point(970, 247); this.txtDateCell.Size = new System.Drawing.Size(70, 20);
 
-            this.chkDefault.Location = new System.Drawing.Point(790, 277); this.chkDefault.Properties.Caption = "Form mặc định";
-            this.chkActive.Location = new System.Drawing.Point(910, 277); this.chkActive.Properties.Caption = "Kích hoạt"; this.chkActive.EditValue = true;
+            this.chkActive.Location = new System.Drawing.Point(790, 277); this.chkActive.Properties.Caption = "Kích hoạt"; this.chkActive.EditValue = true;
 
             this.btnSave.Location = new System.Drawing.Point(790, 312); this.btnSave.Size = new System.Drawing.Size(120, 30); this.btnSave.Text = "Lưu"; this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             this.btnGenerateSample.Location = new System.Drawing.Point(920, 312); this.btnGenerateSample.Size = new System.Drawing.Size(120, 30); this.btnGenerateSample.Text = "Tạo file mẫu"; this.btnGenerateSample.Click += new System.EventHandler(this.btnGenerateSample_Click);
@@ -86,7 +83,7 @@ namespace JigFlow.Forms
             this.Controls.Add(this.lblPartNameCell); this.Controls.Add(this.txtPartNameCell);
             this.Controls.Add(this.lblControlNoCell); this.Controls.Add(this.txtControlNoCell);
             this.Controls.Add(this.lblDateCell); this.Controls.Add(this.txtDateCell);
-            this.Controls.Add(this.chkDefault); this.Controls.Add(this.chkActive);
+            this.Controls.Add(this.chkActive);
             this.Controls.Add(this.btnSave); this.Controls.Add(this.btnGenerateSample);
             this.Name = "FRM_FORM_MASTER";
             this.Text = "Form Master";
@@ -102,7 +99,6 @@ namespace JigFlow.Forms
             ((System.ComponentModel.ISupportInitialize)(this.txtPartNameCell.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtControlNoCell.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtDateCell.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chkDefault.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chkActive.Properties)).EndInit();
             this.ResumeLayout(false);
         }
@@ -111,7 +107,7 @@ namespace JigFlow.Forms
         private DevExpress.XtraGrid.Views.Grid.GridView gvForm;
         private DevExpress.XtraEditors.LabelControl lblFormCode, lblFormName, lblVersion, lblDescription, lblTemplate, lblPartNameCell, lblControlNoCell, lblDateCell;
         private DevExpress.XtraEditors.TextEdit txtFormCode, txtFormName, txtVersion, txtDescription, txtTemplatePath, txtPartNameCell, txtControlNoCell, txtDateCell;
-        private DevExpress.XtraEditors.CheckEdit chkDefault, chkActive;
+        private DevExpress.XtraEditors.CheckEdit chkActive;
         private DevExpress.XtraEditors.SimpleButton btnBrowse, btnSave, btnGenerateSample;
     }
 }
