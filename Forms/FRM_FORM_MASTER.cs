@@ -5,6 +5,7 @@ using System.Data;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace JigFlow.Forms
 {
@@ -19,13 +20,39 @@ namespace JigFlow.Forms
         {
             gvForm.OptionsView.ShowAutoFilterRow = true;
             gvForm.OptionsView.ColumnAutoWidth = false;
+            gvForm.OptionsView.ShowGroupPanel = false;
+            gvForm.Appearance.HeaderPanel.Font = new Font(gvForm.Appearance.HeaderPanel.Font, FontStyle.Bold);
+            gvForm.Appearance.HeaderPanel.Options.UseFont = true;
             LoadData();
         }
 
         private void LoadData()
         {
             gcForm.DataSource = _service.GetFormMasters();
+            BuildColumns();
             gvForm.BestFitColumns();
+        }
+
+        private void BuildColumns()
+        {
+            gvForm.Columns["FORM_ID"].Visible = false;
+            gvForm.Columns["FORM_CODE"].Caption = "Mã biểu mẫu";
+            gvForm.Columns["FORM_NAME"].Caption = "Tên biểu mẫu";
+            gvForm.Columns["FORM_VERSION"].Caption = "Phiên bản";
+            gvForm.Columns["DESCRIPTION"].Caption = "Mô tả";
+            gvForm.Columns["TEMPLATE_FILE_PATH"].Caption = "Đường dẫn file mẫu";
+            gvForm.Columns["PART_NAME_CELL"].Caption = "Ô Part Name";
+            gvForm.Columns["CONTROL_NO_CELL"].Caption = "Ô Control No";
+            gvForm.Columns["CHECK_DATE_CELL"].Caption = "Ô Date";
+            gvForm.Columns["IS_DEFAULT"].Caption = "Mặc định";
+            gvForm.Columns["IS_ACTIVE"].Caption = "Kích hoạt";
+
+            if (gvForm.Columns["STT"] != null) gvForm.Columns["STT"].Width = 50;
+            if (gvForm.Columns["TEMPLATE_FILE_PATH"] != null) gvForm.Columns["TEMPLATE_FILE_PATH"].Width = 220;
+
+            // Ẩn cột audit không quan trọng với end-user
+            if (gvForm.Columns["CREATED_AT"] != null) gvForm.Columns["CREATED_AT"].Visible = false;
+            if (gvForm.Columns["UPDATED_AT"] != null) gvForm.Columns["UPDATED_AT"].Visible = false;
         }
 
         private void btnBrowse_Click(object sender, EventArgs e)
