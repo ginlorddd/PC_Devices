@@ -6,6 +6,18 @@ namespace JigFlow.Data
 {
     public class FormMasterService
     {
+        public DataRow GetDefaultFormByJigType(string jigTypeCode)
+        {
+            const string sql = @"
+SELECT TOP 1 FM.*
+FROM dbo.JIG_TYPE_MASTER JTM
+INNER JOIN dbo.FORM_MASTER FM ON JTM.DEFAULT_FORM_CODE = FM.FORM_CODE
+WHERE JTM.JIG_TYPE_CODE = @JIG_TYPE_CODE
+  AND FM.IS_ACTIVE = 1;";
+            var dt = DbUtils.GetData(sql, new SqlParameter("@JIG_TYPE_CODE", (object)jigTypeCode ?? DBNull.Value));
+            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+        }
+
         public DataTable GetFormMasters()
         {
             const string sql = @"
