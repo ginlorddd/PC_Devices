@@ -1,6 +1,7 @@
 using DevExpress.XtraGrid.Views.Grid;
 using JigFlow.Data;
 using System;
+using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -136,6 +137,7 @@ namespace JigFlow.Forms
             if (rowHandle < 0) return;
 
             var jigTypeCode = Convert.ToString(gvJig.GetRowCellValue(rowHandle, "JIG_TYPE_CODE"));
+            var reportFormCode = Convert.ToString(gvJig.GetRowCellValue(rowHandle, "REPORT_FORM_CODE"));
             var controlNo = Convert.ToString(gvJig.GetRowCellValue(rowHandle, "CONTROL_NO"));
             var jigName = Convert.ToString(gvJig.GetRowCellValue(rowHandle, "JIG_NAME"));
             var nextCheckDate = Convert.ToString(gvJig.GetRowCellValue(rowHandle, "NEXT_CHECK_PLAN_DATE"));
@@ -145,10 +147,15 @@ namespace JigFlow.Forms
                 return;
             }
 
-            var formRow = _formService.GetDefaultFormByJigType(jigTypeCode);
+            DataRow formRow = null;
+            if (!string.IsNullOrWhiteSpace(reportFormCode))
+            {
+                formRow = _formService.GetFormByCode(reportFormCode);
+            }
+
             if (formRow == null)
             {
-                MessageBox.Show("Loại Jig chưa cấu hình Form mặc định.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Jig này chưa có Form Master trong Jig Master. Vui lòng cấu hình từ FRM Register trước khi nhập kết quả kiểm tra.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 

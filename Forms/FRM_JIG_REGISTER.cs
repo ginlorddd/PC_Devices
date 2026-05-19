@@ -246,7 +246,8 @@ namespace JigFlow.Forms
                     txtPurposeUse.Text.Trim(),
                     txtLocation.Text.Trim(),
                     deLastCheckDate.DateTime == DateTime.MinValue ? (DateTime?)null : deLastCheckDate.DateTime.Date,
-                    cboFrequency.Text);
+                    cboFrequency.Text,
+                    Convert.ToString(cboReportForm.EditValue));
 
                 MessageBox.Show("Đã cập nhật Jig.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 DataChangeNotifier.Notify("JIG_MASTER");
@@ -346,6 +347,7 @@ namespace JigFlow.Forms
             txtPurposeUse.Text = Convert.ToString(ROW["PURPOSE_USE"]);
             txtLocation.Text = Convert.ToString(ROW["LOCATION_CODE"]);
             cboFrequency.EditValue = Convert.ToString(ROW["CHECK_FREQUENCY"]);
+            cboReportForm.EditValue = Convert.ToString(ROW["REPORT_FORM_CODE"]);
             if (ROW.Table.Columns.Contains("LAST_CHECK_DATE") && ROW["LAST_CHECK_DATE"] != DBNull.Value)
             {
                 deLastCheckDate.EditValue = Convert.ToDateTime(ROW["LAST_CHECK_DATE"]);

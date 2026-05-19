@@ -18,6 +18,17 @@ WHERE JTM.JIG_TYPE_CODE = @JIG_TYPE_CODE
             return dt.Rows.Count > 0 ? dt.Rows[0] : null;
         }
 
+        public DataRow GetFormByCode(string formCode)
+        {
+            const string sql = @"
+SELECT TOP 1 *
+FROM dbo.FORM_MASTER
+WHERE FORM_CODE = @FORM_CODE
+  AND IS_ACTIVE = 1;";
+            var dt = DbUtils.GetData(sql, new SqlParameter("@FORM_CODE", (object)formCode ?? DBNull.Value));
+            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+        }
+
         public DataTable GetFormMasters()
         {
             const string sql = @"
