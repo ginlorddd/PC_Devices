@@ -8,6 +8,7 @@
         private DevExpress.XtraBars.BarButtonItem btnAccount;
         private DevExpress.XtraBars.BarButtonItem btnChangePassword;
         private DevExpress.XtraBars.BarButtonItem btnProductionPlan;
+        private DevExpress.XtraBars.BarButtonItem btnOhdAlert;
         private DevExpress.XtraBars.Ribbon.RibbonPage ribbonPage1;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup1;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup2;
@@ -30,6 +31,7 @@
             this.btnAccount = new DevExpress.XtraBars.BarButtonItem();
             this.btnChangePassword = new DevExpress.XtraBars.BarButtonItem();
             this.btnProductionPlan = new DevExpress.XtraBars.BarButtonItem();
+            this.btnOhdAlert = new DevExpress.XtraBars.BarButtonItem();
             this.ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.ribbonPageGroup2 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
@@ -47,9 +49,10 @@
             this.btnDieMaster,
             this.btnAccount,
             this.btnChangePassword,
-            this.btnProductionPlan});
+            this.btnProductionPlan,
+            this.btnOhdAlert});
             this.ribbonControl1.Location = new System.Drawing.Point(0, 0);
-            this.ribbonControl1.MaxItemId = 5;
+            this.ribbonControl1.MaxItemId = 6;
             this.ribbonControl1.Name = "ribbonControl1";
             this.ribbonControl1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.ribbonPage1});
@@ -88,6 +91,14 @@
             this.btnProductionPlan.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
             this.btnProductionPlan.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnProductionPlan_ItemClick);
             // 
+            // btnOhdAlert
+            // 
+            this.btnOhdAlert.Caption = "Cảnh báo tiến độ OHD";
+            this.btnOhdAlert.Id = 5;
+            this.btnOhdAlert.Name = "btnOhdAlert";
+            this.btnOhdAlert.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonItemStyles.Large;
+            this.btnOhdAlert.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnOhdAlert_ItemClick);
+            // 
             // ribbonPage1
             // 
             this.ribbonPage1.Groups.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPageGroup[] {
@@ -100,6 +111,7 @@
             // 
             this.ribbonPageGroup1.ItemLinks.Add(this.btnDieMaster);
             this.ribbonPageGroup1.ItemLinks.Add(this.btnProductionPlan);
+            this.ribbonPageGroup1.ItemLinks.Add(this.btnOhdAlert);
             this.ribbonPageGroup1.Name = "ribbonPageGroup1";
             this.ribbonPageGroup1.Text = "Master Data";
             // 
