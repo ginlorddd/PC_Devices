@@ -11,11 +11,17 @@ using System.Windows.Forms;
 using System.IO;
 using System.Drawing;
 using System.Linq;
+using System.Xml;
+using System.IO.Compression;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using DevExpress.XtraGrid;
 
 namespace DM_OHD.FRM
 {
     public partial class FRM_PRODUCTION_PLAN : XtraForm
     {
+        private const string SelectFieldName = "ROW_SELECTED";
         private readonly ProductionPlanDTO _dto = new ProductionPlanDTO();
 
         public FRM_PRODUCTION_PLAN()
@@ -32,30 +38,42 @@ namespace DM_OHD.FRM
             ConfigureMonthEditor(deFrom);
             ConfigureMonthEditor(deTo);
             deFrom.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-            deTo.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-            btnApplyFilter.Click += (s, e) => ApplyMonthFilterToAllViews();
-
-            btnSaveFY.Click += (s, e) => { _dto.SavePlanFY(gridFY.DataSource as DataTable); LoadData(); };
-            btnSaveRatio.Click += (s, e) => { _dto.SaveMachineRatio(gridRatio.DataSource as DataTable); LoadData(); };
-            btnSaveOutput.Click += (s, e) => { _dto.SaveDieOutput(gridOutput.DataSource as DataTable); LoadData(); };
-            btnGenerateMaster.Click += (s, e) => { _dto.GenerateMasterPlan(); LoadData(); };
-            btnExportFY.Click += (s, e) => ExportGrid(viewFY);
-            btnImportFY.Click += (s, e) => ImportCsvToGrid(gridFY.DataSource as DataTable, viewFY);
-            btnExportRatio.Click += (s, e) => ExportGrid(viewRatio);
-            btnImportRatio.Click += (s, e) => ImportCsvToGrid(gridRatio.DataSource as DataTable, viewRatio);
-            btnExportOutput.Click += (s, e) => ExportGrid(viewOutput);
-            btnImportOutput.Click += (s, e) => ImportCsvToGrid(gridOutput.DataSource as DataTable, viewOutput);
-            btnExportMaster.Click += (s, e) => ExportGrid(viewMaster);
+            deTo.EditValue = new DateTime(DateTime.Today.Year + 1, 12, 1);
+            btnApplyFilter.Click += BtnApplyFilter_Click;
+            btnSaveFY.Click += BtnSaveFY_Click;
+            btnSaveRatio.Click += BtnSaveRatio_Click;
+            btnSaveOutput.Click += BtnSaveOutput_Click;
+            btnSaveMaster.Click += BtnSaveMaster_Click;
+            btnDeleteFY.Click += BtnDeleteFY_Click;
+            btnDeleteRatio.Click += BtnDeleteRatio_Click;
+            btnDeleteOutput.Click += BtnDeleteOutput_Click;
+            btnGenerateMaster.Click += BtnGenerateMaster_Click;
+            btnExportFY.Click += BtnExportFY_Click;
+            btnImportFY.Click += BtnImportFY_Click;
+            btnExportRatio.Click += BtnExportRatio_Click;
+            btnImportRatio.Click += BtnImportRatio_Click;
+            btnExportOutput.Click += BtnExportOutput_Click;
+            btnImportOutput.Click += BtnImportOutput_Click;
+            btnExportMaster.Click += BtnExportMaster_Click;
+            btnTemplateFY.Click += (s, e) => SaveImportTemplate(viewFY);
+            btnTemplateRatio.Click += (s, e) => SaveImportTemplate(viewRatio);
+            btnTemplateOutput.Click += (s, e) => SaveImportTemplate(viewOutput);
+            btnTemplateMaster.Click += (s, e) => SaveImportTemplate(viewMaster);
 
             SetupGridEditingBehavior(viewFY);
             SetupGridEditingBehavior(viewRatio);
             SetupGridEditingBehavior(viewOutput);
             SetupGridEditingBehavior(viewMaster);
+            viewFY.MouseDown += View_MouseDownSelectHeader;
+            viewRatio.MouseDown += View_MouseDownSelectHeader;
+            viewOutput.MouseDown += View_MouseDownSelectHeader;
+            viewMaster.RowCellStyle += ViewMaster_RowCellStyle;
             StyleButtons();
 
             ApplyPermissions();
             Load += (s, e) => LoadData();
         }
+
         private void StyleButtons()
         {
             btnApplyFilter.Appearance.BackColor = Color.RoyalBlue;
@@ -76,9 +94,63 @@ namespace DM_OHD.FRM
             ApplyButtonColor(btnImportFY, importColor);
             ApplyButtonColor(btnImportRatio, importColor);
             ApplyButtonColor(btnImportOutput, importColor);
+            ApplyButtonColor(btnTemplateFY, Color.Teal);
+            ApplyButtonColor(btnTemplateRatio, Color.Teal);
+            ApplyButtonColor(btnTemplateOutput, Color.Teal);
+            ApplyButtonColor(btnTemplateMaster, Color.Teal);
             ApplyButtonColor(btnSaveFY, Color.MediumSeaGreen);
             ApplyButtonColor(btnSaveRatio, Color.MediumSeaGreen);
             ApplyButtonColor(btnSaveOutput, Color.MediumSeaGreen);
+            ApplyButtonColor(btnSaveMaster, Color.MediumSeaGreen);
+            ApplyButtonColor(btnDeleteFY, Color.IndianRed);
+            ApplyButtonColor(btnDeleteRatio, Color.IndianRed);
+            ApplyButtonColor(btnDeleteOutput, Color.IndianRed);
+        }
+
+        private void SaveImportTemplate(GridView sourceView)
+        {
+            DataTable source = sourceView?.GridControl?.DataSource as DataTable;
+            if (source == null) return;
+
+            DataTable template = source.Clone();
+            foreach (string helperCol in new[] { "STT", SelectFieldName, "QTY_ORDER", "CAVITY_DETAIL" })
+            {
+                if (template.Columns.Contains(helperCol)) template.Columns.Remove(helperCol);
+            }
+            var captionMap = sourceView.Columns
+                .Cast<GridColumn>()
+                .ToDictionary(c => c.FieldName, c => c.Caption);
+
+            using (SaveFileDialog dialog = new SaveFileDialog { Filter = "Excel file (*.xlsx)|*.xlsx", FileName = "import_template.xlsx" })
+            {
+                if (dialog.ShowDialog() != DialogResult.OK) return;
+
+                object originalDataSource = sourceView.GridControl.DataSource;
+                try
+                {
+                    sourceView.GridControl.DataSource = template;
+                    sourceView.PopulateColumns();
+
+                    foreach (GridColumn col in sourceView.Columns)
+                    {
+                        if (captionMap.TryGetValue(col.FieldName, out string caption))
+                            col.Caption = caption;
+                    }
+                    sourceView.ExportToXlsx(dialog.FileName);
+                }
+                finally
+                {
+                    sourceView.GridControl.DataSource = originalDataSource;
+                    if (sourceView == viewFY) RebuildViewColumns(viewFY, true);
+                    else if (sourceView == viewRatio) RebuildViewColumns(viewRatio, true);
+                    else if (sourceView == viewOutput) RebuildViewColumns(viewOutput, true);
+                    else if (sourceView == viewMaster) RebuildViewColumns(viewMaster, false);
+                    SetCaptions();
+                    ApplyMonthFilterToAllViews();
+                }
+            }
+
+            NotifyAction("Đã lưu form import mẫu.");
         }
 
         private void ApplyButtonColor(SimpleButton button, Color color)
@@ -87,6 +159,96 @@ namespace DM_OHD.FRM
             button.Appearance.ForeColor = Color.White;
             button.Appearance.Options.UseBackColor = true;
             button.Appearance.Options.UseForeColor = true;
+        }
+
+        private void NotifyAction(string message)
+        {
+            XtraMessageBox.Show(message, "Thông báo");
+        }
+
+        private void BtnApplyFilter_Click(object sender, EventArgs e)
+        {
+            ApplyMonthFilterToAllViews();
+            NotifyAction("Đã áp dụng bộ lọc tháng.");
+        }
+
+        private void BtnSaveFY_Click(object sender, EventArgs e)
+        {
+            _dto.SavePlanFY(gridFY.DataSource as DataTable);
+            LoadData();
+            NotifyAction("Đã lưu kế hoạch FY.");
+        }
+
+        private void BtnSaveRatio_Click(object sender, EventArgs e)
+        {
+            _dto.SaveMachineRatio(gridRatio.DataSource as DataTable);
+            LoadData();
+            NotifyAction("Đã lưu tỉ lệ chạy máy.");
+        }
+
+        private void BtnSaveOutput_Click(object sender, EventArgs e)
+        {
+            _dto.SaveDieOutput(gridOutput.DataSource as DataTable);
+            LoadData();
+            NotifyAction("Đã lưu sản lượng khuôn.");
+        }
+
+        private void BtnSaveMaster_Click(object sender, EventArgs e)
+        {
+            _dto.SaveMaster(gridMaster.DataSource as DataTable);
+            LoadData();
+            NotifyAction("Đã lưu bảng kế hoạch OHD.");
+        }
+
+        private void BtnDeleteFY_Click(object sender, EventArgs e)
+        {
+            int deleted = DeleteSelectedRows(viewFY);
+            NotifyAction($"Đã xóa {deleted} dòng FY được chọn.");
+        }
+
+        private void BtnDeleteRatio_Click(object sender, EventArgs e)
+        {
+            int deleted = DeleteSelectedRows(viewRatio);
+            NotifyAction($"Đã xóa {deleted} dòng tỉ lệ được chọn.");
+        }
+
+        private void BtnDeleteOutput_Click(object sender, EventArgs e)
+        {
+            int deleted = DeleteSelectedRows(viewOutput);
+            NotifyAction($"Đã xóa {deleted} dòng sản lượng được chọn.");
+        }
+
+        private void BtnGenerateMaster_Click(object sender, EventArgs e)
+        {
+            _dto.GenerateMasterPlan();
+            LoadData();
+            NotifyAction("Đã tạo bảng kế hoạch OHD.");
+        }
+
+        private void BtnExportFY_Click(object sender, EventArgs e) => ExportGrid(viewFY);
+        private void BtnExportRatio_Click(object sender, EventArgs e) => ExportGrid(viewRatio);
+        private void BtnExportOutput_Click(object sender, EventArgs e) => ExportGrid(viewOutput);
+        private void BtnExportMaster_Click(object sender, EventArgs e) => ExportGrid(viewMaster);
+
+        private void BtnImportFY_Click(object sender, EventArgs e)
+        {
+            int imported = ImportExcelToGrid(gridFY.DataSource as DataTable, viewFY);
+            if (imported < 0) return;
+            NotifyAction($"Đã import {imported} dòng cho kế hoạch FY.");
+        }
+
+        private void BtnImportRatio_Click(object sender, EventArgs e)
+        {
+            int imported = ImportExcelToGrid(gridRatio.DataSource as DataTable, viewRatio);
+            if (imported < 0) return;
+            NotifyAction($"Đã import {imported} dòng cho tỉ lệ chạy máy.");
+        }
+
+        private void BtnImportOutput_Click(object sender, EventArgs e)
+        {
+            int imported = ImportExcelToGrid(gridOutput.DataSource as DataTable, viewOutput);
+            if (imported < 0) return;
+            NotifyAction($"Đã import {imported} dòng cho sản lượng khuôn.");
         }
 
         private void SetupGridEditingBehavior(GridView view)
@@ -102,7 +264,9 @@ namespace DM_OHD.FRM
             var view = sender as GridView;
             if (view?.FocusedColumn == null) return;
             string field = view.FocusedColumn.FieldName;
-            if (!field.StartsWith("M") || field.Length != 7) return;
+            bool isMonthField = field.StartsWith("M") && field.Length == 7;
+            bool isLatestShotField = view == viewMaster && field == "LATEST_SHOT";
+            if (!isMonthField && !isLatestShotField) return;
 
             if (decimal.TryParse(Convert.ToString(e.Value)?.Replace(".", "").Replace(",", ""), out decimal num))
             {
@@ -138,7 +302,7 @@ namespace DM_OHD.FRM
             for (int r = 0; r < rows.Length; r++)
             {
                 if (string.IsNullOrWhiteSpace(rows[r])) continue;
-                string[] cells = rows[r].Split('	');
+                string[] cells = rows[r].Split('\t');
                 int targetRow = startRow + r;
                 if (targetRow >= view.RowCount) view.AddNewRow();
                 targetRow = Math.Min(targetRow, view.RowCount - 1);
@@ -156,8 +320,48 @@ namespace DM_OHD.FRM
 
         private decimal ParseNumber(string value)
         {
-            string clean = (value ?? string.Empty).Trim().Replace(".", "").Replace(",", "");
-            return decimal.TryParse(clean, out decimal num) ? Math.Round(num, 0) : 0m;
+            string clean = (value ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(clean) || clean == "-") return 0m;
+
+            NumberStyles styles = NumberStyles.Number | NumberStyles.AllowExponent;
+            if (decimal.TryParse(clean, styles, CultureInfo.InvariantCulture, out decimal numInvariant))
+                return Math.Round(numInvariant, 0);
+            if (decimal.TryParse(clean, styles, CultureInfo.GetCultureInfo("vi-VN"), out decimal numVi))
+                return Math.Round(numVi, 0);
+            if (decimal.TryParse(clean, styles, CultureInfo.GetCultureInfo("en-US"), out decimal numEn))
+                return Math.Round(numEn, 0);
+
+            if (Regex.IsMatch(clean, @"^\d{1,3}(\.\d{3})+$"))
+            {
+                string normalized = clean.Replace(".", "");
+                if (decimal.TryParse(normalized, styles, CultureInfo.InvariantCulture, out decimal numDotGrouped))
+                    return Math.Round(numDotGrouped, 0);
+            }
+
+            if (Regex.IsMatch(clean, @"^\d{1,3}(,\d{3})+$"))
+            {
+                string normalized = clean.Replace(",", "");
+                if (decimal.TryParse(normalized, styles, CultureInfo.InvariantCulture, out decimal numCommaGrouped))
+                    return Math.Round(numCommaGrouped, 0);
+            }
+
+            return 0m;
+        }
+
+        private decimal ParseDecimalRaw(string value)
+        {
+            string clean = (value ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(clean) || clean == "-") return 0m;
+
+            NumberStyles styles = NumberStyles.Number | NumberStyles.AllowExponent;
+            if (decimal.TryParse(clean, styles, CultureInfo.InvariantCulture, out decimal numInvariant))
+                return numInvariant;
+            if (decimal.TryParse(clean, styles, CultureInfo.GetCultureInfo("vi-VN"), out decimal numVi))
+                return numVi;
+            if (decimal.TryParse(clean, styles, CultureInfo.GetCultureInfo("en-US"), out decimal numEn))
+                return numEn;
+
+            return ParseNumber(clean);
         }
 
         private void ExportGrid(GridView view)
@@ -165,36 +369,175 @@ namespace DM_OHD.FRM
             using (var dialog = new SaveFileDialog { Filter = "Excel file (*.xlsx)|*.xlsx" })
             {
                 if (dialog.ShowDialog() != DialogResult.OK) return;
-                view.ExportToXlsx(dialog.FileName);
+                GridColumn sttCol = view.Columns["STT"];
+                GridColumn selectCol = view.Columns[SelectFieldName];
+                bool sttVisible = sttCol != null && sttCol.Visible;
+                bool selectVisible = selectCol != null && selectCol.Visible;
+                try
+                {
+                    if (sttCol != null) sttCol.Visible = false;
+                    if (selectCol != null) selectCol.Visible = false;
+                    view.ExportToXlsx(dialog.FileName);
+                }
+                finally
+                {
+                    if (sttCol != null) sttCol.Visible = sttVisible;
+                    if (selectCol != null) selectCol.Visible = selectVisible;
+                }
                 XtraMessageBox.Show("Export thành công.", "Thông báo");
             }
         }
 
-        private void ImportCsvToGrid(DataTable dt, GridView view)
+        private int ImportExcelToGrid(DataTable dt, GridView view)
         {
-            if (dt == null) return;
-            using (var dialog = new OpenFileDialog { Filter = "CSV file (*.csv)|*.csv|Text file (*.txt)|*.txt" })
+            if (dt == null) return 0;
+            using (var dialog = new OpenFileDialog { Filter = "Excel (*.xlsx)|*.xlsx" })
             {
-                if (dialog.ShowDialog() != DialogResult.OK) return;
-                var lines = File.ReadAllLines(dialog.FileName);
-                if (lines.Length < 2) return;
-
-                string[] headers = lines[0].Split(',');
-                for (int i = 1; i < lines.Length; i++)
+                if (dialog.ShowDialog() != DialogResult.OK) return -1;
+                DataTable source = ReadXlsx(dialog.FileName);
+                dt.Rows.Clear();
+                int importedCount = 0;
+                string[] keyColumns = { "PRODUCT_NO", "DIE_NO", "DIE_NAME", "CAVITY" };
+                Dictionary<string, string> lastKeyValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (DataRow srcRow in source.Rows)
                 {
-                    if (string.IsNullOrWhiteSpace(lines[i])) continue;
-                    string[] cells = lines[i].Split(',');
                     DataRow row = dt.NewRow();
-                    for (int c = 0; c < headers.Length && c < cells.Length; c++)
+                    bool hasMappedValue = false;
+                    foreach (DataColumn sourceCol in source.Columns)
                     {
-                        string h = headers[c].Trim();
-                        if (!dt.Columns.Contains(h)) continue;
-                        row[h] = dt.Columns[h].DataType == typeof(decimal) ? ParseNumber(cells[c]) : (object)cells[c].Trim();
+                        string header = sourceCol.ColumnName.Trim();
+                        string targetColumn = ResolveTargetColumnName(view, dt, header);
+                        if (string.IsNullOrWhiteSpace(targetColumn)) continue;
+                        string value = Convert.ToString(srcRow[sourceCol] ?? string.Empty).Trim();
+                        if (dt.Columns[targetColumn].DataType == typeof(decimal))
+                        {
+                            bool isRatioMonth = view == viewRatio && targetColumn.StartsWith("M") && targetColumn.Length == 7;
+                            decimal number = isRatioMonth ? ParseDecimalRaw(value) : ParseNumber(value);
+                            if (isRatioMonth && number >= 0m && number <= 1m) number *= 100m;
+                            row[targetColumn] = number;
+                        }
+                        else
+                        {
+                            row[targetColumn] = value;
+                        }
+                        hasMappedValue = hasMappedValue || !string.IsNullOrWhiteSpace(value);
                     }
-                    dt.Rows.Add(row);
+
+                    foreach (string keyCol in keyColumns)
+                    {
+                        if (!dt.Columns.Contains(keyCol)) continue;
+                        string current = Convert.ToString(row[keyCol]);
+                        if (string.IsNullOrWhiteSpace(current))
+                        {
+                            if (lastKeyValues.TryGetValue(keyCol, out string lastValue))
+                                row[keyCol] = lastValue;
+                        }
+                        else
+                        {
+                            lastKeyValues[keyCol] = current.Trim();
+                            row[keyCol] = current.Trim();
+                        }
+                    }
+
+                    bool hasKey = HasAnyValue(row, "PRODUCT_NO", "DIE_NO", "DIE_NAME", "CAVITY");
+                    if (hasMappedValue && hasKey)
+                    {
+                        dt.Rows.Add(row);
+                        importedCount++;
+                    }
                 }
                 view.RefreshData();
+                return importedCount;
             }
+        }
+
+        private bool HasAnyValue(DataRow row, params string[] columns)
+        {
+            return columns.Any(c => row.Table.Columns.Contains(c) && !string.IsNullOrWhiteSpace(Convert.ToString(row[c])));
+        }
+
+        private string ResolveTargetColumnName(GridView view, DataTable dt, string sourceHeader)
+        {
+            if (string.IsNullOrWhiteSpace(sourceHeader)) return null;
+            string header = sourceHeader.Trim();
+            if (string.Equals(header, "STT", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(header, "Chọn", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(header, SelectFieldName, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+            if (dt.Columns.Contains(header)) return header;
+
+            GridColumn byCaption = view.Columns
+                .Cast<GridColumn>()
+                .FirstOrDefault(c => string.Equals(c.Caption?.Trim(), header, StringComparison.OrdinalIgnoreCase)
+                                     && dt.Columns.Contains(c.FieldName));
+            if (byCaption != null) return byCaption.FieldName;
+
+            string monthField = TryParseMonthHeaderToFieldName(header);
+            if (!string.IsNullOrWhiteSpace(monthField) && dt.Columns.Contains(monthField)) return monthField;
+
+            return null;
+        }
+
+        private string TryParseMonthHeaderToFieldName(string header)
+        {
+            Match slashPattern = Regex.Match(header, @"^(?<m>\d{1,2})[\/\-](?<y>\d{4})$");
+            if (slashPattern.Success)
+            {
+                int month = int.Parse(slashPattern.Groups["m"].Value);
+                int year = int.Parse(slashPattern.Groups["y"].Value);
+                if (month >= 1 && month <= 12) return $"M{year}{month:00}";
+            }
+
+            Match thgPattern = Regex.Match(header, @"^(Thg|THG)\s*(?<m>\d{1,2})[-\/](?<y>\d{2,4})$");
+            if (thgPattern.Success)
+            {
+                int month = int.Parse(thgPattern.Groups["m"].Value);
+                string yearText = thgPattern.Groups["y"].Value;
+                int year = yearText.Length == 2 ? 2000 + int.Parse(yearText) : int.Parse(yearText);
+                if (month >= 1 && month <= 12) return $"M{year}{month:00}";
+            }
+
+            string[] dateFormats = { "d/M/yyyy", "dd/MM/yyyy", "M/d/yyyy", "MM/dd/yyyy", "d-M-yyyy", "M-d-yyyy" };
+            List<DateTime> parsedDates = new List<DateTime>();
+            foreach (string format in dateFormats)
+            {
+                if (DateTime.TryParseExact(header, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsed))
+                {
+                    parsedDates.Add(parsed);
+                }
+            }
+            DateTime firstDayCandidate = parsedDates.FirstOrDefault(d => d.Day == 1);
+            if (firstDayCandidate != default(DateTime))
+            {
+                return $"M{firstDayCandidate.Year}{firstDayCandidate.Month:00}";
+            }
+            if (parsedDates.Count > 0)
+            {
+                DateTime parsed = parsedDates[0];
+                return $"M{parsed.Year}{parsed.Month:00}";
+            }
+
+            string[] monthNameFormats = { "MMM-yy", "MMM-yyyy", "MMMM-yy", "MMMM-yyyy", "MMM yy", "MMM/yyyy" };
+            foreach (string format in monthNameFormats)
+            {
+                if (DateTime.TryParseExact(header, format, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime parsed))
+                {
+                    return $"M{parsed.Year}{parsed.Month:00}";
+                }
+            }
+
+            if (double.TryParse(header, NumberStyles.Any, CultureInfo.InvariantCulture, out double oaDate))
+            {
+                if (oaDate > 20000 && oaDate < 70000)
+                {
+                    DateTime parsed = DateTime.FromOADate(oaDate);
+                    return $"M{parsed.Year}{parsed.Month:00}";
+                }
+            }
+
+            return null;
         }
 
         private void ConfigureMonthEditor(DateEdit editor)
@@ -213,10 +556,15 @@ namespace DM_OHD.FRM
             btnSaveFY.Enabled = canEdit;
             btnSaveRatio.Enabled = canEdit;
             btnSaveOutput.Enabled = canEdit;
+            btnDeleteFY.Enabled = canEdit;
+            btnDeleteRatio.Enabled = canEdit;
+            btnDeleteOutput.Enabled = canEdit;
+            btnSaveMaster.Enabled = canEdit;
             btnGenerateMaster.Enabled = canEdit;
             viewFY.OptionsBehavior.Editable = canEdit;
             viewRatio.OptionsBehavior.Editable = canEdit;
             viewOutput.OptionsBehavior.Editable = canEdit;
+            viewMaster.OptionsBehavior.Editable = canEdit;
         }
 
         private void ConfigureGrid(GridView view, bool editable = true)
@@ -230,13 +578,47 @@ namespace DM_OHD.FRM
             view.OptionsView.AllowCellMerge = true;
             view.CellMerge -= View_CellMerge;
             view.CellMerge += View_CellMerge;
+            EnsureSttColumn(view);
+            ConfigureSelector(view);
+        }
+
+        private void ConfigureSelector(GridView view)
+        {
+            bool allowSelector = view == viewFY || view == viewRatio || view == viewOutput;
+            view.OptionsSelection.MultiSelect = false;
+            view.OptionsSelection.MultiSelectMode = GridMultiSelectMode.RowSelect;
+            view.OptionsSelection.ShowCheckBoxSelectorInColumnHeader = DefaultBoolean.False;
+            view.OptionsSelection.CheckBoxSelectorColumnWidth = 0;
+            if (!allowSelector) return;
+
+            DataTable dt = view.GridControl?.DataSource as DataTable;
+            if (dt != null && !dt.Columns.Contains(SelectFieldName))
+            {
+                dt.Columns.Add(SelectFieldName, typeof(bool));
+                foreach (DataRow row in dt.Rows) row[SelectFieldName] = false;
+            }
         }
 
         private void View_CellMerge(object sender, CellMergeEventArgs e)
         {
             var view = sender as GridView;
             string field = e.Column.FieldName;
-            if (field != "PRODUCT_NO" && field != "DIE_NO" && field != "DIE_NAME")
+            if (field == "STT")
+            {
+                e.Merge = false;
+                e.Handled = true;
+                return;
+            }
+
+            bool isMaster = view == viewMaster;
+            if (!isMaster && field != "PRODUCT_NO" && field != "DIE_NO" && field != "DIE_NAME")
+            {
+                e.Merge = false;
+                e.Handled = true;
+                return;
+            }
+
+            if (isMaster && field != "DIE_NO" && field != "DIE_NAME" && field != "TOTAL_CAVITY")
             {
                 e.Merge = false;
                 e.Handled = true;
@@ -255,34 +637,48 @@ namespace DM_OHD.FRM
             gridRatio.DataSource = _dto.GetMachineRatio();
             gridOutput.DataSource = _dto.GetDieOutput();
             gridMaster.DataSource = _dto.GetMaster();
+            RebuildViewColumns(viewFY, true);
+            RebuildViewColumns(viewRatio, true);
+            RebuildViewColumns(viewOutput, true);
+            RebuildViewColumns(viewMaster, false);
             SetCaptions();
             ApplyMonthFilterToAllViews();
         }
 
         private void SetCaptions()
         {
-            SetGridCaption(viewFY, "PRODUCT_NO", "ITEM_CODE");
-            SetGridCaption(viewFY, "DIE_NAME", "ITEM_DESC");
-            SetGridCaption(viewFY, "DIE_NO", "MOLD_NO");
-            SetGridCaption(viewFY, "CAVITY", "CAVITY");
+            SetGridCaption(viewFY, "STT", "STT");
+            SetGridCaption(viewFY, "PRODUCT_NO", "Mã hàng");
+            SetGridCaption(viewFY, "DIE_NAME", "Tên khuôn");
+            SetGridCaption(viewFY, "DIE_NO", "Số khuôn");
+            SetGridCaption(viewFY, "CAVITY", "Số cavity");
             ConfigureMonthColumns(viewFY, "Kế hoạch FY");
 
-            SetGridCaption(viewRatio, "DIE_NAME", "ITEM_DESC");
-            SetGridCaption(viewRatio, "DIE_NO", "MOLD_NO");
-            SetGridCaption(viewRatio, "CAVITY", "CAVITY");
+            SetGridCaption(viewRatio, "STT", "STT");
+            SetGridCaption(viewRatio, "DIE_NAME", "Tên khuôn");
+            SetGridCaption(viewRatio, "DIE_NO", "Số khuôn");
+            SetGridCaption(viewRatio, "CAVITY", "Số cavity");
             ConfigureMonthColumns(viewRatio, "Tỉ lệ chạy máy (%)");
 
-            SetGridCaption(viewOutput, "DIE_NAME", "ITEM_DESC");
-            SetGridCaption(viewOutput, "DIE_NO", "MOLD_NO");
-            SetGridCaption(viewOutput, "CAVITY", "CAVITY");
+            SetGridCaption(viewOutput, "STT", "STT");
+            SetGridCaption(viewOutput, "DIE_NAME", "Tên khuôn");
+            SetGridCaption(viewOutput, "DIE_NO", "Số khuôn");
+            SetGridCaption(viewOutput, "CAVITY", "Số cavity");
             ConfigureMonthColumns(viewOutput, "Sản lượng khuôn");
 
-            SetGridCaption(viewMaster, "DIE_NAME", "ITEM_DESC");
-            SetGridCaption(viewMaster, "DIE_NO", "MOLD_NO");
-            SetGridCaption(viewMaster, "TOTAL_CAVITY", "TOTAL_CAVITY");
+            SetGridCaption(viewMaster, "STT", "STT");
+            SetGridCaption(viewMaster, "DIE_NAME", "Tên khuôn");
+            SetGridCaption(viewMaster, "DIE_NO", "Số khuôn");
+            SetGridCaption(viewMaster, "TOTAL_CAVITY", "Tổng số cavity");
             if (viewMaster.Columns["CAVITY_DETAIL"] != null) viewMaster.Columns["CAVITY_DETAIL"].Visible = false;
-            SetGridCaption(viewMaster, "QTY_TYPE", "QTY_TYPE");
+            if (viewMaster.Columns["QTY_ORDER"] != null) viewMaster.Columns["QTY_ORDER"].Visible = false;
+            SetGridCaption(viewMaster, "QTY_TYPE", "Loại dữ liệu");
+            SetGridCaption(viewMaster, "LATEST_SHOT", "Cập nhật số shot mới nhất");
             ConfigureMonthColumns(viewMaster, "Bảng 1 - Kế hoạch OHD");
+            NormalizeLeadingColumns(viewFY, true);
+            NormalizeLeadingColumns(viewRatio, true);
+            NormalizeLeadingColumns(viewOutput, true);
+            NormalizeLeadingColumns(viewMaster, false);
 
             ApplyFixedColumns(viewFY, true, false);
             ApplyFixedColumns(viewRatio, false, false);
@@ -310,12 +706,20 @@ namespace DM_OHD.FRM
                 col.ToolTip = valueCaption;
             }
 
+            if (view.Columns["STT"] != null) view.Columns["STT"].Width = 55;
             if (view.Columns["PRODUCT_NO"] != null) view.Columns["PRODUCT_NO"].Width = 110;
             if (view.Columns["DIE_NAME"] != null) view.Columns["DIE_NAME"].Width = 180;
             if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].Width = 110;
             if (view.Columns["CAVITY"] != null) view.Columns["CAVITY"].Width = 100;
             if (view.Columns["TOTAL_CAVITY"] != null) view.Columns["TOTAL_CAVITY"].Width = 110;
-            if (view.Columns["QTY_TYPE"] != null) view.Columns["QTY_TYPE"].Width = 150;
+            if (view.Columns["LATEST_SHOT"] != null)
+            {
+                view.Columns["LATEST_SHOT"].Width = 170;
+                view.Columns["LATEST_SHOT"].DisplayFormat.FormatType = FormatType.Numeric;
+                view.Columns["LATEST_SHOT"].DisplayFormat.FormatString = "N0";
+                view.Columns["LATEST_SHOT"].OptionsColumn.AllowEdit = view.OptionsBehavior.Editable;
+            }
+            if (view.Columns["QTY_TYPE"] != null) view.Columns["QTY_TYPE"].Width = 230;
         }
 
         private void ApplySort(GridView view, bool includeProductNo, bool includeQtyType)
@@ -326,17 +730,40 @@ namespace DM_OHD.FRM
                 view.ClearSorting();
                 int i = 0;
                 if (includeProductNo && view.Columns["PRODUCT_NO"] != null)
+                {
+                    view.Columns["PRODUCT_NO"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["PRODUCT_NO"].SortIndex = i++;
+                }
                 if (view.Columns["DIE_NAME"] != null)
+                {
+                    view.Columns["DIE_NAME"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["DIE_NAME"].SortIndex = i++;
+                }
                 if (view.Columns["DIE_NO"] != null)
+                {
+                    view.Columns["DIE_NO"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["DIE_NO"].SortIndex = i++;
+                }
                 if (view.Columns["CAVITY"] != null)
+                {
+                    view.Columns["CAVITY"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["CAVITY"].SortIndex = i++;
+                }
                 if (includeQtyType && view.Columns["TOTAL_CAVITY"] != null)
+                {
+                    view.Columns["TOTAL_CAVITY"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["TOTAL_CAVITY"].SortIndex = i++;
+                }
+                if (includeQtyType && view.Columns["QTY_ORDER"] != null)
+                {
+                    view.Columns["QTY_ORDER"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
+                    view.Columns["QTY_ORDER"].SortIndex = i++;
+                }
                 if (includeQtyType && view.Columns["QTY_TYPE"] != null)
+                {
+                    view.Columns["QTY_TYPE"].SortOrder = DevExpress.Data.ColumnSortOrder.Ascending;
                     view.Columns["QTY_TYPE"].SortIndex = i;
+                }
             }
             finally
             {
@@ -346,6 +773,7 @@ namespace DM_OHD.FRM
 
         private void ApplyFixedColumns(GridView view, bool includeProductNo, bool includeQtyType)
         {
+            if (view.Columns["STT"] != null) view.Columns["STT"].Fixed = FixedStyle.Left;
             if (includeProductNo && view.Columns["PRODUCT_NO"] != null)
                 view.Columns["PRODUCT_NO"].Fixed = FixedStyle.Left;
             if (view.Columns["DIE_NAME"] != null)
@@ -356,6 +784,8 @@ namespace DM_OHD.FRM
                 view.Columns["CAVITY"].Fixed = FixedStyle.Left;
             if (includeQtyType && view.Columns["TOTAL_CAVITY"] != null)
                 view.Columns["TOTAL_CAVITY"].Fixed = FixedStyle.Left;
+            if (includeQtyType && view.Columns["LATEST_SHOT"] != null)
+                view.Columns["LATEST_SHOT"].Fixed = FixedStyle.Left;
             if (includeQtyType && view.Columns["QTY_TYPE"] != null)
                 view.Columns["QTY_TYPE"].Fixed = FixedStyle.Left;
         }
@@ -403,15 +833,309 @@ namespace DM_OHD.FRM
             if (e.Value == null || e.Value == DBNull.Value) return;
             string field = e.Column?.FieldName ?? string.Empty;
             bool isMonthValue = field.StartsWith("M") && field.Length == 7;
-            if (!isMonthValue) return;
+            bool isLatestShot = sender == viewMaster && field == "LATEST_SHOT";
+            if (!isMonthValue && !isLatestShot) return;
 
             if (!decimal.TryParse(Convert.ToString(e.Value), out decimal number)) return;
-            e.DisplayText = number.ToString("N0", CultureInfo.InvariantCulture).Replace(",", ".");
+            if (sender == viewMaster)
+            {
+                if (isLatestShot)
+                {
+                    e.DisplayText = number.ToString("N0", CultureInfo.InvariantCulture).Replace(",", ".");
+                    return;
+                }
+                int rowHandle = e.ListSourceRowIndex >= 0 ? viewMaster.GetRowHandle(e.ListSourceRowIndex) : viewMaster.FocusedRowHandle;
+                string qtyType = Convert.ToString(viewMaster.GetRowCellValue(rowHandle, "QTY_TYPE"));
+                bool isOhdRow = !string.IsNullOrWhiteSpace(qtyType) && qtyType.ToLowerInvariant().Contains("ohd");
+                if (isOhdRow && number == 0m)
+                {
+                    e.DisplayText = string.Empty;
+                    return;
+                }
+            }
+            bool isRatioView = sender == viewRatio;
+            if (isRatioView)
+            {
+                e.DisplayText = $"{number.ToString("N0", CultureInfo.InvariantCulture).Replace(",", ".")}%";
+            }
+            else
+            {
+                e.DisplayText = number.ToString("N0", CultureInfo.InvariantCulture).Replace(",", ".");
+            }
         }
 
         private void SetGridCaption(GridView view, string field, string caption)
         {
             if (view.Columns[field] != null) view.Columns[field].Caption = caption;
+        }
+
+        private void NormalizeLeadingColumns(GridView view, bool hasSelect)
+        {
+            if (hasSelect && view.Columns[SelectFieldName] != null)
+            {
+                view.Columns[SelectFieldName].VisibleIndex = 0;
+                view.Columns[SelectFieldName].Fixed = FixedStyle.Left;
+            }
+
+            if (view.Columns["STT"] != null)
+            {
+                view.Columns["STT"].VisibleIndex = hasSelect ? 1 : 0;
+                view.Columns["STT"].Fixed = FixedStyle.Left;
+            }
+
+            if (!hasSelect && view == viewMaster)
+            {
+                int index = view.Columns["STT"] != null ? 1 : 0;
+                if (view.Columns["DIE_NAME"] != null) view.Columns["DIE_NAME"].VisibleIndex = index++;
+                if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].VisibleIndex = index++;
+                if (view.Columns["TOTAL_CAVITY"] != null) view.Columns["TOTAL_CAVITY"].VisibleIndex = index++;
+                if (view.Columns["QTY_TYPE"] != null) view.Columns["QTY_TYPE"].VisibleIndex = index++;
+                if (view.Columns["LATEST_SHOT"] != null) view.Columns["LATEST_SHOT"].VisibleIndex = index;
+            }
+        }
+
+        private void EnsureSttColumn(GridView view)
+        {
+            if (view.Columns["STT"] == null)
+            {
+                GridColumn col = view.Columns.AddVisible("STT", "STT");
+                col.UnboundType = DevExpress.Data.UnboundColumnType.Integer;
+                col.OptionsColumn.AllowEdit = false;
+                col.Fixed = FixedStyle.Left;
+                col.Width = 55;
+                col.VisibleIndex = 1;
+            }
+
+            view.CustomUnboundColumnData -= View_CustomUnboundColumnData;
+            view.CustomUnboundColumnData += View_CustomUnboundColumnData;
+        }
+
+        private void RebuildViewColumns(GridView view, bool includeSelectColumn)
+        {
+            view.Columns.Clear();
+            view.PopulateColumns();
+            if (includeSelectColumn) EnsureSelectionColumn(view);
+            ConfigureSelector(view);
+            EnsureSttColumn(view);
+        }
+
+        private void EnsureSelectionColumn(GridView view)
+        {
+            ConfigureSelector(view);
+            GridColumn selectCol = view.Columns[SelectFieldName];
+            if (selectCol == null)
+            {
+                selectCol = view.Columns.AddVisible(SelectFieldName, "Chọn");
+            }
+            selectCol.Visible = true;
+            selectCol.VisibleIndex = 0;
+            selectCol.Fixed = FixedStyle.Left;
+            selectCol.Width = 52;
+            selectCol.OptionsColumn.AllowEdit = true;
+        }
+
+        private void View_CustomUnboundColumnData(object sender, DevExpress.XtraGrid.Views.Base.CustomColumnDataEventArgs e)
+        {
+            if (e.Column.FieldName != "STT" || !e.IsGetData) return;
+            e.Value = e.ListSourceRowIndex + 1;
+        }
+
+        private int DeleteSelectedRows(GridView view)
+        {
+            DataTable dt = view.GridControl?.DataSource as DataTable;
+            if (dt == null || !dt.Columns.Contains(SelectFieldName)) return 0;
+            int deleted = 0;
+            for (int i = dt.Rows.Count - 1; i >= 0; i--)
+            {
+                if (!Convert.ToBoolean(dt.Rows[i][SelectFieldName])) continue;
+                dt.Rows.RemoveAt(i);
+                deleted++;
+            }
+            view.RefreshData();
+            return deleted;
+        }
+
+        private void View_MouseDownSelectHeader(object sender, MouseEventArgs e)
+        {
+            GridView view = sender as GridView;
+            if (view == null) return;
+            var hit = view.CalcHitInfo(e.Location);
+            if (hit.HitTest != GridHitTest.Column || hit.Column == null || hit.Column.FieldName != SelectFieldName) return;
+
+            DataTable dt = view.GridControl?.DataSource as DataTable;
+            if (dt == null || !dt.Columns.Contains(SelectFieldName)) return;
+
+            bool shouldSelectAll = dt.AsEnumerable().Any(r => !Convert.ToBoolean(r[SelectFieldName]));
+            foreach (DataRow row in dt.Rows)
+            {
+                row[SelectFieldName] = shouldSelectAll;
+            }
+            view.RefreshData();
+        }
+
+        private void ViewMaster_RowCellStyle(object sender, RowCellStyleEventArgs e)
+        {
+            if (e.RowHandle < 0 || e.Column == null) return;
+            GridColumn qtyTypeCol = viewMaster.Columns["QTY_TYPE"];
+            if (qtyTypeCol == null) return;
+
+            if (e.Column.VisibleIndex < qtyTypeCol.VisibleIndex) return;
+
+            string qtyType = Convert.ToString(viewMaster.GetRowCellValue(e.RowHandle, "QTY_TYPE")).ToLowerInvariant();
+            if (qtyType.Contains("fy"))
+            {
+                e.Appearance.BackColor = Color.FromArgb(220, 242, 245);
+                return;
+            }
+
+            if (qtyType.Contains("cộng đồn") || qtyType.Contains("cộng dồn"))
+            {
+                e.Appearance.BackColor = Color.FromArgb(255, 248, 220);
+                return;
+            }
+
+            if (qtyType.Contains("ohd"))
+            {
+                e.Appearance.BackColor = Color.White;
+                string field = e.Column.FieldName ?? string.Empty;
+                if (field.StartsWith("M") && decimal.TryParse(Convert.ToString(viewMaster.GetRowCellValue(e.RowHandle, e.Column)), out decimal ohdValue) && ohdValue > 0)
+                {
+                    e.Appearance.BackColor = Color.FromArgb(255, 230, 153);
+                }
+            }
+        }
+
+        private DataTable ReadXlsx(string filePath)
+        {
+            DataTable table = new DataTable();
+            using (ZipArchive archive = ZipFile.OpenRead(filePath))
+            {
+                List<string> sharedStrings = ReadSharedStrings(archive);
+                string sheetPath = GetFirstSheetPath(archive);
+                ZipArchiveEntry sheetEntry = archive.GetEntry(sheetPath);
+                if (sheetEntry == null) return table;
+
+                XmlDocument doc = new XmlDocument();
+                using (Stream stream = sheetEntry.Open())
+                {
+                    doc.Load(stream);
+                }
+
+                XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
+                ns.AddNamespace("x", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+                XmlNodeList rows = doc.SelectNodes("//x:sheetData/x:row", ns);
+                if (rows == null || rows.Count == 0) return table;
+
+                bool headerDone = false;
+                foreach (XmlNode row in rows)
+                {
+                    Dictionary<int, string> values = new Dictionary<int, string>();
+                    foreach (XmlNode cell in row.SelectNodes("x:c", ns))
+                    {
+                        string r = cell.Attributes?["r"]?.Value ?? string.Empty;
+                        int colIndex = GetColumnIndex(r);
+                        values[colIndex] = ReadCellValue(cell, ns, sharedStrings);
+                    }
+
+                    if (!headerDone)
+                    {
+                        int maxCol = values.Count == 0 ? 0 : values.Keys.Max();
+                        for (int i = 0; i <= maxCol; i++)
+                        {
+                            string colName = values.ContainsKey(i) ? values[i] : $"Column{i + 1}";
+                            if (string.IsNullOrWhiteSpace(colName)) colName = $"Column{i + 1}";
+                            if (table.Columns.Contains(colName)) colName += "_" + i;
+                            table.Columns.Add(colName);
+                        }
+                        headerDone = true;
+                        continue;
+                    }
+
+                    DataRow dr = table.NewRow();
+                    for (int i = 0; i < table.Columns.Count; i++)
+                    {
+                        dr[i] = values.ContainsKey(i) ? values[i] : string.Empty;
+                    }
+                    table.Rows.Add(dr);
+                }
+            }
+
+            return table;
+        }
+
+        private List<string> ReadSharedStrings(ZipArchive archive)
+        {
+            List<string> list = new List<string>();
+            ZipArchiveEntry entry = archive.GetEntry("xl/sharedStrings.xml");
+            if (entry == null) return list;
+
+            XmlDocument doc = new XmlDocument();
+            using (Stream stream = entry.Open())
+            {
+                doc.Load(stream);
+            }
+
+            XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
+            ns.AddNamespace("x", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+            XmlNodeList nodes = doc.SelectNodes("//x:sst/x:si", ns);
+            foreach (XmlNode node in nodes)
+            {
+                XmlNode t = node.SelectSingleNode(".//x:t", ns);
+                list.Add(t?.InnerText ?? string.Empty);
+            }
+            return list;
+        }
+
+        private string GetFirstSheetPath(ZipArchive archive)
+        {
+            XmlDocument wbDoc = new XmlDocument();
+            using (Stream s = archive.GetEntry("xl/workbook.xml").Open())
+            {
+                wbDoc.Load(s);
+            }
+
+            XmlNamespaceManager wbNs = new XmlNamespaceManager(wbDoc.NameTable);
+            wbNs.AddNamespace("x", "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
+            wbNs.AddNamespace("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
+            XmlNode firstSheet = wbDoc.SelectSingleNode("//x:sheets/x:sheet", wbNs);
+            string rId = firstSheet?.Attributes?["r:id"]?.Value;
+            if (string.IsNullOrWhiteSpace(rId)) return "xl/worksheets/sheet1.xml";
+
+            XmlDocument relDoc = new XmlDocument();
+            using (Stream s = archive.GetEntry("xl/_rels/workbook.xml.rels").Open())
+            {
+                relDoc.Load(s);
+            }
+
+            XmlNamespaceManager relNs = new XmlNamespaceManager(relDoc.NameTable);
+            relNs.AddNamespace("r", "http://schemas.openxmlformats.org/package/2006/relationships");
+            XmlNode relNode = relDoc.SelectSingleNode($"//r:Relationship[@Id='{rId}']", relNs);
+            string target = relNode?.Attributes?["Target"]?.Value ?? "worksheets/sheet1.xml";
+            return target.StartsWith("xl/") ? target : "xl/" + target.TrimStart('/');
+        }
+
+        private int GetColumnIndex(string cellRef)
+        {
+            if (string.IsNullOrWhiteSpace(cellRef)) return 0;
+            int i = 0;
+            while (i < cellRef.Length && char.IsLetter(cellRef[i])) i++;
+            string letters = cellRef.Substring(0, i).ToUpperInvariant();
+            int index = 0;
+            foreach (char c in letters) index = index * 26 + (c - 'A' + 1);
+            return Math.Max(0, index - 1);
+        }
+
+        private string ReadCellValue(XmlNode cell, XmlNamespaceManager ns, List<string> sharedStrings)
+        {
+            string type = cell.Attributes?["t"]?.Value ?? string.Empty;
+            XmlNode valNode = cell.SelectSingleNode("x:v", ns);
+            if (valNode == null) return string.Empty;
+            string raw = valNode.InnerText ?? string.Empty;
+            if (type == "s" && int.TryParse(raw, out int idx) && idx >= 0 && idx < sharedStrings.Count)
+            {
+                return sharedStrings[idx];
+            }
+            return raw;
         }
     }
 }

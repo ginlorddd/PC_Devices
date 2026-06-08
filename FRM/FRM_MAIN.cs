@@ -16,6 +16,7 @@ namespace DM_OHD.FRM
             btnAccount.Enabled = Constaint.IsAdmin() || Constaint.HasRole("ACCOUNT_MGMT");
             btnDieMaster.Enabled = Constaint.IsAdmin() || Constaint.HasRole("DIE_MST_MGMT");
             btnProductionPlan.Enabled = Constaint.IsAdmin() || Constaint.HasRole("PLAN_MGMT");
+            btnOhdAlert.Enabled = Constaint.IsAdmin() || Constaint.HasRole("PLAN_MGMT");
         }
 
         private void OpenChild<T>() where T : Form, new()
@@ -52,6 +53,11 @@ namespace DM_OHD.FRM
         private void btnProductionPlan_ItemClick(object sender, ItemClickEventArgs e)
         {
             OpenChild<FRM_PRODUCTION_PLAN>();
+        }
+
+        private void btnOhdAlert_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            OpenChild<FRM_OHD_ALERT>();
         }
     }
 }

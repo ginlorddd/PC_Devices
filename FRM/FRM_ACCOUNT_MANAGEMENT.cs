@@ -37,6 +37,7 @@ namespace DM_OHD.FRM
         {
             if (view.Columns["USER_ID"] != null) view.Columns["USER_ID"].Caption = "Mã tài khoản";
             if (view.Columns["FULL_NAME"] != null) view.Columns["FULL_NAME"].Caption = "Họ tên";
+            if (view.Columns["EMAIL"] != null) view.Columns["EMAIL"].Caption = "Email";
             if (view.Columns["IS_ACTIVE"] != null) view.Columns["IS_ACTIVE"].Caption = "Kích hoạt";
             if (view.Columns["ROLES"] != null) view.Columns["ROLES"].Caption = "Phân quyền";
             view.BestFitColumns();
@@ -62,7 +63,7 @@ namespace DM_OHD.FRM
         private void BtnSave_Click(object sender, EventArgs e)
         {
             List<string> roles = chkRoles.CheckedItems.Cast<CheckedListBoxItem>().Select(x => x.Value.ToString()).ToList();
-            _userDto.SaveUser(txtUser.Text.Trim(), txtName.Text.Trim(), txtPassword.Text, chkActive.Checked, roles);
+            _userDto.SaveUser(txtUser.Text.Trim(), txtName.Text.Trim(), txtEmail.Text.Trim(), txtPassword.Text, chkActive.Checked, roles);
             XtraMessageBox.Show("Lưu tài khoản thành công.");
             LoadUsers();
         }
@@ -73,6 +74,7 @@ namespace DM_OHD.FRM
 
             txtUser.Text = view.GetRowCellDisplayText(e.RowHandle, "USER_ID");
             txtName.Text = view.GetRowCellDisplayText(e.RowHandle, "FULL_NAME");
+            txtEmail.Text = view.GetRowCellDisplayText(e.RowHandle, "EMAIL");
             chkActive.Checked = view.GetRowCellValue(e.RowHandle, "IS_ACTIVE") != DBNull.Value && Convert.ToBoolean(view.GetRowCellValue(e.RowHandle, "IS_ACTIVE"));
             txtPassword.Text = string.Empty;
 

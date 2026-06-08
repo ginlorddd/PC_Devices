@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using DevExpress.XtraGrid.Columns;
 
 namespace DM_OHD.FRM
 {
@@ -57,21 +58,56 @@ namespace DM_OHD.FRM
             view.OptionsView.ShowAutoFilterRow = true;
             view.OptionsView.ShowGroupPanel = false;
             view.OptionsView.ColumnAutoWidth = false;
+            view.OptionsSelection.MultiSelect = true;
+            view.OptionsSelection.MultiSelectMode = GridMultiSelectMode.CheckBoxRowSelect;
+            view.OptionsSelection.CheckBoxSelectorColumnWidth = 36;
             view.Appearance.HeaderPanel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             view.Appearance.HeaderPanel.Options.UseFont = true;
         }
 
         private void ApplyColumnCaptions()
         {
+            if (view.Columns["ID"] != null) view.Columns["ID"].Visible = false;
+            if (view.Columns["STT"] != null) view.Columns["STT"].Caption = "STT";
             if (view.Columns["DIE_NO"] != null) view.Columns["DIE_NO"].Caption = "Số khuôn";
             if (view.Columns["DIE_NAME"] != null) view.Columns["DIE_NAME"].Caption = "Tên khuôn";
             if (view.Columns["TOTAL_CAVITY"] != null) view.Columns["TOTAL_CAVITY"].Caption = "Tổng số cavity";
             view.BestFitColumns();
         }
 
+        private void EnsureSttColumn()
+        {
+            if (view.Columns["STT"] == null)
+            {
+                GridColumn col = view.Columns.AddVisible("STT", "STT");
+                col.UnboundType = DevExpress.Data.UnboundColumnType.Integer;
+                col.OptionsColumn.AllowEdit = false;
+                col.VisibleIndex = 0;
+                col.Width = 55;
+                col.Fixed = DevExpress.XtraGrid.Columns.FixedStyle.Left;
+            }
+
+            view.CustomUnboundColumnData -= View_CustomUnboundColumnData;
+            view.CustomUnboundColumnData += View_CustomUnboundColumnData;
+        }
+
+        private void View_CustomUnboundColumnData(object sender, DevExpress.XtraGrid.Views.Base.CustomColumnDataEventArgs e)
+        {
+            if (e.Column.FieldName == "STT" && e.IsGetData)
+            {
+                e.Value = e.ListSourceRowIndex + 1;
+            }
+        }
+
         private void LoadData()
         {
             grid.DataSource = _dto.GetAll();
+            bool hasDataColumn = view.Columns.Cast<GridColumn>().Any(c => c.FieldName != "STT");
+            if (!hasDataColumn)
+            {
+                view.PopulateColumns();
+            }
+            EnsureSttColumn();
             ApplyColumnCaptions();
         }
 
@@ -79,12 +115,32 @@ namespace DM_OHD.FRM
         {
             _dto.Save(txtDieNo.Text.Trim(), txtDieName.Text.Trim(), Convert.ToInt32(spCavity.Value));
             LoadData();
+            XtraMessageBox.Show("Đã lưu dữ liệu khuôn.", "Thông báo");
         }
 
         private void BtnDelete_Click(object sender, EventArgs e)
         {
-            _dto.Delete(txtDieNo.Text.Trim());
+            int[] selectedRows = view.GetSelectedRows();
+            if (selectedRows != null && selectedRows.Length > 0)
+            {
+                int deletedCount = 0;
+                foreach (int rowHandle in selectedRows)
+                {
+                    if (rowHandle < 0) continue;
+                    object idValue = view.GetRowCellValue(rowHandle, "ID");
+                    if (!int.TryParse(Convert.ToString(idValue), out int id) || id <= 0) continue;
+                    _dto.DeleteById(id);
+                    deletedCount++;
+                }
+
+                LoadData();
+                XtraMessageBox.Show($"Đã xóa {deletedCount} dòng được chọn.");
+                return;
+            }
+
+            _dto.Delete(txtDieNo.Text.Trim(), txtDieName.Text.Trim());
             LoadData();
+            XtraMessageBox.Show("Đã xóa dữ liệu khuôn.", "Thông báo");
         }
 
         private void View_DoubleClick(object sender, EventArgs e)
@@ -117,6 +173,7 @@ namespace DM_OHD.FRM
                 DataTable source = ReadExcel(ofd.FileName);
                 int okCount = 0;
                 int skipCount = 0;
+                int emptyCount = 0;
 
                 foreach (DataRow row in source.Rows)
                 {
@@ -124,25 +181,45 @@ namespace DM_OHD.FRM
                     string dieName = GetFieldValue(row, "Tên khuôn", "ten khuon", "die_name", "die name");
                     string cavityText = GetFieldValue(row, "Tổng số cavity", "tong so cavity", "cavity", "total_cavity");
 
+                    bool isEmptyRow = string.IsNullOrWhiteSpace(dieNo)
+                                      && string.IsNullOrWhiteSpace(dieName)
+                                      && string.IsNullOrWhiteSpace(cavityText);
+                    if (isEmptyRow)
+                    {
+                        emptyCount++;
+                        continue;
+                    }
+
                     if (string.IsNullOrWhiteSpace(dieNo))
                     {
                         skipCount++;
                         continue;
                     }
 
-                    if (!int.TryParse(cavityText, out int cavity))
-                    {
-                        skipCount++;
-                        continue;
-                    }
-
+                    int cavity = ParseCavityValue(cavityText);
                     _dto.Save(dieNo.Trim(), dieName.Trim(), cavity);
                     okCount++;
                 }
 
                 LoadData();
-                XtraMessageBox.Show($"Import xong. Thành công: {okCount}, Bỏ qua: {skipCount}");
+                XtraMessageBox.Show($"Import xong. Thành công: {okCount}, Bỏ qua lỗi: {skipCount}, Dòng trống: {emptyCount}");
             }
+        }
+
+        private int ParseCavityValue(string cavityText)
+        {
+            string value = (cavityText ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(value) || value == "-") return 0;
+
+            if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.GetCultureInfo("vi-VN"), out decimal viValue))
+                return Math.Max(0, Convert.ToInt32(Math.Round(viValue, 0)));
+            if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.GetCultureInfo("en-US"), out decimal enValue))
+                return Math.Max(0, Convert.ToInt32(Math.Round(enValue, 0)));
+            if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal invValue))
+                return Math.Max(0, Convert.ToInt32(Math.Round(invValue, 0)));
+
+            string compact = value.Replace(".", "").Replace(",", "");
+            return int.TryParse(compact, out int compactValue) ? Math.Max(0, compactValue) : 0;
         }
 
         private string GetFieldValue(DataRow row, params string[] candidateHeaders)
