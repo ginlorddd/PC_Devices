@@ -71,6 +71,7 @@ namespace DM_OHD.DTO
 
         public DataTable GetRules()
         {
+            EnsureRuleWorkflowColumns();
             return DBUtils.GetData(@"SELECT ID,
                                            OWNER_USER_ID,
                                            ALERT_CONTENT,
@@ -85,7 +86,10 @@ namespace DM_OHD.DTO
                                            DUE_DAYS_210,
                                            DUE_DAYS_240,
                                            USE_MONTH_FIRST_DAY,
-                                           EXACT_DAY_IN_MONTH
+                                           EXACT_DAY_IN_MONTH,
+                                           SEND_MAIL_AFTER_FINAL_DONE,
+                                           MAIL_DELAY_DAYS,
+                                           RULE_NOTE
                                     FROM OHD_ALERT_RULE
                                     ORDER BY ID");
         }
@@ -97,12 +101,53 @@ namespace DM_OHD.DTO
 
         public void SaveRules(DataTable dt)
         {
+            EnsureRuleWorkflowColumns();
             if (dt == null) return;
             foreach (DataRow row in dt.Rows)
             {
-                if (row.RowState == DataRowState.Deleted) continue;
+                if (row.RowState == DataRowState.Deleted)
+                {
+                    int deletedId = ToInt(row["ID", DataRowVersion.Original]);
+                    if (deletedId > 0)
+                    {
+                        string deletedContent = Convert.ToString(row["ALERT_CONTENT", DataRowVersion.Original] ?? string.Empty);
+                        DBUtils.Exec("DELETE FROM OHD_ALERT_PROGRESS WHERE ISNULL(APPROVED,0)=0 AND ALERT_CONTENT=@C", new SqlParameter("@C", deletedContent));
+                        DBUtils.Exec("DELETE FROM OHD_ALERT_RULE WHERE ID=@ID", new SqlParameter("@ID", deletedId));
+                    }
+                    continue;
+                }
+
+                string owner = Convert.ToString(row["OWNER_USER_ID"] ?? string.Empty).Trim();
+                string content = Convert.ToString(row["ALERT_CONTENT"] ?? string.Empty).Trim();
+                if (string.IsNullOrWhiteSpace(content)) continue;
+
                 int id = ToInt(row["ID"]);
-                if (id <= 0) continue;
+                if (id <= 0)
+                {
+                    DBUtils.Exec(@"INSERT INTO OHD_ALERT_RULE(OWNER_USER_ID,ALERT_CONTENT,DUE_DAYS_30,DUE_DAYS_60,DUE_DAYS_90,DUE_DAYS_120,DUE_DAYS_150,DUE_DAYS_180,DUE_DAYS_210,DUE_DAYS_240,ALERT_BG_COLOR,ALERT_FG_COLOR,USE_MONTH_FIRST_DAY,EXACT_DAY_IN_MONTH,SEND_MAIL_AFTER_FINAL_DONE,MAIL_DELAY_DAYS,RULE_NOTE)
+                                   VALUES(@U,@C,@D30,@D60,@D90,@D120,@D150,@D180,@D210,@D240,@BG,@FG,@M1,@EX,@MAIL,@DELAY,@NOTE)",
+                        new SqlParameter("@U", owner),
+                        new SqlParameter("@C", content),
+                        new SqlParameter("@D30", ToInt(row["DUE_DAYS_30"])),
+                        new SqlParameter("@D60", ToInt(row["DUE_DAYS_60"])),
+                        new SqlParameter("@D90", ToInt(row["DUE_DAYS_90"])),
+                        new SqlParameter("@D120", ToInt(row["DUE_DAYS_120"])),
+                        new SqlParameter("@D150", ToInt(row["DUE_DAYS_150"])),
+                        new SqlParameter("@D180", ToInt(row["DUE_DAYS_180"])),
+                        new SqlParameter("@D210", ToInt(row["DUE_DAYS_210"])),
+                        new SqlParameter("@D240", ToInt(row["DUE_DAYS_240"])),
+                        new SqlParameter("@BG", NormalizeColor(row["ALERT_BG_COLOR"], "#FFF3CD")),
+                        new SqlParameter("@FG", NormalizeColor(row["ALERT_FG_COLOR"], "#7A4E00")),
+                        new SqlParameter("@M1", ToBool(row["USE_MONTH_FIRST_DAY"])),
+                        new SqlParameter("@EX", ToNullableInt(row["EXACT_DAY_IN_MONTH"])),
+                        new SqlParameter("@MAIL", ToBool(row["SEND_MAIL_AFTER_FINAL_DONE"])),
+                        new SqlParameter("@DELAY", Math.Max(0, ToInt(row["MAIL_DELAY_DAYS"]))),
+                        new SqlParameter("@NOTE", Convert.ToString(row["RULE_NOTE"] ?? string.Empty)));
+                    continue;
+                }
+
+                string originalContent = row.RowState == DataRowState.Modified ? Convert.ToString(row["ALERT_CONTENT", DataRowVersion.Original] ?? string.Empty) : content;
+
                 DBUtils.Exec(@"UPDATE OHD_ALERT_RULE
                                SET OWNER_USER_ID=@U,
                                    ALERT_CONTENT=@C,
@@ -117,10 +162,13 @@ namespace DM_OHD.DTO
                                    ALERT_BG_COLOR=@BG,
                                    ALERT_FG_COLOR=@FG,
                                    USE_MONTH_FIRST_DAY=@M1,
-                                   EXACT_DAY_IN_MONTH=@EX
+                                   EXACT_DAY_IN_MONTH=@EX,
+                                   SEND_MAIL_AFTER_FINAL_DONE=@MAIL,
+                                   MAIL_DELAY_DAYS=@DELAY,
+                                   RULE_NOTE=@NOTE
                                WHERE ID=@ID",
-                    new SqlParameter("@U", Convert.ToString(row["OWNER_USER_ID"] ?? string.Empty)),
-                    new SqlParameter("@C", Convert.ToString(row["ALERT_CONTENT"] ?? string.Empty)),
+                    new SqlParameter("@U", owner),
+                    new SqlParameter("@C", content),
                     new SqlParameter("@D30", ToInt(row["DUE_DAYS_30"])),
                     new SqlParameter("@D60", ToInt(row["DUE_DAYS_60"])),
                     new SqlParameter("@D90", ToInt(row["DUE_DAYS_90"])),
@@ -129,11 +177,23 @@ namespace DM_OHD.DTO
                     new SqlParameter("@D180", ToInt(row["DUE_DAYS_180"])),
                     new SqlParameter("@D210", ToInt(row["DUE_DAYS_210"])),
                     new SqlParameter("@D240", ToInt(row["DUE_DAYS_240"])),
-                    new SqlParameter("@BG", Convert.ToString(row["ALERT_BG_COLOR"] ?? "#FFF3CD")),
-                    new SqlParameter("@FG", Convert.ToString(row["ALERT_FG_COLOR"] ?? "#7A4E00")),
+                    new SqlParameter("@BG", NormalizeColor(row["ALERT_BG_COLOR"], "#FFF3CD")),
+                    new SqlParameter("@FG", NormalizeColor(row["ALERT_FG_COLOR"], "#7A4E00")),
                     new SqlParameter("@M1", ToBool(row["USE_MONTH_FIRST_DAY"])),
                     new SqlParameter("@EX", ToNullableInt(row["EXACT_DAY_IN_MONTH"])),
+                    new SqlParameter("@MAIL", ToBool(row["SEND_MAIL_AFTER_FINAL_DONE"])),
+                    new SqlParameter("@DELAY", Math.Max(0, ToInt(row["MAIL_DELAY_DAYS"]))),
+                    new SqlParameter("@NOTE", Convert.ToString(row["RULE_NOTE"] ?? string.Empty)),
                     new SqlParameter("@ID", id));
+
+                if (!string.Equals(originalContent, content, StringComparison.Ordinal))
+                {
+                    DBUtils.Exec(@"UPDATE OHD_ALERT_PROGRESS
+                                   SET ALERT_CONTENT=@NEW
+                                   WHERE ISNULL(APPROVED,0)=0 AND ALERT_CONTENT=@OLD",
+                        new SqlParameter("@NEW", content),
+                        new SqlParameter("@OLD", originalContent));
+                }
             }
         }
 
@@ -296,8 +356,53 @@ namespace DM_OHD.DTO
             }
         }
 
+        public int ApplyPostFinalCompletionMailRules()
+        {
+            EnsureRuleWorkflowColumns();
+            return DBUtils.Exec(@";WITH final_done AS (
+                                    SELECT DIE_NO,
+                                           NEXT_OHD_MOC,
+                                           CAST(TRACK_START_DATE AS date) AS TRACK_DATE,
+                                           MAX(COMPLETED_AT) AS FINAL_COMPLETED_AT
+                                    FROM OHD_ALERT_PROGRESS
+                                    WHERE ISNULL(APPROVED,0)=1
+                                      AND COMPLETED_AT IS NOT NULL
+                                      AND ALERT_CONTENT = N'Hoàn thiện part'
+                                    GROUP BY DIE_NO, NEXT_OHD_MOC, CAST(TRACK_START_DATE AS date)
+                                  ), mail_rule AS (
+                                    SELECT OWNER_USER_ID,
+                                           ALERT_CONTENT,
+                                           ALERT_BG_COLOR,
+                                           ALERT_FG_COLOR,
+                                           MAIL_DELAY_DAYS,
+                                           RULE_NOTE
+                                    FROM OHD_ALERT_RULE
+                                    WHERE ISNULL(SEND_MAIL_AFTER_FINAL_DONE,0)=1
+                                  )
+                                  UPDATE p
+                                  SET p.OWNER_USER_ID = r.OWNER_USER_ID,
+                                      p.ALERT_BG_COLOR = r.ALERT_BG_COLOR,
+                                      p.ALERT_FG_COLOR = r.ALERT_FG_COLOR,
+                                      p.DUE_DATE = DATEADD(day, ISNULL(r.MAIL_DELAY_DAYS,1), CAST(f.FINAL_COMPLETED_AT AS date)),
+                                      p.REVIEW_NOTE = CASE
+                                            WHEN ISNULL(p.APPROVED,0)=1 THEN p.REVIEW_NOTE
+                                            ELSE ISNULL(NULLIF(r.RULE_NOTE,''), N'Chờ gửi mail sau khi Hoàn thiện part được xác nhận OK')
+                                      END
+                                  FROM OHD_ALERT_PROGRESS p
+                                  INNER JOIN mail_rule r ON ISNULL(p.ALERT_CONTENT,'') = ISNULL(r.ALERT_CONTENT,'')
+                                  INNER JOIN final_done f ON f.DIE_NO = p.DIE_NO
+                                                         AND f.NEXT_OHD_MOC = p.NEXT_OHD_MOC
+                                                         AND f.TRACK_DATE = CAST(p.TRACK_START_DATE AS date)
+                                  WHERE ISNULL(CONVERT(varchar(10), p.DUE_DATE, 23),'') <> ISNULL(CONVERT(varchar(10), DATEADD(day, ISNULL(r.MAIL_DELAY_DAYS,1), CAST(f.FINAL_COMPLETED_AT AS date)), 23),'')
+                                     OR ISNULL(p.OWNER_USER_ID,'') <> ISNULL(r.OWNER_USER_ID,'')
+                                     OR ISNULL(p.ALERT_BG_COLOR,'') <> ISNULL(r.ALERT_BG_COLOR,'')
+                                     OR ISNULL(p.ALERT_FG_COLOR,'') <> ISNULL(r.ALERT_FG_COLOR,'')
+                                     OR (ISNULL(p.APPROVED,0)=0 AND ISNULL(p.REVIEW_NOTE,'') <> ISNULL(NULLIF(r.RULE_NOTE,''), N'Chờ gửi mail sau khi Hoàn thiện part được xác nhận OK'));");
+        }
+
         public int RefreshProgressFromPlan()
         {
+            EnsureRuleWorkflowColumns();
             return DBUtils.Exec(@";WITH src AS (
                                     SELECT p.DIE_NO,
                                            ISNULL(p.DIE_NAME,'') AS DIE_NAME,
@@ -447,6 +552,53 @@ namespace DM_OHD.DTO
 
             result.Rows.Add(summary);
             return result;
+        }
+
+        private void EnsureRuleWorkflowColumns()
+        {
+            DBUtils.Exec(@"IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'ALERT_BG_COLOR')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD ALERT_BG_COLOR NVARCHAR(20) NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_BG DEFAULT('#FFF3CD');
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'ALERT_FG_COLOR')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD ALERT_FG_COLOR NVARCHAR(20) NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_FG DEFAULT('#7A4E00');
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'DUE_DAYS_30')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD DUE_DAYS_30 INT NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_D30 DEFAULT(30);
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'DUE_DAYS_60')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD DUE_DAYS_60 INT NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_D60 DEFAULT(60);
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'DUE_DAYS_90')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD DUE_DAYS_90 INT NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_D90 DEFAULT(90);
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'DUE_DAYS_120')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD DUE_DAYS_120 INT NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_D120 DEFAULT(120);
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'DUE_DAYS_150')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD DUE_DAYS_150 INT NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_D150 DEFAULT(150);
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'DUE_DAYS_180')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD DUE_DAYS_180 INT NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_D180 DEFAULT(180);
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'DUE_DAYS_210')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD DUE_DAYS_210 INT NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_D210 DEFAULT(210);
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'DUE_DAYS_240')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD DUE_DAYS_240 INT NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_D240 DEFAULT(240);
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'USE_MONTH_FIRST_DAY')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD USE_MONTH_FIRST_DAY BIT NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_M1 DEFAULT(1);
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'EXACT_DAY_IN_MONTH')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD EXACT_DAY_IN_MONTH INT NULL;
+                          IF EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'OWNER_USER_ID' AND max_length < 1000)
+                              ALTER TABLE dbo.OHD_ALERT_RULE ALTER COLUMN OWNER_USER_ID NVARCHAR(500) NULL;
+                          IF EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_PROGRESS') AND name = 'OWNER_USER_ID' AND max_length < 1000)
+                              ALTER TABLE dbo.OHD_ALERT_PROGRESS ALTER COLUMN OWNER_USER_ID NVARCHAR(500) NULL;
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'SEND_MAIL_AFTER_FINAL_DONE')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD SEND_MAIL_AFTER_FINAL_DONE BIT NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_MAIL_FINAL DEFAULT(0);
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'MAIL_DELAY_DAYS')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD MAIL_DELAY_DAYS INT NOT NULL CONSTRAINT DF_OHD_ALERT_RULE_MAIL_DELAY DEFAULT(1);
+                          IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.OHD_ALERT_RULE') AND name = 'RULE_NOTE')
+                              ALTER TABLE dbo.OHD_ALERT_RULE ADD RULE_NOTE NVARCHAR(500) NULL;
+                          IF NOT EXISTS (SELECT 1 FROM dbo.OHD_ALERT_RULE WHERE ALERT_CONTENT = N'Check sau khi hoàn thiện')
+                              INSERT INTO dbo.OHD_ALERT_RULE(OWNER_USER_ID, ALERT_CONTENT, ALERT_BG_COLOR, ALERT_FG_COLOR, DUE_DAYS_30, DUE_DAYS_60, DUE_DAYS_90, DUE_DAYS_120, DUE_DAYS_150, DUE_DAYS_180, DUE_DAYS_210, DUE_DAYS_240, USE_MONTH_FIRST_DAY, SEND_MAIL_AFTER_FINAL_DONE, MAIL_DELAY_DAYS, RULE_NOTE)
+                              VALUES (N'Kỹ sư', N'Check sau khi hoàn thiện', '#FFF2CC', '#7A4E00', 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, N'Gửi mail vào ngày hôm sau khi mục số 5 được xác nhận OK');");
+        }
+
+        private string NormalizeColor(object value, string fallback)
+        {
+            string text = Convert.ToString(value ?? string.Empty).Trim();
+            return string.IsNullOrWhiteSpace(text) ? fallback : text;
         }
 
         private int ToInt(object value) => int.TryParse(Convert.ToString(value), out int x) ? x : 0;

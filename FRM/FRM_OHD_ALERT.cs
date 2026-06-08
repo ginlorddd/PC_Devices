@@ -135,7 +135,8 @@ namespace DM_OHD.FRM
         private void BtnSave_Click(object sender, EventArgs e)
         {
             _dto.SaveProgress(grid.DataSource as DataTable);
-            XtraMessageBox.Show("Đã lưu cảnh báo tiến độ.");
+            int mailRuleAffected = _dto.ApplyPostFinalCompletionMailRules();
+            XtraMessageBox.Show($"Đã lưu cảnh báo tiến độ.{Environment.NewLine}Đã áp dụng quy tắc gửi mail sau Hoàn thiện part: {Math.Max(0, mailRuleAffected)} dòng.");
             LoadData();
         }
 

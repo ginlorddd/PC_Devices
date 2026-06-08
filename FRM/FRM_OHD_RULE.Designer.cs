@@ -7,7 +7,9 @@ namespace DM_OHD.FRM
         private DevExpress.XtraGrid.Views.Grid.GridView view;
         private DevExpress.XtraEditors.PanelControl panelTop;
         private DevExpress.XtraEditors.SimpleButton btnSave;
-        private DevExpress.XtraEditors.Repository.RepositoryItemLookUpEdit cboOwner;
+        private DevExpress.XtraEditors.SimpleButton btnAdd;
+        private DevExpress.XtraEditors.SimpleButton btnDelete;
+        private DevExpress.XtraEditors.Repository.RepositoryItemCheckedComboBoxEdit cboOwner;
         private DevExpress.XtraEditors.Repository.RepositoryItemColorPickEdit colorBgEdit;
         private DevExpress.XtraEditors.Repository.RepositoryItemColorPickEdit colorFgEdit;
 
@@ -23,7 +25,9 @@ namespace DM_OHD.FRM
             this.view = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.panelTop = new DevExpress.XtraEditors.PanelControl();
             this.btnSave = new DevExpress.XtraEditors.SimpleButton();
-            this.cboOwner = new DevExpress.XtraEditors.Repository.RepositoryItemLookUpEdit();
+            this.btnAdd = new DevExpress.XtraEditors.SimpleButton();
+            this.btnDelete = new DevExpress.XtraEditors.SimpleButton();
+            this.cboOwner = new DevExpress.XtraEditors.Repository.RepositoryItemCheckedComboBoxEdit();
             this.colorBgEdit = new DevExpress.XtraEditors.Repository.RepositoryItemColorPickEdit();
             this.colorFgEdit = new DevExpress.XtraEditors.Repository.RepositoryItemColorPickEdit();
             ((System.ComponentModel.ISupportInitialize)(this.grid)).BeginInit();
@@ -37,9 +41,17 @@ namespace DM_OHD.FRM
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTop.Size = new System.Drawing.Size(1100, 44);
             this.panelTop.Controls.Add(this.btnSave);
+            this.panelTop.Controls.Add(this.btnAdd);
+            this.panelTop.Controls.Add(this.btnDelete);
             this.btnSave.Location = new System.Drawing.Point(12, 9);
             this.btnSave.Size = new System.Drawing.Size(130, 26);
             this.btnSave.Text = "Lưu quy tắc";
+            this.btnAdd.Location = new System.Drawing.Point(150, 9);
+            this.btnAdd.Size = new System.Drawing.Size(110, 26);
+            this.btnAdd.Text = "Thêm quy tắc";
+            this.btnDelete.Location = new System.Drawing.Point(268, 9);
+            this.btnDelete.Size = new System.Drawing.Size(110, 26);
+            this.btnDelete.Text = "Xóa quy tắc";
             this.grid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grid.Location = new System.Drawing.Point(0, 44);
             this.grid.MainView = this.view;
