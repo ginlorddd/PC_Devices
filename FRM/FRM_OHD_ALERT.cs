@@ -14,6 +14,8 @@ namespace DM_OHD.FRM
     public partial class FRM_OHD_ALERT : XtraForm
     {
         private readonly OhdAlertDTO _dto = new OhdAlertDTO();
+        private DateTime _lastAutoUpdateAt = DateTime.MinValue;
+        private bool _isAutoUpdating;
 
         public FRM_OHD_ALERT()
         {
@@ -29,6 +31,7 @@ namespace DM_OHD.FRM
             deFrom.EditValue = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             deTo.EditValue = new DateTime(DateTime.Today.Year + 1, 12, 1);
             Load += FRM_OHD_ALERT_Load;
+            Activated += FRM_OHD_ALERT_Activated;
         }
 
         private void ConfigureMonthEditor(DateEdit editor)
@@ -50,6 +53,32 @@ namespace DM_OHD.FRM
             {
                 btnConfigMail.ToolTip = "Chỉ tài khoản ADMIN mới được cấu hình mail.";
             }
+            AutoUpdateProgressFromPlan();
+        }
+
+        private void FRM_OHD_ALERT_Activated(object sender, EventArgs e)
+        {
+            AutoUpdateProgressFromPlan();
+        }
+
+        private void AutoUpdateProgressFromPlan()
+        {
+            if (_isAutoUpdating || (DateTime.Now - _lastAutoUpdateAt).TotalSeconds < 5)
+            {
+                return;
+            }
+
+            _isAutoUpdating = true;
+            try
+            {
+                UpdateProgressFromPlan(false);
+                _lastAutoUpdateAt = DateTime.Now;
+            }
+            finally
+            {
+                _isAutoUpdating = false;
+            }
+
             LoadData();
         }
 
@@ -70,6 +99,12 @@ namespace DM_OHD.FRM
         }
 
         private void BtnUpdate_Click(object sender, EventArgs e)
+        {
+            UpdateProgressFromPlan(true);
+            LoadData();
+        }
+
+        private void UpdateProgressFromPlan(bool showSummary)
         {
             DataTable obsolete = _dto.GetObsoleteProgressRows();
             int deleted = 0;
@@ -103,14 +138,21 @@ namespace DM_OHD.FRM
 
             int inserted = _dto.RefreshProgressFromPlan();
             int affected = _dto.ApplyRulesToAllProgress();
+            int mailAffected = _dto.ApplyPostFinalCompletionMailRules();
+
+            if (!showSummary)
+            {
+                return;
+            }
 
             XtraMessageBox.Show(
                 $"Đã cập nhật khuôn vào bảng cảnh báo: {Math.Max(0, inserted)} dòng."
                 + Environment.NewLine
                 + $"Đã xóa dòng cảnh báo cũ: {Math.Max(0, deleted)} dòng."
                 + Environment.NewLine
-                + $"Đã áp dụng lại quy tắc (bao gồm Due Date): {Math.Max(0, affected)} dòng.");
-            LoadData();
+                + $"Đã áp dụng lại quy tắc (bao gồm Due Date): {Math.Max(0, affected)} dòng."
+                + Environment.NewLine
+                + $"Đã áp dụng quy tắc gửi mail sau Hoàn thiện part: {Math.Max(0, mailAffected)} dòng.");
         }
 
         private void BtnApprove_Click(object sender, EventArgs e)
