@@ -111,6 +111,7 @@ namespace JigFlow.Forms
         private void btnJigRegisterHistory_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_REGISTER_HISTORY_LIST));
         private void btnJigNotChecked_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_NOT_CHECKED_LIST));
         private void btnJigCheckHistory_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_CHECK_HISTORY_LIST));
+        private void btnJigEditHistory_ItemClick(object sender, ItemClickEventArgs e) => OpenOrActivate(typeof(FRM_JIG_EDIT_HISTORY_LIST));
         private void btnJigCancelRegister_ItemClick(object sender, ItemClickEventArgs e)
         {
             using (var FORM = new FRM_JIG_CANCEL_REGISTER())

@@ -49,6 +49,7 @@ namespace JigFlow.Forms
             gvHistory.Columns.AddVisible("JIG_TYPE_NAME", "Loại Jig");
             gvHistory.Columns.AddVisible("JIG_SIZE", "Size");
             gvHistory.Columns.AddVisible("USE_PRODUCT", "Sản phẩm sử dụng");
+            gvHistory.Columns.AddVisible("PURPOSE_USE", "Mục đích sử dụng");
             gvHistory.Columns.AddVisible("LOCATION_CODE", "Vị trí");
             gvHistory.Columns.AddVisible("DEPARTMENT", "Bộ phận đăng ký");
             gvHistory.Columns.AddVisible("REQUEST_AT", "Ngày đăng ký");

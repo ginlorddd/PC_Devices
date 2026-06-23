@@ -28,6 +28,7 @@ namespace JigFlow.Forms
             this.btnJigRegisterHistory = new DevExpress.XtraBars.BarButtonItem();
             this.btnJigNotChecked = new DevExpress.XtraBars.BarButtonItem();
             this.btnJigCheckHistory = new DevExpress.XtraBars.BarButtonItem();
+            this.btnJigEditHistory = new DevExpress.XtraBars.BarButtonItem();
             this.btnJigCancelRegister = new DevExpress.XtraBars.BarButtonItem();
             this.btnJigCancelWaitingApprove = new DevExpress.XtraBars.BarButtonItem();
             this.btnJigCancelHistory = new DevExpress.XtraBars.BarButtonItem();
@@ -39,6 +40,7 @@ namespace JigFlow.Forms
             this.rpgRegister = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.rpgCheck = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.rpgCancel = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
+            this.rpgMasterConfig = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.rpgSystem = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.ribbonStatusBar1 = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
             this.xtraTabbedMdiManager1 = new DevExpress.XtraTabbedMdi.XtraTabbedMdiManager(this.components);
@@ -70,6 +72,7 @@ namespace JigFlow.Forms
                 this.btnJigRegisterHistory,
                 this.btnJigNotChecked,
                 this.btnJigCheckHistory,
+                this.btnJigEditHistory,
                 this.btnJigCancelRegister,
                 this.btnJigCancelWaitingApprove,
                 this.btnJigCancelHistory,
@@ -77,7 +80,7 @@ namespace JigFlow.Forms
                 this.btnFormMaster,
                 this.btnJigTypeMaster});
             this.ribbonControl1.Location = new System.Drawing.Point(0, 0);
-            this.ribbonControl1.MaxItemId = 21;
+            this.ribbonControl1.MaxItemId = 22;
             this.ribbonControl1.Name = "ribbonControl1";
             this.ribbonControl1.PageHeaderItemLinks.Add(this.subUser);
             this.ribbonControl1.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] { this.ribbonPage1 });
@@ -112,6 +115,7 @@ namespace JigFlow.Forms
             this.btnJigRegisterHistory.Caption = "Lịch sử đăng ký Jig"; this.btnJigRegisterHistory.Id = 12; this.btnJigRegisterHistory.Name = "btnJigRegisterHistory"; this.btnJigRegisterHistory.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnJigRegisterHistory_ItemClick);
             this.btnJigNotChecked.Caption = "Jig chưa được kiểm tra"; this.btnJigNotChecked.Id = 13; this.btnJigNotChecked.Name = "btnJigNotChecked"; this.btnJigNotChecked.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnJigNotChecked_ItemClick);
             this.btnJigCheckHistory.Caption = "Lịch sử kiểm tra Jig"; this.btnJigCheckHistory.Id = 14; this.btnJigCheckHistory.Name = "btnJigCheckHistory"; this.btnJigCheckHistory.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnJigCheckHistory_ItemClick);
+            this.btnJigEditHistory.Caption = "Lịch sử sửa đổi Jig"; this.btnJigEditHistory.Id = 21; this.btnJigEditHistory.Name = "btnJigEditHistory"; this.btnJigEditHistory.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnJigEditHistory_ItemClick);
             this.btnJigCancelRegister.Caption = "Đăng ký hủy Jig"; this.btnJigCancelRegister.Id = 15; this.btnJigCancelRegister.Name = "btnJigCancelRegister"; this.btnJigCancelRegister.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnJigCancelRegister_ItemClick);
             this.btnJigCancelWaitingApprove.Caption = "Jig hủy chờ duyệt"; this.btnJigCancelWaitingApprove.Id = 16; this.btnJigCancelWaitingApprove.Name = "btnJigCancelWaitingApprove"; this.btnJigCancelWaitingApprove.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnJigCancelWaitingApprove_ItemClick);
             this.btnJigCancelHistory.Caption = "Lịch sử hủy Jig"; this.btnJigCancelHistory.Id = 17; this.btnJigCancelHistory.Name = "btnJigCancelHistory"; this.btnJigCancelHistory.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnJigCancelHistory_ItemClick);
@@ -125,15 +129,13 @@ namespace JigFlow.Forms
                 this.rpgRegister,
                 this.rpgCheck,
                 this.rpgCancel,
+                this.rpgMasterConfig,
                 this.rpgSystem});
             this.ribbonPage1.Name = "ribbonPage1";
             this.ribbonPage1.Text = "JigFlow";
 
             this.rpgMaster.ItemLinks.Add(this.btnJigFunctionList);
             this.rpgMaster.ItemLinks.Add(this.btnJigVisualList);
-            this.rpgMaster.ItemLinks.Add(this.btnJigDrawing);
-            this.rpgMaster.ItemLinks.Add(this.btnFormMaster);
-            this.rpgMaster.ItemLinks.Add(this.btnJigTypeMaster);
             this.rpgMaster.Text = "Master";
 
             this.rpgRegister.ItemLinks.Add(this.btnJigRegisterList);
@@ -143,12 +145,18 @@ namespace JigFlow.Forms
 
             this.rpgCheck.ItemLinks.Add(this.btnJigNotChecked);
             this.rpgCheck.ItemLinks.Add(this.btnJigCheckHistory);
+            this.rpgCheck.ItemLinks.Add(this.btnJigEditHistory);
             this.rpgCheck.Text = "Định kỳ kiểm tra Jig";
 
             this.rpgCancel.ItemLinks.Add(this.btnJigCancelRegister);
             this.rpgCancel.ItemLinks.Add(this.btnJigCancelWaitingApprove);
             this.rpgCancel.ItemLinks.Add(this.btnJigCancelHistory);
             this.rpgCancel.Text = "Hủy Jig";
+
+            this.rpgMasterConfig.ItemLinks.Add(this.btnFormMaster);
+            this.rpgMasterConfig.ItemLinks.Add(this.btnJigTypeMaster);
+            this.rpgMasterConfig.ItemLinks.Add(this.btnJigDrawing);
+            this.rpgMasterConfig.Text = "Master";
 
             this.rpgSystem.ItemLinks.Add(this.btnAccountManagement);
             this.rpgSystem.Text = "Hệ thống";
@@ -206,6 +214,7 @@ namespace JigFlow.Forms
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgRegister;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgCheck;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgCancel;
+        private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgMasterConfig;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup rpgSystem;
         private DevExpress.XtraBars.Ribbon.RibbonStatusBar ribbonStatusBar1;
         private DevExpress.XtraTabbedMdi.XtraTabbedMdiManager xtraTabbedMdiManager1;
@@ -223,6 +232,7 @@ namespace JigFlow.Forms
         private DevExpress.XtraBars.BarButtonItem btnJigRegisterHistory;
         private DevExpress.XtraBars.BarButtonItem btnJigNotChecked;
         private DevExpress.XtraBars.BarButtonItem btnJigCheckHistory;
+        private DevExpress.XtraBars.BarButtonItem btnJigEditHistory;
         private DevExpress.XtraBars.BarButtonItem btnJigCancelRegister;
         private DevExpress.XtraBars.BarButtonItem btnJigCancelWaitingApprove;
         private DevExpress.XtraBars.BarButtonItem btnJigCancelHistory;

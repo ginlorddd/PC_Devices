@@ -1,7 +1,11 @@
 using DevExpress.XtraGrid.Views.Grid;
 using JigFlow.Data;
 using System;
+using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace JigFlow.Forms
@@ -9,6 +13,7 @@ namespace JigFlow.Forms
     public partial class FRM_JIG_NOT_CHECKED_LIST : DevExpress.XtraEditors.XtraForm
     {
         private readonly JigFunctionService _service = new JigFunctionService();
+        private readonly FormMasterService _formService = new FormMasterService();
 
         public FRM_JIG_NOT_CHECKED_LIST()
         {
@@ -29,6 +34,7 @@ namespace JigFlow.Forms
             VIEW.Appearance.HeaderPanel.Options.UseFont = true;
             VIEW.OptionsView.ColumnAutoWidth = false;
             VIEW.RowCellStyle += GvJig_RowCellStyle;
+            VIEW.DoubleClick += GvJig_DoubleClick;
         }
 
         private void LoadData()
@@ -109,20 +115,95 @@ namespace JigFlow.Forms
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            var ROW_HANDLE = gvJig.FocusedRowHandle;
-            if (ROW_HANDLE < 0) return;
-            var CONTROL_NO = Convert.ToString(gvJig.GetRowCellValue(ROW_HANDLE, "CONTROL_NO"));
-            if (string.IsNullOrWhiteSpace(CONTROL_NO)) return;
-
-            using (var FORM = new FRM_JIG_REGISTER(CONTROL_NO.Trim()))
-            {
-                FORM.ShowDialog(this);
-            }
+            OpenAndFillCheckForm();
         }
 
         private void btnClose_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void GvJig_DoubleClick(object sender, EventArgs e)
+        {
+            var hit = gvJig.CalcHitInfo(gvJig.GridControl.PointToClient(Cursor.Position));
+            if (!hit.InRowCell || hit.Column == null) return;
+            if (!string.Equals(hit.Column.FieldName, "CHECK_RESULT", StringComparison.OrdinalIgnoreCase)) return;
+            OpenAndFillCheckForm();
+        }
+
+        private void OpenAndFillCheckForm()
+        {
+            var rowHandle = gvJig.FocusedRowHandle;
+            if (rowHandle < 0) return;
+
+            var jigTypeCode = Convert.ToString(gvJig.GetRowCellValue(rowHandle, "JIG_TYPE_CODE"));
+            var reportFormCode = Convert.ToString(gvJig.GetRowCellValue(rowHandle, "REPORT_FORM_CODE"));
+            var controlNo = Convert.ToString(gvJig.GetRowCellValue(rowHandle, "CONTROL_NO"));
+            var jigName = Convert.ToString(gvJig.GetRowCellValue(rowHandle, "JIG_NAME"));
+            var nextCheckDate = Convert.ToString(gvJig.GetRowCellValue(rowHandle, "NEXT_CHECK_PLAN_DATE"));
+            if (string.IsNullOrWhiteSpace(jigTypeCode) || string.IsNullOrWhiteSpace(controlNo))
+            {
+                MessageBox.Show("Thiếu dữ liệu Jig Type hoặc Control No.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DataRow formRow = null;
+            if (!string.IsNullOrWhiteSpace(reportFormCode))
+            {
+                formRow = _formService.GetFormByCode(reportFormCode);
+            }
+
+            if (formRow == null)
+            {
+                MessageBox.Show("Jig này chưa có Form Master trong Jig Master. Vui lòng cấu hình từ FRM Register trước khi nhập kết quả kiểm tra.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var templatePath = Convert.ToString(formRow["TEMPLATE_FILE_PATH"]);
+            if (string.IsNullOrWhiteSpace(templatePath) || !File.Exists(templatePath))
+            {
+                MessageBox.Show("Không tìm thấy file form mẫu.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var outputFolder = Path.Combine(StorageConfig.FolderFileUpload, "CheckResultForms", controlNo, DateTime.Now.ToString("yyyyMM"));
+            Directory.CreateDirectory(outputFolder);
+            var outputPath = Path.Combine(outputFolder, $"{controlNo}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+            File.Copy(templatePath, outputPath, true);
+
+            FillExcelByCell(outputPath,
+                Convert.ToString(formRow["PART_NAME_CELL"]), jigName,
+                Convert.ToString(formRow["CONTROL_NO_CELL"]), controlNo,
+                Convert.ToString(formRow["CHECK_DATE_CELL"]), string.IsNullOrWhiteSpace(nextCheckDate) ? DateTime.Now.ToString("dd-MM-yyyy") : Convert.ToDateTime(nextCheckDate).ToString("dd-MM-yyyy"));
+
+            Process.Start(outputPath);
+        }
+
+        private void FillExcelByCell(string filePath, string partCell, string partValue, string noCell, string noValue, string dateCell, string dateValue)
+        {
+            Type excelType = Type.GetTypeFromProgID("Excel.Application");
+            if (excelType == null) throw new InvalidOperationException("Máy chưa cài Microsoft Excel.");
+            dynamic excel = Activator.CreateInstance(excelType);
+            dynamic wb = null;
+            dynamic ws = null;
+            try
+            {
+                excel.DisplayAlerts = false;
+                wb = excel.Workbooks.Open(filePath);
+                ws = wb.Worksheets[1];
+                if (!string.IsNullOrWhiteSpace(partCell)) ws.Range[partCell].Value = partValue;
+                if (!string.IsNullOrWhiteSpace(noCell)) ws.Range[noCell].Value = noValue;
+                if (!string.IsNullOrWhiteSpace(dateCell)) ws.Range[dateCell].Value = dateValue;
+                wb.Save();
+            }
+            finally
+            {
+                if (wb != null) wb.Close();
+                excel.Quit();
+                if (ws != null) Marshal.ReleaseComObject(ws);
+                if (wb != null) Marshal.ReleaseComObject(wb);
+                Marshal.ReleaseComObject(excel);
+            }
         }
     }
 }

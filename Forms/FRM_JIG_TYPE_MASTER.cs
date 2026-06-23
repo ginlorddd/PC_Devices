@@ -123,8 +123,15 @@ namespace JigFlow.Forms
                 var targetFolder = Path.Combine(StorageConfig.FolderFileUpload, "JigDrawings", CODE);
                 Directory.CreateDirectory(targetFolder);
                 var targetFile = Path.Combine(targetFolder, Path.GetFileName(sourcePath));
-                File.Copy(sourcePath, targetFile, true);
-                storedPath = targetFile;
+                var sourceFullPath = Path.GetFullPath(sourcePath);
+                var targetFullPath = Path.GetFullPath(targetFile);
+
+                if (!string.Equals(sourceFullPath, targetFullPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    File.Copy(sourceFullPath, targetFullPath, true);
+                }
+
+                storedPath = targetFullPath;
             }
 
             _service.UpsertJigTypeMaster(CODE, NAME, TYPE_MAIN, drawingCode, drawingName, storedPath, chkIsActive.Checked);
