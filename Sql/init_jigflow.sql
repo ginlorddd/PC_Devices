@@ -251,7 +251,8 @@ IF COL_LENGTH('dbo.FORM_MASTER', 'IS_DEFAULT') IS NOT NULL
 BEGIN
     -- chuyển logic default từ FORM_MASTER sang JIG_TYPE_MASTER
     -- giữ cột cũ để tương thích, không sử dụng trong logic mới
-END;
+    PRINT N'FORM_MASTER.IS_DEFAULT exists; kept for compatibility.'
+END
 
 
 
@@ -446,7 +447,7 @@ AND NOT EXISTS
     SELECT 1
     FROM dbo.ROLE_PERMISSIONS RP
     WHERE RP.ROLE_CODE = 'APPROVER' AND RP.MENU_CODE = M.MENU_CODE
-)
+);
 
 /****** Grant view-only for MEMBER on operational menus ******/
 INSERT INTO dbo.ROLE_PERMISSIONS(ROLE_CODE, MENU_CODE, CAN_VIEW, CAN_CREATE, CAN_EDIT, CAN_DELETE)
@@ -463,4 +464,4 @@ AND NOT EXISTS
     SELECT 1
     FROM dbo.ROLE_PERMISSIONS RP
     WHERE RP.ROLE_CODE = 'MEMBER' AND RP.MENU_CODE = M.MENU_CODE
-)
+);

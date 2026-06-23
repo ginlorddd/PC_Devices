@@ -16,7 +16,6 @@ SELECT
     JM.JIG_NAME,
     COALESCE(JTM.JIG_TYPE_NAME, JM.JIG_TYPE) AS JIG_TYPE_NAME,
     JM.JIG_TYPE_CODE,
-    JM.REPORT_FORM_CODE,
     JM.JIG_SIZE,
     JM.USE_PRODUCT,
     JM.PURPOSE_USE,
@@ -69,6 +68,8 @@ ORDER BY JM.JIG_ID";
 
         public DataTable GetNotCheckedJigs(DateTime MONTH_REFERENCE)
         {
+            EnsureReportFormCodeColumn();
+
             var MONTH_START = new DateTime(MONTH_REFERENCE.Year, MONTH_REFERENCE.Month, 1);
             var NEXT_MONTH_START = MONTH_START.AddMonths(1);
 
@@ -80,6 +81,7 @@ SELECT
     JM.JIG_NAME,
     COALESCE(JTM.JIG_TYPE_NAME, JM.JIG_TYPE) AS JIG_TYPE_NAME,
     JM.JIG_TYPE_CODE,
+    JM.REPORT_FORM_CODE,
     JM.JIG_SIZE,
     JM.NEXT_CHECK_PLAN_DATE,
     JM.USE_SECTION,
@@ -94,6 +96,14 @@ ORDER BY JM.NEXT_CHECK_PLAN_DATE, JM.JIG_ID;";
             return DbUtils.GetData(
                 SQL_QUERY,
                 new SqlParameter("@NEXT_MONTH_START", NEXT_MONTH_START));
+        }
+
+        private void EnsureReportFormCodeColumn()
+        {
+            const string SQL_QUERY = @"
+IF COL_LENGTH('dbo.JIG_MASTER', 'REPORT_FORM_CODE') IS NULL
+    ALTER TABLE dbo.JIG_MASTER ADD REPORT_FORM_CODE VARCHAR(100) NULL";
+            DbUtils.Execute(SQL_QUERY);
         }
 
         public DataTable GetJigCheckHistory()
